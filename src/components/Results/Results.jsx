@@ -1,6 +1,5 @@
 import { getBestDates, getVoteSummary } from '../../utils/pollHelpers';
-import { formatDate } from '../../utils/dateHelpers';
-import DateSummary from './DateSummary';
+import { format, parseISO } from 'date-fns';
 
 function Results({ dates }) {
   const bestDates = getBestDates(dates);
@@ -21,126 +20,82 @@ function Results({ dates }) {
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-4">
-      <div className="mb-3">
-        <h3 className="text-lg font-bold text-gray-900 mb-1">Quick Results</h3>
-        <p className="text-sm text-gray-600">
-          {totalVoters} {totalVoters === 1 ? 'person has' : 'people have'} voted so far
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-base font-bold text-gray-900">Results</h3>
+        <p className="text-xs text-gray-600">
+          {totalVoters} {totalVoters === 1 ? 'voter' : 'voters'}
         </p>
       </div>
 
-      {/* Best Dates */}
-      <div className="space-y-3">
-        {bestDates.slice(0, 2).map((dateData, index) => {
+      {/* Grid of Results */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+        {bestDates.map((dateData, index) => {
           const summary = getVoteSummary(dateData.votes);
           const hasVotes = dateData.votes.length > 0;
+          const totalVotes = summary.yes + summary.maybe + summary.no;
 
           return (
             <div
               key={dateData.id}
-              className={`border rounded-md p-3 ${
+              className={`border rounded-md p-2 relative ${
                 index === 0 && hasVotes
-                  ? 'border-green-300 bg-green-50'
-                  : 'border-gray-200'
+                  ? 'border-green-400 bg-green-50'
+                  : 'border-gray-200 bg-white'
               }`}
             >
-              <div className="flex justify-between items-start mb-2">
-                <div>
-                  <h4 className="text-sm font-semibold text-gray-900">
-                    {formatDate(dateData.date)}
-                    {index === 0 && hasVotes && (
-                      <span className="ml-2 text-xs font-medium text-green-700">
-                        🏆 Best
-                      </span>
-                    )}
-                  </h4>
+              {/* Best Badge */}
+              {index === 0 && hasVotes && (
+                <div className="absolute -top-1.5 -right-1.5 bg-green-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                  🏆 BEST
                 </div>
-                <div className="text-xs text-gray-600">
-                  {dateData.votes.length} {dateData.votes.length === 1 ? 'vote' : 'votes'}
+              )}
+
+              {/* Date */}
+              <div className="mb-1.5">
+                <div className="text-xs font-semibold text-gray-900 leading-tight">
+                  {format(parseISO(dateData.date), 'EEE, MMM d')}
+                </div>
+                <div className="text-[10px] text-gray-500">
+                  {format(parseISO(dateData.date), 'yyyy')}
                 </div>
               </div>
 
-              {/* Vote Bars - Compact */}
+              {/* Vote Counts */}
               {hasVotes ? (
-                <div className="space-y-1.5">
-                  {/* Yes Bar */}
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-medium text-green-700 w-14">
-                      Yes ({summary.yes})
-                    </span>
-                    <div className="flex-1 bg-gray-200 rounded-full h-4 overflow-hidden">
-                      <div
-                        className="bg-green-500 h-full flex items-center justify-end px-1.5 transition-all duration-300"
-                        style={{
-                          width: `${(summary.yes / dateData.votes.length) * 100}%`,
-                        }}
-                      >
-                        {summary.yes > 0 && (
-                          <span className="text-[10px] font-medium text-white">
-                            {Math.round((summary.yes / dateData.votes.length) * 100)}%
-                          </span>
-                        )}
-                      </div>
+                <div className="flex gap-1 flex-wrap">
+                  {summary.yes > 0 && (
+                    <div className="inline-flex items-center gap-0.5 bg-green-100 text-green-800 px-1.5 py-0.5 rounded text-[11px] font-medium">
+                      <span>✓</span>
+                      <span>{summary.yes}</span>
                     </div>
-                  </div>
-
-                  {/* Maybe Bar */}
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-medium text-yellow-700 w-14">
-                      Maybe ({summary.maybe})
-                    </span>
-                    <div className="flex-1 bg-gray-200 rounded-full h-4 overflow-hidden">
-                      <div
-                        className="bg-yellow-500 h-full flex items-center justify-end px-1.5 transition-all duration-300"
-                        style={{
-                          width: `${(summary.maybe / dateData.votes.length) * 100}%`,
-                        }}
-                      >
-                        {summary.maybe > 0 && (
-                          <span className="text-[10px] font-medium text-white">
-                            {Math.round((summary.maybe / dateData.votes.length) * 100)}%
-                          </span>
-                        )}
-                      </div>
+                  )}
+                  {summary.maybe > 0 && (
+                    <div className="inline-flex items-center gap-0.5 bg-yellow-100 text-yellow-800 px-1.5 py-0.5 rounded text-[11px] font-medium">
+                      <span>?</span>
+                      <span>{summary.maybe}</span>
                     </div>
-                  </div>
-
-                  {/* No Bar */}
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-medium text-red-700 w-14">
-                      No ({summary.no})
-                    </span>
-                    <div className="flex-1 bg-gray-200 rounded-full h-4 overflow-hidden">
-                      <div
-                        className="bg-red-500 h-full flex items-center justify-end px-1.5 transition-all duration-300"
-                        style={{
-                          width: `${(summary.no / dateData.votes.length) * 100}%`,
-                        }}
-                      >
-                        {summary.no > 0 && (
-                          <span className="text-[10px] font-medium text-white">
-                            {Math.round((summary.no / dateData.votes.length) * 100)}%
-                          </span>
-                        )}
-                      </div>
+                  )}
+                  {summary.no > 0 && (
+                    <div className="inline-flex items-center gap-0.5 bg-red-100 text-red-800 px-1.5 py-0.5 rounded text-[11px] font-medium">
+                      <span>✗</span>
+                      <span>{summary.no}</span>
                     </div>
-                  </div>
-
-                  {/* Voter List */}
-                  <DateSummary votes={dateData.votes} />
+                  )}
                 </div>
               ) : (
-                <p className="text-xs text-gray-500 italic">No votes yet</p>
+                <div className="text-[10px] text-gray-400 italic">No votes</div>
+              )}
+
+              {/* Total votes indicator */}
+              {hasVotes && (
+                <div className="mt-1 text-[10px] text-gray-500">
+                  {totalVotes} {totalVotes === 1 ? 'vote' : 'votes'}
+                </div>
               )}
             </div>
           );
         })}
       </div>
-
-      {bestDates.length > 2 && (
-        <p className="mt-3 text-xs text-gray-500 text-center">
-          Showing top 2 dates
-        </p>
-      )}
     </div>
   );
 }
