@@ -105,25 +105,25 @@ function PollView() {
 
       {/* Name Input Section - Prominent and Clear */}
       {!voterName ? (
-        <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg shadow-lg p-6 text-white">
-          <div className="flex items-start gap-4">
-            <div className="flex-shrink-0 w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center text-2xl">
+        <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg shadow-lg p-4 sm:p-6 text-white">
+          <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
+            <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center text-xl sm:text-2xl">
               👤
             </div>
-            <div className="flex-1">
-              <h3 className="text-xl font-bold mb-2">
+            <div className="flex-1 w-full">
+              <h3 className="text-lg sm:text-xl font-bold mb-2">
                 Step 1: Enter Your Name
               </h3>
-              <p className="text-blue-100 mb-4">
+              <p className="text-blue-100 text-sm sm:text-base mb-4">
                 Please provide your name to start voting and commenting on dates. This helps everyone see who has voted.
               </p>
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <input
                   type="text"
                   value={tempName}
                   onChange={(e) => setTempName(e.target.value)}
                   placeholder="Enter your name (e.g., John Smith)"
-                  className="flex-1 px-4 py-3 rounded-md text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-blue-600"
+                  className="flex-1 px-4 py-3 rounded-md bg-white text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-blue-600 w-full"
                   autoFocus
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') handleSaveName();
@@ -132,7 +132,7 @@ function PollView() {
                 <button
                   onClick={handleSaveName}
                   disabled={!tempName.trim()}
-                  className="px-6 py-3 bg-white text-blue-600 font-semibold rounded-md hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="w-full sm:w-auto px-6 py-3 bg-white text-blue-600 font-semibold rounded-md hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
                 >
                   Continue
                 </button>
