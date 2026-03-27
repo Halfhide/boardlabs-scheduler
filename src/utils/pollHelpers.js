@@ -1,4 +1,4 @@
-import { doc, setDoc, getDoc, updateDoc, arrayUnion } from 'firebase/firestore';
+import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
 import { nanoid } from 'nanoid';
 import { db } from '../firebase';
 

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { format } from 'date-fns';
 
-function CommentSection({ comments, pollId, dateId, voterName, onComment }) {
+function CommentSection({ comments, dateId, voterName, onComment }) {
   const [commentText, setCommentText] = useState('');
   const [loading, setLoading] = useState(false);
 

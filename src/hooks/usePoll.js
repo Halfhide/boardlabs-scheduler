@@ -9,13 +9,11 @@ import { db } from '../firebase';
  */
 export function usePoll(pollId) {
   const [poll, setPoll] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(!!pollId);
+  const [error, setError] = useState(!pollId ? 'No poll ID provided' : null);
 
   useEffect(() => {
     if (!pollId) {
-      setError('No poll ID provided');
-      setLoading(false);
       return;
     }
 
