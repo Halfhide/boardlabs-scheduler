@@ -3,9 +3,39 @@ service cloud.firestore {
   match /databases/{database}/documents {
     match /polls/{pollId} {
       allow read: if true;
-      allow create: if true;
-      allow update: if true;
+
+      // Anyone can create a poll, but only with the expected shape
+      // and within size limits
+      allow create: if
+        request.resource.data.keys().hasOnly(['id', 'title', 'createdAt', 'dates']) &&
+        request.resource.data.id == pollId &&
+        request.resource.data.title is string &&
+        request.resource.data.title.size() > 0 &&
+        request.resource.data.title.size() <= 100 &&
+        request.resource.data.createdAt is timestamp &&
+        request.resource.data.dates is list &&
+        request.resource.data.dates.size() > 0 &&
+        request.resource.data.dates.size() <= 92;
+
+      // Updates may only touch the dates array (votes and comments).
+      // The poll's id, title and creation time are immutable, and the
+      // set of dates cannot grow or shrink.
+      allow update: if
+        request.resource.data.keys().hasOnly(['id', 'title', 'createdAt', 'dates']) &&
+        request.resource.data.id == resource.data.id &&
+        request.resource.data.title == resource.data.title &&
+        request.resource.data.createdAt == resource.data.createdAt &&
+        request.resource.data.dates is list &&
+        request.resource.data.dates.size() == resource.data.dates.size();
+
       allow delete: if false;
     }
   }
 }
+
+// Note: without authentication these rules cannot stop a determined
+// visitor from rewriting votes inside the dates array of a poll whose
+// link they have. They do prevent retitling or resizing polls, deleting
+// them, creating malformed or oversized documents, and touching any
+// other collection. This app is intended for friendly groups, not
+// adversarial environments.

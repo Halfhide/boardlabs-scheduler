@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPoll } from '../../utils/pollHelpers';
 import { generateDateRange } from '../../utils/dateHelpers';
 import confetti from 'canvas-confetti';
+
+const MAX_RANGE_DAYS = 92;
 
 function CreatePoll() {
   const [title, setTitle] = useState('');
@@ -11,6 +13,17 @@ function CreatePoll() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const confettiIntervalRef = useRef(null);
+
+  // Stop the fireworks (and the delayed navigation) if the user
+  // leaves the page before the animation finishes
+  useEffect(() => {
+    return () => {
+      if (confettiIntervalRef.current) {
+        clearInterval(confettiIntervalRef.current);
+      }
+    };
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -44,6 +57,12 @@ function CreatePoll() {
         return;
       }
 
+      if (dates.length > MAX_RANGE_DAYS) {
+        setError(`Date range is too long (${dates.length} days). Please choose a range of ${MAX_RANGE_DAYS} days or less.`);
+        setLoading(false);
+        return;
+      }
+
       // Create poll in Firebase
       const pollId = await createPoll(title, dates);
 
@@ -56,11 +75,12 @@ function CreatePoll() {
         return Math.random() * (max - min) + min;
       }
 
-      const interval = setInterval(function() {
+      confettiIntervalRef.current = setInterval(function() {
         const timeLeft = animationEnd - Date.now();
 
         if (timeLeft <= 0) {
-          clearInterval(interval);
+          clearInterval(confettiIntervalRef.current);
+          confettiIntervalRef.current = null;
           // Navigate to the poll page after fireworks
           navigate(`/poll/${pollId}`);
           return;
@@ -104,6 +124,7 @@ function CreatePoll() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="e.g., Board Game Night - January"
+            maxLength={100}
             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             disabled={loading}
           />
@@ -133,6 +154,7 @@ function CreatePoll() {
               type="date"
               id="endDate"
               value={endDate}
+              min={startDate || undefined}
               onChange={(e) => setEndDate(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               disabled={loading}

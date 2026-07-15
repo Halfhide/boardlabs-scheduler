@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 function CommentSection({ comments, dateId, voterName, onComment }) {
   const [commentText, setCommentText] = useState('');
   const [loading, setLoading] = useState(false);
+  const [submitError, setSubmitError] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -11,12 +12,13 @@ function CommentSection({ comments, dateId, voterName, onComment }) {
     if (!commentText.trim() || !voterName) return;
 
     setLoading(true);
+    setSubmitError(false);
     try {
       await onComment(dateId, commentText.trim());
       setCommentText('');
     } catch (error) {
       console.error('Error adding comment:', error);
-      alert('Failed to add comment. Please try again.');
+      setSubmitError(true);
     } finally {
       setLoading(false);
     }
@@ -63,6 +65,12 @@ function CommentSection({ comments, dateId, voterName, onComment }) {
           {loading ? 'Sending...' : 'Send'}
         </button>
       </form>
+
+      {submitError && (
+        <p className="text-xs text-red-600">
+          Failed to add comment. Please try again.
+        </p>
+      )}
 
       {!voterName && (
         <p className="text-xs text-gray-500 italic">

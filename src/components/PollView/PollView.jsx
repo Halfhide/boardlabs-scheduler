@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { nanoid } from 'nanoid';
 import { usePoll } from '../../hooks/usePoll';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { addVote, addComment } from '../../utils/pollHelpers';
@@ -14,26 +15,34 @@ function PollView() {
   const { pollId } = useParams();
   const { poll, loading, error } = usePoll(pollId);
   const [voterName, setVoterName] = useLocalStorage('voterName', '');
+  // Stable per-browser voter ID so votes survive renames and two
+  // voters with the same name don't overwrite each other
+  const [voterId] = useLocalStorage('voterId', nanoid(8));
   const [tempName, setTempName] = useState('');
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDateId, setSelectedDateId] = useState(null);
+  const [copied, setCopied] = useState(false);
 
   // Generate shareable link
   const pollUrl = `${window.location.origin}/poll/${pollId}`;
 
   const handleVote = async (dateId, response) => {
-    if (!voterName) {
-      alert('Please enter your name first');
-      return;
-    }
-    await addVote(pollId, dateId, voterName, response);
+    if (!voterName) return;
+    await addVote(pollId, dateId, { id: voterId, name: voterName }, response);
   };
 
   const handleComment = async (dateId, text) => {
-    if (!voterName) {
-      alert('Please enter your name first');
-      return;
+    if (!voterName) return;
+    await addComment(pollId, dateId, { id: voterId, name: voterName }, text);
+  };
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(pollUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
     }
-    await addComment(pollId, dateId, voterName, text);
   };
 
   const handleSaveName = () => {
@@ -51,7 +60,7 @@ function PollView() {
   };
 
   const handleDateClick = (dateData) => {
-    setSelectedDate(dateData);
+    setSelectedDateId(dateData.id);
   };
 
   if (loading) {
@@ -73,6 +82,11 @@ function PollView() {
 
   const sortedDates = sortDates(poll.dates);
 
+  // Derive the selected date from live poll data so the modal
+  // reflects real-time vote and comment updates
+  const selectedDate =
+    sortedDates.find((d) => d.id === selectedDateId) ?? null;
+
   return (
     <div className="space-y-6">
       {/* Poll Header */}
@@ -82,23 +96,10 @@ function PollView() {
 
           {/* Subtle Share Button */}
           <button
-            onClick={async () => {
-              try {
-                await navigator.clipboard.writeText(pollUrl);
-                // Simple feedback without intrusive message
-                const btn = document.activeElement;
-                const originalText = btn.textContent;
-                btn.textContent = '✓ Copied!';
-                setTimeout(() => {
-                  btn.textContent = originalText;
-                }, 2000);
-              } catch (err) {
-                console.error('Failed to copy:', err);
-              }
-            }}
+            onClick={handleCopyLink}
             className="text-sm text-blue-600 hover:text-blue-700 font-medium px-3 py-1 rounded-md hover:bg-blue-50 transition-colors"
           >
-            📋 Share Poll
+            {copied ? '✓ Copied!' : '📋 Share Poll'}
           </button>
         </div>
       </div>
@@ -107,7 +108,7 @@ function PollView() {
       {!voterName ? (
         <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg shadow-lg p-4 sm:p-6 text-white">
           <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
-            <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center text-xl sm:text-2xl">
+            <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-full flex items-center justify-center text-xl sm:text-2xl">
               👤
             </div>
             <div className="flex-1 w-full">
@@ -176,6 +177,7 @@ function PollView() {
         </h3>
         <Calendar
           dates={sortedDates}
+          voterId={voterId}
           voterName={voterName}
           onDateClick={handleDateClick}
         />
@@ -188,11 +190,11 @@ function PollView() {
       {selectedDate && (
         <DateModal
           dateData={selectedDate}
-          pollId={pollId}
+          voterId={voterId}
           voterName={voterName}
           onVote={handleVote}
           onComment={handleComment}
-          onClose={() => setSelectedDate(null)}
+          onClose={() => setSelectedDateId(null)}
         />
       )}
     </div>

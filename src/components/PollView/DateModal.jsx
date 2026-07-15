@@ -1,21 +1,33 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import VoteButton from './VoteButton';
 import CommentSection from './CommentSection';
 import { formatDate } from '../../utils/dateHelpers';
-import { getVoteSummary } from '../../utils/pollHelpers';
+import { getVoteSummary, findUserVote } from '../../utils/pollHelpers';
 import confetti from 'canvas-confetti';
 
-function DateModal({ dateData, pollId, voterName, onVote, onComment, onClose }) {
+function DateModal({ dateData, voterId, voterName, onVote, onComment, onClose }) {
   const [loading, setLoading] = useState(false);
   const [justVoted, setJustVoted] = useState(false);
   const [votingFor, setVotingFor] = useState(null);
+  const [voteError, setVoteError] = useState(false);
+
+  // Close on Escape and lock background scroll while the modal is open
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = '';
+    };
+  }, [onClose]);
 
   if (!dateData) return null;
 
   // Find current user's vote
-  const currentUserVote = dateData.votes.find(
-    (v) => v.voterName === voterName
-  );
+  const currentUserVote = findUserVote(dateData.votes, voterId, voterName);
 
   const voteSummary = getVoteSummary(dateData.votes);
 
@@ -24,6 +36,7 @@ function DateModal({ dateData, pollId, voterName, onVote, onComment, onClose }) 
 
     setLoading(true);
     setVotingFor(response);
+    setVoteError(false);
 
     try {
       await onVote(dateData.id, response);
@@ -60,7 +73,7 @@ function DateModal({ dateData, pollId, voterName, onVote, onComment, onClose }) 
       // Keep success message visible - don't auto-hide
     } catch (error) {
       console.error('Error voting:', error);
-      alert('Failed to vote. Please try again.');
+      setVoteError(true);
       setJustVoted(false);
     } finally {
       setLoading(false);
@@ -72,10 +85,13 @@ function DateModal({ dateData, pollId, voterName, onVote, onComment, onClose }) 
   const displayedVote = votingFor || currentUserVote?.response;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50" onClick={onClose}>
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50" onClick={onClose}>
       <div
         className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-label={formatDate(dateData.date)}
       >
         {/* Header */}
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-start">
@@ -130,6 +146,15 @@ function DateModal({ dateData, pollId, voterName, onVote, onComment, onClose }) 
               </div>
             )}
 
+            {/* Error Message */}
+            {voteError && (
+              <div className="bg-red-50 border border-red-200 rounded-md p-3 mb-3">
+                <p className="text-sm text-red-800 font-medium">
+                  Failed to save your vote. Please try again.
+                </p>
+              </div>
+            )}
+
             {/* Success Message */}
             {justVoted && (
               <div className="bg-green-50 border border-green-200 rounded-md p-3 mb-3 animate-bounce-in">
@@ -180,7 +205,6 @@ function DateModal({ dateData, pollId, voterName, onVote, onComment, onClose }) 
             </h4>
             <CommentSection
               comments={dateData.comments}
-              pollId={pollId}
               dateId={dateData.id}
               voterName={voterName}
               onComment={onComment}

@@ -1,4 +1,4 @@
-import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, setDoc, runTransaction } from 'firebase/firestore';
 import { nanoid } from 'nanoid';
 import { db } from '../firebase';
 
@@ -34,65 +34,92 @@ export async function createPoll(title, dateStrings) {
 }
 
 /**
+ * Check whether a vote belongs to a voter. Matches by stable voter ID,
+ * falling back to name for votes recorded before voter IDs existed.
+ */
+function isVoteByVoter(vote, voterId, voterName) {
+  return vote.voterId ? vote.voterId === voterId : vote.voterName === voterName;
+}
+
+/**
+ * Find a voter's existing vote in a list of votes
+ * @param {Array} votes - Array of vote objects
+ * @param {string} voterId - Stable per-browser voter ID
+ * @param {string} voterName - Voter's display name
+ * @returns {Object|undefined} The voter's vote, if any
+ */
+export function findUserVote(votes, voterId, voterName) {
+  return votes.find(v => isVoteByVoter(v, voterId, voterName));
+}
+
+/**
  * Add a vote to a specific date
  * @param {string} pollId - Poll ID
  * @param {string} dateId - Date ID
- * @param {string} voterName - Voter's name
+ * @param {{id: string, name: string}} voter - Voter identity
  * @param {string} response - Vote response ('yes', 'no', or 'maybe')
  */
-export async function addVote(pollId, dateId, voterName, response) {
+export async function addVote(pollId, dateId, voter, response) {
   try {
     const pollRef = doc(db, 'polls', pollId);
-    const pollSnap = await getDoc(pollRef);
 
-    if (!pollSnap.exists()) {
-      throw new Error('Poll not found');
-    }
+    // Run inside a transaction so concurrent voters don't overwrite
+    // each other's changes to the dates array
+    await runTransaction(db, async (transaction) => {
+      const pollSnap = await transaction.get(pollRef);
 
-    const poll = pollSnap.data();
-    const dateIndex = poll.dates.findIndex(d => d.id === dateId);
+      if (!pollSnap.exists()) {
+        throw new Error('Poll not found');
+      }
 
-    if (dateIndex === -1) {
-      throw new Error('Date not found');
-    }
+      const poll = pollSnap.data();
+      const dateIndex = poll.dates.findIndex(d => d.id === dateId);
 
-    // Check if voter already voted on this date
-    const existingVoteIndex = poll.dates[dateIndex].votes.findIndex(
-      v => v.voterName === voterName
-    );
+      if (dateIndex === -1) {
+        throw new Error('Date not found');
+      }
 
-    let updatedVotes;
-    if (existingVoteIndex !== -1) {
-      // Update existing vote
-      updatedVotes = [...poll.dates[dateIndex].votes];
-      updatedVotes[existingVoteIndex] = {
-        id: updatedVotes[existingVoteIndex].id,
-        voterName,
-        response,
-        timestamp: new Date()
-      };
-    } else {
-      // Add new vote
-      updatedVotes = [
-        ...poll.dates[dateIndex].votes,
-        {
-          id: nanoid(8),
-          voterName,
+      // Check if voter already voted on this date
+      const existingVoteIndex = poll.dates[dateIndex].votes.findIndex(
+        v => isVoteByVoter(v, voter.id, voter.name)
+      );
+
+      let updatedVotes;
+      if (existingVoteIndex !== -1) {
+        // Update existing vote (stamping the voter ID onto legacy
+        // name-only votes)
+        updatedVotes = [...poll.dates[dateIndex].votes];
+        updatedVotes[existingVoteIndex] = {
+          id: updatedVotes[existingVoteIndex].id,
+          voterId: voter.id,
+          voterName: voter.name,
           response,
           timestamp: new Date()
-        }
-      ];
-    }
+        };
+      } else {
+        // Add new vote
+        updatedVotes = [
+          ...poll.dates[dateIndex].votes,
+          {
+            id: nanoid(8),
+            voterId: voter.id,
+            voterName: voter.name,
+            response,
+            timestamp: new Date()
+          }
+        ];
+      }
 
-    // Update the entire dates array
-    const updatedDates = [...poll.dates];
-    updatedDates[dateIndex] = {
-      ...updatedDates[dateIndex],
-      votes: updatedVotes
-    };
+      // Update the entire dates array
+      const updatedDates = [...poll.dates];
+      updatedDates[dateIndex] = {
+        ...updatedDates[dateIndex],
+        votes: updatedVotes
+      };
 
-    await updateDoc(pollRef, {
-      dates: updatedDates
+      transaction.update(pollRef, {
+        dates: updatedDates
+      });
     });
   } catch (error) {
     console.error('Error adding vote:', error);
@@ -104,41 +131,47 @@ export async function addVote(pollId, dateId, voterName, response) {
  * Add a comment to a specific date
  * @param {string} pollId - Poll ID
  * @param {string} dateId - Date ID
- * @param {string} voterName - Commenter's name
+ * @param {{id: string, name: string}} voter - Commenter identity
  * @param {string} text - Comment text
  */
-export async function addComment(pollId, dateId, voterName, text) {
+export async function addComment(pollId, dateId, voter, text) {
   try {
     const pollRef = doc(db, 'polls', pollId);
-    const pollSnap = await getDoc(pollRef);
 
-    if (!pollSnap.exists()) {
-      throw new Error('Poll not found');
-    }
+    // Run inside a transaction so concurrent writers don't overwrite
+    // each other's changes to the dates array
+    await runTransaction(db, async (transaction) => {
+      const pollSnap = await transaction.get(pollRef);
 
-    const poll = pollSnap.data();
-    const dateIndex = poll.dates.findIndex(d => d.id === dateId);
+      if (!pollSnap.exists()) {
+        throw new Error('Poll not found');
+      }
 
-    if (dateIndex === -1) {
-      throw new Error('Date not found');
-    }
+      const poll = pollSnap.data();
+      const dateIndex = poll.dates.findIndex(d => d.id === dateId);
 
-    const newComment = {
-      id: nanoid(8),
-      voterName,
-      text,
-      timestamp: new Date()
-    };
+      if (dateIndex === -1) {
+        throw new Error('Date not found');
+      }
 
-    // Update the entire dates array with new comment
-    const updatedDates = [...poll.dates];
-    updatedDates[dateIndex] = {
-      ...updatedDates[dateIndex],
-      comments: [...updatedDates[dateIndex].comments, newComment]
-    };
+      const newComment = {
+        id: nanoid(8),
+        voterId: voter.id,
+        voterName: voter.name,
+        text,
+        timestamp: new Date()
+      };
 
-    await updateDoc(pollRef, {
-      dates: updatedDates
+      // Update the entire dates array with new comment
+      const updatedDates = [...poll.dates];
+      updatedDates[dateIndex] = {
+        ...updatedDates[dateIndex],
+        comments: [...updatedDates[dateIndex].comments, newComment]
+      };
+
+      transaction.update(pollRef, {
+        dates: updatedDates
+      });
     });
   } catch (error) {
     console.error('Error adding comment:', error);
@@ -177,6 +210,12 @@ export function getBestDates(dates) {
     const aNo = a.votes.filter(v => v.response === 'no').length;
     const bNo = b.votes.filter(v => v.response === 'no').length;
 
-    return aNo - bNo;
+    if (aNo !== bNo) return aNo - bNo;
+
+    // Finally, prefer more maybe votes
+    const aMaybe = a.votes.filter(v => v.response === 'maybe').length;
+    const bMaybe = b.votes.filter(v => v.response === 'maybe').length;
+
+    return bMaybe - aMaybe;
   });
 }

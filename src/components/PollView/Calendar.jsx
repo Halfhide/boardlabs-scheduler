@@ -1,7 +1,7 @@
-import { format, parseISO, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, subMonths } from 'date-fns';
-import { getVoteSummary } from '../../utils/pollHelpers';
+import { format, parseISO, startOfMonth, endOfMonth, eachDayOfInterval, eachMonthOfInterval, isSameMonth, isSameDay } from 'date-fns';
+import { getVoteSummary, findUserVote } from '../../utils/pollHelpers';
 
-function MonthCalendar({ monthDate, dates, voterName, onDateClick }) {
+function MonthCalendar({ monthDate, dates, voterId, voterName, onDateClick }) {
   const monthStart = startOfMonth(monthDate);
   const monthEnd = endOfMonth(monthDate);
 
@@ -31,7 +31,7 @@ function MonthCalendar({ monthDate, dates, voterName, onDateClick }) {
   const getUserVote = (day) => {
     const dateData = dates.find(d => isSameDay(parseISO(d.date), day));
     if (!dateData || !voterName) return null;
-    const userVote = dateData.votes.find(v => v.voterName === voterName);
+    const userVote = findUserVote(dateData.votes, voterId, voterName);
     return userVote?.response;
   };
 
@@ -44,8 +44,8 @@ function MonthCalendar({ monthDate, dates, voterName, onDateClick }) {
 
       {/* Week day headers */}
       <div className="grid grid-cols-7 mb-1">
-        {weekDays.map(day => (
-          <div key={day} className="text-center text-xs font-semibold text-gray-500 py-1">
+        {weekDays.map((day, index) => (
+          <div key={index} className="text-center text-xs font-semibold text-gray-500 py-1">
             {day}
           </div>
         ))}
@@ -117,22 +117,17 @@ function MonthCalendar({ monthDate, dates, voterName, onDateClick }) {
   );
 }
 
-function Calendar({ dates, voterName, onDateClick }) {
-  // Find the range of poll dates to determine which months to show
+function Calendar({ dates, voterId, voterName, onDateClick }) {
+  if (dates.length === 0) {
+    return null;
+  }
+
+  // Show every month that contains at least one poll date
   const pollDates = dates.map(d => parseISO(d.date)).sort((a, b) => a - b);
-  const firstPollDate = pollDates[0];
-  const lastPollDate = pollDates[pollDates.length - 1];
-
-  // Calculate the middle date of the poll range
-  const middlePollDate = new Date((firstPollDate.getTime() + lastPollDate.getTime()) / 2);
-
-  // Show 3 months: previous month, middle month, next month
-  const middleMonth = startOfMonth(middlePollDate);
-  const prevMonth = subMonths(middleMonth, 1);
-  const nextMonth = new Date(middleMonth);
-  nextMonth.setMonth(nextMonth.getMonth() + 1);
-
-  const months = [prevMonth, middleMonth, nextMonth];
+  const months = eachMonthOfInterval({
+    start: pollDates[0],
+    end: pollDates[pollDates.length - 1]
+  });
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
@@ -160,13 +155,14 @@ function Calendar({ dates, voterName, onDateClick }) {
         </div>
       </div>
 
-      {/* 3-Month Calendar Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Calendar Grid - one panel per month in the poll range */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {months.map((month) => (
           <MonthCalendar
             key={month.toISOString()}
             monthDate={month}
             dates={dates}
+            voterId={voterId}
             voterName={voterName}
             onDateClick={onDateClick}
           />

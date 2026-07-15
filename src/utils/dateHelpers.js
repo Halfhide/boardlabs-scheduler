@@ -1,4 +1,4 @@
-import { format, parseISO } from 'date-fns';
+import { format, parseISO, eachDayOfInterval, isValid } from 'date-fns';
 
 /**
  * Format a date string to a readable format
@@ -21,16 +21,18 @@ export function formatDate(dateString) {
  * @returns {string[]} Array of ISO date strings
  */
 export function generateDateRange(startDate, endDate) {
-  const dates = [];
-  let current = new Date(startDate);
-  const end = new Date(endDate);
+  const start = parseISO(startDate);
+  const end = parseISO(endDate);
 
-  while (current <= end) {
-    dates.push(current.toISOString().split('T')[0]);
-    current.setDate(current.getDate() + 1);
+  if (!isValid(start) || !isValid(end) || start > end) {
+    return [];
   }
 
-  return dates;
+  // date-fns handles DST transitions correctly, unlike manual
+  // setDate() arithmetic which can duplicate or skip days
+  return eachDayOfInterval({ start, end }).map(day =>
+    format(day, 'yyyy-MM-dd')
+  );
 }
 
 /**

@@ -11,6 +11,16 @@ export function usePoll(pollId) {
   const [poll, setPoll] = useState(null);
   const [loading, setLoading] = useState(!!pollId);
   const [error, setError] = useState(!pollId ? 'No poll ID provided' : null);
+  const [prevPollId, setPrevPollId] = useState(pollId);
+
+  // Reset state during render when the poll ID changes, so a stale
+  // poll is never shown while the new one is loading
+  if (prevPollId !== pollId) {
+    setPrevPollId(pollId);
+    setPoll(null);
+    setLoading(!!pollId);
+    setError(!pollId ? 'No poll ID provided' : null);
+  }
 
   useEffect(() => {
     if (!pollId) {

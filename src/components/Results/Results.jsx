@@ -8,11 +8,12 @@ function Results({ dates }) {
     return null;
   }
 
-  // Get total unique voters
+  // Get total unique voters (by stable ID, falling back to name for
+  // votes recorded before voter IDs existed)
   const allVoters = new Set();
   dates.forEach(date => {
     date.votes.forEach(vote => {
-      allVoters.add(vote.voterName);
+      allVoters.add(vote.voterId || vote.voterName);
     });
   });
 
