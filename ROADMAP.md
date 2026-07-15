@@ -33,6 +33,7 @@ features were proposed, 11 accepted, 4 rejected (see bottom).
 | 6 | My polls list        | 2     | done        |
 | 7 | Player capacity      | 3     | done        |
 | 8 | Game voting          | 3     | done        |
+| 12 | BGG game search     | 3     | not started |
 | 9 | Polish + i18n        | 4     | not started |
 | 10 | PWA install         | 4     | not started |
 | 11 | Google sign-in      | 5     | not started |
@@ -274,6 +275,43 @@ Acceptance criteria:
 - Suggesting, voting, and unvoting work live for multiple users;
   legacy polls without a games field keep working.
 
+### 12. BoardGameGeek game search (added 15 Jul 2026 on Adam's request)
+
+Status: not started
+Depends on: game voting (feature 8, done).
+
+Goal: when suggesting a game, typing its name shows live suggestions
+from the BoardGameGeek database; picking one fills the title and the
+BGG link automatically.
+
+Scope:
+- Autocomplete on the GameVoting title input: debounce keystrokes
+  (~300ms, min 2-3 chars), query BGG, show a dropdown of matches
+  (name + year to disambiguate editions), keyboard and click
+  selection, and a way to dismiss and keep free text (typing a game
+  BGG does not know must keep working).
+- On selection, fill the title and set the link to
+  https://boardgamegeek.com/boardgame/<id>.
+- BGG XML API2 (https://boardgamegeek.com/xmlapi2/search?query=...&
+  type=boardgame) needs no API key BUT sends no CORS headers, so the
+  browser cannot call it directly. Add a Vercel serverless function
+  (api/bgg-search.js) that proxies the query, parses the XML and
+  returns trimmed JSON ({id, name, year}[]). This is the repo's
+  first backend code; note that `npm run dev` alone will not serve
+  it (use `vercel dev`, or a small Vite dev proxy fallback).
+- Be polite to BGG: cancel stale requests, cap results (~10), and
+  handle their 202 "try again" responses and rate limiting
+  gracefully (fail silent to free-text entry, never block the form).
+- Optional nice-to-have if cheap: fetch min/max players for the
+  selected game (xmlapi2/thing) and hint the creator about the
+  capacity setting (feature 7).
+
+Acceptance criteria:
+- Typing shows relevant BGG suggestions; selecting one fills title
+  and link; free-text suggestions still work when BGG is down or has
+  no match; the deployed app works on Vercel (proxy function included
+  in the deployment).
+
 ## Phase 4: Reach
 
 ### 9. Polish + i18n
@@ -367,3 +405,6 @@ Acceptance criteria: defined during its planning session.
 - 15 Jul 2026: feature 8 (game voting) implemented and verified in
   the browser with two voters; phase 3 complete. firebase-rules.txt
   updated again (one manual deploy covers everything to date).
+- 15 Jul 2026: Adam requested a Game Voting extension: live game
+  name autocomplete from the BoardGameGeek API. Added as feature 12
+  in phase 3 (next in line before phase 4).
