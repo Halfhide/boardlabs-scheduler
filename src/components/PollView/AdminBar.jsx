@@ -11,6 +11,7 @@ function AdminBar({
   onToggleClosed,
   onSetDeadline,
   onClearDeadline,
+  onSetCapacity,
   onUnfinalize
 }) {
   const [titleDraft, setTitleDraft] = useState(poll.title);
@@ -18,6 +19,8 @@ function AdminBar({
   const [deadlineDraft, setDeadlineDraft] = useState(
     deadlineDate ? format(deadlineDate, "yyyy-MM-dd'T'HH:mm") : ''
   );
+  const [minDraft, setMinDraft] = useState(poll.minPlayers ?? '');
+  const [maxDraft, setMaxDraft] = useState(poll.maxPlayers ?? '');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
@@ -56,6 +59,21 @@ function AdminBar({
       await onClearDeadline();
       setDeadlineDraft('');
     }, 'Deadline removed');
+
+  const handleSaveCapacity = () =>
+    run(async () => {
+      const parse = (v) => (v === '' ? null : parseInt(v, 10));
+      await onSetCapacity(parse(minDraft), parse(maxDraft));
+    }, 'Player capacity updated');
+
+  const handleClearCapacity = () =>
+    run(async () => {
+      await onSetCapacity(null, null);
+      setMinDraft('');
+      setMaxDraft('');
+    }, 'Player capacity removed');
+
+  const hasCapacity = poll.minPlayers != null || poll.maxPlayers != null;
 
   return (
     <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4 space-y-3">
@@ -192,6 +210,60 @@ function AdminBar({
               ? `The deadline (${format(deadlineDate, 'MMM d, HH:mm')}) has passed and voting is closed. Change or remove it to reopen.`
               : `Voting closes ${format(deadlineDate, 'MMM d, HH:mm')}.`
             : 'No voting deadline set.'}
+        </p>
+      </div>
+
+      {/* Player capacity */}
+      <div>
+        <label htmlFor="admin-min-players" className="block text-xs font-medium text-indigo-900 mb-1">
+          Player capacity (dates show whether enough people can attend)
+        </label>
+        <div className="flex flex-col sm:flex-row gap-2">
+          <input
+            type="number"
+            id="admin-min-players"
+            min={1}
+            max={99}
+            value={minDraft}
+            onChange={(e) => setMinDraft(e.target.value)}
+            placeholder="Min"
+            aria-label="Minimum players"
+            className="w-full sm:w-24 px-3 py-2 border border-indigo-200 rounded-md text-sm bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            disabled={busy}
+          />
+          <input
+            type="number"
+            id="admin-max-players"
+            min={1}
+            max={99}
+            value={maxDraft}
+            onChange={(e) => setMaxDraft(e.target.value)}
+            placeholder="Max"
+            aria-label="Maximum players"
+            className="w-full sm:w-24 px-3 py-2 border border-indigo-200 rounded-md text-sm bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            disabled={busy}
+          />
+          <button
+            onClick={handleSaveCapacity}
+            disabled={busy || (minDraft === '' && maxDraft === '')}
+            className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            Save capacity
+          </button>
+          {hasCapacity && (
+            <button
+              onClick={handleClearCapacity}
+              disabled={busy}
+              className="px-4 py-2 border border-indigo-300 text-indigo-700 text-sm font-medium rounded-md hover:bg-indigo-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              Remove capacity
+            </button>
+          )}
+        </div>
+        <p className="mt-1 text-xs text-indigo-700">
+          {hasCapacity
+            ? `Current: ${poll.minPlayers ?? 'no'} min, ${poll.maxPlayers ?? 'no'} max.`
+            : 'No player capacity set.'}
         </p>
       </div>
 

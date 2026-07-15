@@ -25,6 +25,8 @@ everyone votes Yes / Maybe / No on each date. Results update in real time.
   "We're playing on ..." banner with the attendee list, the chosen date
   is highlighted in the calendar and results, and voting closes (it can
   be un-finalized to reopen)
+- Player capacity: optional min/max players; dates show "needs X more",
+  "enough players" or "full", and viable dates rank first in results
 - The homepage lists polls you created or visited in this browser, so
   links don't get lost
 - Rolling 3D dice bursts instead of confetti. A lot of dice.
@@ -86,6 +88,8 @@ polls/<pollId>
   closed: boolean        (voting closed by the creator)
   deadline: timestamp    (optional; voting closes automatically)
   finalizedDateId: string (optional; the chosen date, closes voting)
+  minPlayers: number     (optional; player capacity lower bound)
+  maxPlayers: number     (optional; player capacity upper bound)
   dates: [
     { id, date: 'YYYY-MM-DD',
       votes: [{ id, voterId, voterName, response, timestamp }],

@@ -1,4 +1,4 @@
-import { getBestDates, groupVotesByResponse } from '../../utils/pollHelpers';
+import { getBestDates, groupVotesByResponse, getCapacityStatus } from '../../utils/pollHelpers';
 import { format, parseISO } from 'date-fns';
 
 const RESPONSE_META = [
@@ -7,8 +7,14 @@ const RESPONSE_META = [
   { key: 'no', icon: '✗', badge: 'bg-red-100 text-red-800' }
 ];
 
-function Results({ dates, finalizedDateId, onDateClick }) {
-  const bestDates = getBestDates(dates);
+const CAPACITY_STYLES = {
+  needs: 'bg-amber-100 text-amber-800',
+  enough: 'bg-green-100 text-green-800',
+  full: 'bg-violet-100 text-violet-800'
+};
+
+function Results({ dates, finalizedDateId, minPlayers, maxPlayers, onDateClick }) {
+  const bestDates = getBestDates(dates, minPlayers);
 
   if (dates.length === 0) {
     return null;
@@ -46,6 +52,7 @@ function Results({ dates, finalizedDateId, onDateClick }) {
           const isChosen = dateData.id === finalizedDateId;
           // Once a date is chosen, the BEST heuristic steps aside
           const isBest = !finalizedDateId && index === 0 && hasVotes;
+          const capacity = getCapacityStatus(dateData.votes, minPlayers, maxPlayers);
 
           return (
             <button
@@ -104,6 +111,15 @@ function Results({ dates, finalizedDateId, onDateClick }) {
                 </div>
               ) : (
                 <div className="text-[10px] text-gray-400 italic">No votes</div>
+              )}
+
+              {/* Player capacity state */}
+              {capacity && (
+                <div className="mt-1">
+                  <span className={`inline-block text-[10px] font-medium px-1.5 py-0.5 rounded ${CAPACITY_STYLES[capacity.key]}`}>
+                    {capacity.label}
+                  </span>
+                </div>
               )}
 
               {/* Total votes indicator */}

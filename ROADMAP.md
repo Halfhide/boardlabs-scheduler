@@ -31,7 +31,7 @@ features were proposed, 11 accepted, 4 rejected (see bottom).
 | 4 | Availability heatmap | 2     | done        |
 | 5 | Doodle-style matrix  | 2     | done        |
 | 6 | My polls list        | 2     | done        |
-| 7 | Player capacity      | 3     | not started |
+| 7 | Player capacity      | 3     | done        |
 | 8 | Game voting          | 3     | not started |
 | 9 | Polish + i18n        | 4     | not started |
 | 10 | PWA install         | 4     | not started |
@@ -216,7 +216,14 @@ Acceptance criteria:
 
 ### 7. Player capacity
 
-Status: not started
+Status: done (15 Jul 2026). Optional `minPlayers`/`maxPlayers` on the
+poll document (create form and AdminBar, validated 1-99 with max >=
+min, clearable). getCapacityStatus derives "Needs N more players" /
+"Enough players" / "Full" from yes counts; badges show on results
+cards and in the date modal header, updating live. getBestDates ranks
+viable dates (yes >= min) first. Rules updated for the new optional
+int fields (manual deploy needed). Polls without capacity behave
+exactly as before.
 Depends on: creator controls (settings live in the admin surface).
 
 Goal: reflect that board games have player counts.
@@ -342,3 +349,6 @@ Acceptance criteria: defined during its planning session.
   viewport. No data model or rules changes.
 - 15 Jul 2026: feature 6 (my polls list) implemented and verified in
   the browser; phase 2 complete. No data model or rules changes.
+- 15 Jul 2026: feature 7 (player capacity) implemented and verified
+  in the browser (all three states plus viable-first ranking);
+  firebase-rules.txt updated again.

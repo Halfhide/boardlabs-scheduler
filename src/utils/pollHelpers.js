@@ -10,10 +10,12 @@ export const MAX_POLL_DATES = 92;
  * Create a new poll
  * @param {string} title - Poll title
  * @param {string[]} dateStrings - Array of ISO date strings
- * @param {Date|null} deadline - Optional voting deadline
+ * @param {{deadline?: Date|null, minPlayers?: number|null, maxPlayers?: number|null}} options
  * @returns {Promise<{pollId: string, creatorToken: string}>} Poll ID and creator token
  */
-export async function createPoll(title, dateStrings, deadline = null) {
+export async function createPoll(title, dateStrings, options = {}) {
+  const { deadline = null, minPlayers = null, maxPlayers = null } = options;
+
   try {
     const pollId = nanoid(10);
     const creatorToken = nanoid(16);
@@ -26,6 +28,8 @@ export async function createPoll(title, dateStrings, deadline = null) {
       creatorToken,
       closed: false,
       ...(deadline ? { deadline } : {}),
+      ...(minPlayers ? { minPlayers } : {}),
+      ...(maxPlayers ? { maxPlayers } : {}),
       dates: dateStrings.map((dateString, index) => ({
         id: `date${index}`,
         date: dateString,
@@ -151,6 +155,61 @@ export async function addPollDate(pollId, creatorToken, dateString) {
     console.error('Error adding poll date:', error);
     throw error;
   }
+}
+
+/**
+ * Set or clear the player capacity (creator only). Pass null for a
+ * bound to remove it.
+ */
+export async function setPollCapacity(pollId, creatorToken, minPlayers, maxPlayers) {
+  const validate = (value, label) => {
+    if (value !== null && (!Number.isInteger(value) || value < 1 || value > 99)) {
+      throw new Error(`${label} must be a whole number between 1 and 99`);
+    }
+  };
+  validate(minPlayers, 'Minimum players');
+  validate(maxPlayers, 'Maximum players');
+  if (minPlayers !== null && maxPlayers !== null && maxPlayers < minPlayers) {
+    throw new Error('Maximum players cannot be lower than minimum players');
+  }
+
+  try {
+    await runCreatorUpdate(pollId, creatorToken, () => ({
+      minPlayers: minPlayers ?? deleteField(),
+      maxPlayers: maxPlayers ?? deleteField()
+    }));
+  } catch (error) {
+    console.error('Error updating poll capacity:', error);
+    throw error;
+  }
+}
+
+/**
+ * Describe a date's viability given the poll's player capacity
+ * @param {Array} votes - The date's votes
+ * @param {number|null} minPlayers
+ * @param {number|null} maxPlayers
+ * @returns {{key: 'needs'|'enough'|'full', label: string}|null} null
+ *   when the poll has no capacity settings
+ */
+export function getCapacityStatus(votes, minPlayers, maxPlayers) {
+  const min = minPlayers ?? null;
+  const max = maxPlayers ?? null;
+  if (!min && !max) return null;
+
+  const summary = getVoteSummary(votes);
+
+  if (max && summary.yes >= max) {
+    return { key: 'full', label: 'Full' };
+  }
+  if (min && summary.yes < min) {
+    const needed = min - summary.yes;
+    return {
+      key: 'needs',
+      label: `Needs ${needed} more player${needed === 1 ? '' : 's'}`
+    };
+  }
+  return { key: 'enough', label: 'Enough players' };
 }
 
 /**
@@ -378,12 +437,20 @@ export function getVoteSummary(votes) {
 /**
  * Find the best dates based on votes
  * @param {Array} dates - Array of date objects
+ * @param {number|null} minPlayers - When set, dates with enough yes
+ *   votes to actually play rank before dates without
  * @returns {Array} Sorted dates (best first)
  */
-export function getBestDates(dates) {
+export function getBestDates(dates, minPlayers = null) {
   return [...dates].sort((a, b) => {
     const aYes = a.votes.filter(v => v.response === 'yes').length;
     const bYes = b.votes.filter(v => v.response === 'yes').length;
+
+    if (minPlayers) {
+      const aViable = aYes >= minPlayers;
+      const bViable = bYes >= minPlayers;
+      if (aViable !== bViable) return aViable ? -1 : 1;
+    }
 
     if (aYes !== bYes) return bYes - aYes;
 

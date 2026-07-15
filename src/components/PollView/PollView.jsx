@@ -14,6 +14,7 @@ import {
   removePollDate,
   setPollClosed,
   setPollDeadline,
+  setPollCapacity,
   setFinalizedDate,
   groupVotesByResponse
 } from '../../utils/pollHelpers';
@@ -195,6 +196,7 @@ function PollView() {
           }
           onSetDeadline={(date) => setPollDeadline(pollId, creatorToken, date)}
           onClearDeadline={() => setPollDeadline(pollId, creatorToken, null)}
+          onSetCapacity={(min, max) => setPollCapacity(pollId, creatorToken, min, max)}
           onUnfinalize={() => setFinalizedDate(pollId, creatorToken, null)}
         />
       )}
@@ -324,6 +326,8 @@ function PollView() {
       <Results
         dates={sortedDates}
         finalizedDateId={poll.finalizedDateId ?? null}
+        minPlayers={poll.minPlayers ?? null}
+        maxPlayers={poll.maxPlayers ?? null}
         onDateClick={handleDateClick}
       />
 
@@ -336,6 +340,8 @@ function PollView() {
           isCreator={isCreator}
           closed={isClosed}
           finalizedDateId={poll.finalizedDateId ?? null}
+          minPlayers={poll.minPlayers ?? null}
+          maxPlayers={poll.maxPlayers ?? null}
           onVote={handleVote}
           onComment={handleComment}
           onRemoveDate={(dateId) => removePollDate(pollId, creatorToken, dateId)}

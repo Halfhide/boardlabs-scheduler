@@ -7,9 +7,11 @@ service cloud.firestore {
       // Anyone can create a poll, but only with the expected shape
       // and within size limits
       allow create: if
-        request.resource.data.keys().hasOnly(['id', 'title', 'createdAt', 'dates', 'creatorToken', 'closed', 'deadline', 'finalizedDateId']) &&
+        request.resource.data.keys().hasOnly(['id', 'title', 'createdAt', 'dates', 'creatorToken', 'closed', 'deadline', 'finalizedDateId', 'minPlayers', 'maxPlayers']) &&
         (!('deadline' in request.resource.data) || request.resource.data.deadline is timestamp) &&
         (!('finalizedDateId' in request.resource.data) || request.resource.data.finalizedDateId is string) &&
+        (!('minPlayers' in request.resource.data) || (request.resource.data.minPlayers is int && request.resource.data.minPlayers >= 1 && request.resource.data.minPlayers <= 99)) &&
+        (!('maxPlayers' in request.resource.data) || (request.resource.data.maxPlayers is int && request.resource.data.maxPlayers >= 1 && request.resource.data.maxPlayers <= 99)) &&
         request.resource.data.id == pollId &&
         request.resource.data.title is string &&
         request.resource.data.title.size() > 0 &&
@@ -31,9 +33,11 @@ service cloud.firestore {
       // document is publicly readable, so the token cannot act as a
       // server-side secret anyway.
       allow update: if
-        request.resource.data.keys().hasOnly(['id', 'title', 'createdAt', 'dates', 'creatorToken', 'closed', 'deadline', 'finalizedDateId']) &&
+        request.resource.data.keys().hasOnly(['id', 'title', 'createdAt', 'dates', 'creatorToken', 'closed', 'deadline', 'finalizedDateId', 'minPlayers', 'maxPlayers']) &&
         (!('deadline' in request.resource.data) || request.resource.data.deadline is timestamp) &&
         (!('finalizedDateId' in request.resource.data) || request.resource.data.finalizedDateId is string) &&
+        (!('minPlayers' in request.resource.data) || (request.resource.data.minPlayers is int && request.resource.data.minPlayers >= 1 && request.resource.data.minPlayers <= 99)) &&
+        (!('maxPlayers' in request.resource.data) || (request.resource.data.maxPlayers is int && request.resource.data.maxPlayers >= 1 && request.resource.data.maxPlayers <= 99)) &&
         request.resource.data.id == resource.data.id &&
         request.resource.data.createdAt == resource.data.createdAt &&
         request.resource.data.get('creatorToken', '') == resource.data.get('creatorToken', '') &&

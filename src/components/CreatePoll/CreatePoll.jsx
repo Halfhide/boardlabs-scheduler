@@ -11,6 +11,8 @@ function CreatePoll() {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [deadline, setDeadline] = useState('');
+  const [minPlayers, setMinPlayers] = useState('');
+  const [maxPlayers, setMaxPlayers] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -55,6 +57,19 @@ function CreatePoll() {
       }
     }
 
+    const parsePlayers = (value) => (value === '' ? null : parseInt(value, 10));
+    const min = parsePlayers(minPlayers);
+    const max = parsePlayers(maxPlayers);
+    const invalidBound = (v) => v !== null && (!Number.isInteger(v) || v < 1 || v > 99);
+    if (invalidBound(min) || invalidBound(max)) {
+      setError('Player counts must be whole numbers between 1 and 99');
+      return;
+    }
+    if (min !== null && max !== null && max < min) {
+      setError('Maximum players cannot be lower than minimum players');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -74,7 +89,11 @@ function CreatePoll() {
       }
 
       // Create poll in Firebase
-      const { pollId, creatorToken } = await createPoll(title, dates, deadlineDate);
+      const { pollId, creatorToken } = await createPoll(title, dates, {
+        deadline: deadlineDate,
+        minPlayers: min,
+        maxPlayers: max
+      });
 
       // Remember that this browser created the poll, unlocking the
       // creator tools on the poll page
@@ -196,6 +215,46 @@ function CreatePoll() {
             Voting closes automatically at this time. Leave empty for no deadline.
           </p>
         </div>
+
+        {/* Optional Player Capacity */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="minPlayers" className="block text-sm font-medium text-gray-700 mb-2">
+              Min Players <span className="text-gray-400 font-normal">(optional)</span>
+            </label>
+            <input
+              type="number"
+              id="minPlayers"
+              min={1}
+              max={99}
+              value={minPlayers}
+              onChange={(e) => setMinPlayers(e.target.value)}
+              placeholder="e.g., 3"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              disabled={loading}
+            />
+          </div>
+          <div>
+            <label htmlFor="maxPlayers" className="block text-sm font-medium text-gray-700 mb-2">
+              Max Players <span className="text-gray-400 font-normal">(optional)</span>
+            </label>
+            <input
+              type="number"
+              id="maxPlayers"
+              min={1}
+              max={99}
+              value={maxPlayers}
+              onChange={(e) => setMaxPlayers(e.target.value)}
+              placeholder="e.g., 6"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              disabled={loading}
+            />
+          </div>
+        </div>
+        <p className="-mt-4 text-xs text-gray-500">
+          Board games have player counts: dates will show whether enough
+          people can attend.
+        </p>
 
         {/* Error Message */}
         {error && (

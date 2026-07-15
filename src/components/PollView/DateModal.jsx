@@ -3,10 +3,16 @@ import VoteButton from './VoteButton';
 import VoterBreakdown from './VoterBreakdown';
 import CommentSection from './CommentSection';
 import { formatDate } from '../../utils/dateHelpers';
-import { getVoteSummary, findUserVote } from '../../utils/pollHelpers';
+import { getVoteSummary, findUserVote, getCapacityStatus } from '../../utils/pollHelpers';
 import { diceRoll } from '../../utils/diceRoll';
 
-function DateModal({ dateData, voterId, voterName, isCreator, closed, finalizedDateId, onVote, onComment, onRemoveDate, onFinalize, onClose }) {
+const CAPACITY_STYLES = {
+  needs: 'bg-amber-100 text-amber-800',
+  enough: 'bg-green-100 text-green-800',
+  full: 'bg-violet-100 text-violet-800'
+};
+
+function DateModal({ dateData, voterId, voterName, isCreator, closed, finalizedDateId, minPlayers, maxPlayers, onVote, onComment, onRemoveDate, onFinalize, onClose }) {
   const [loading, setLoading] = useState(false);
   const [justVoted, setJustVoted] = useState(false);
   const [votingFor, setVotingFor] = useState(null);
@@ -36,6 +42,7 @@ function DateModal({ dateData, voterId, voterName, isCreator, closed, finalizedD
   const currentUserVote = findUserVote(dateData.votes, voterId, voterName);
 
   const voteSummary = getVoteSummary(dateData.votes);
+  const capacity = getCapacityStatus(dateData.votes, minPlayers, maxPlayers);
 
   const handleVote = async (response) => {
     if (!voterName) return;
@@ -134,6 +141,11 @@ function DateModal({ dateData, voterId, voterName, isCreator, closed, finalizedD
               <span className="text-red-600 font-medium">
                 {voteSummary.no} No
               </span>
+              {capacity && (
+                <span className={`text-xs font-medium px-2 py-0.5 rounded-full self-center ${CAPACITY_STYLES[capacity.key]}`}>
+                  {capacity.label}
+                </span>
+              )}
             </div>
           </div>
           <button
