@@ -3,9 +3,17 @@ import { useParams } from 'react-router-dom';
 import { nanoid } from 'nanoid';
 import { usePoll } from '../../hooks/usePoll';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
-import { addVote, addComment } from '../../utils/pollHelpers';
+import {
+  addVote,
+  addComment,
+  updatePollTitle,
+  addPollDate,
+  removePollDate,
+  setPollClosed
+} from '../../utils/pollHelpers';
 import { sortDates } from '../../utils/dateHelpers';
 import Loading from '../shared/Loading';
+import AdminBar from './AdminBar';
 import Calendar from './Calendar';
 import DateModal from './DateModal';
 import Results from '../Results/Results';
@@ -87,6 +95,12 @@ function PollView() {
   const selectedDate =
     sortedDates.find((d) => d.id === selectedDateId) ?? null;
 
+  // Creator detection: the browser that created the poll holds the
+  // matching token in localStorage
+  const creatorToken = localStorage.getItem(`creatorToken:${pollId}`);
+  const isCreator = !!poll.creatorToken && creatorToken === poll.creatorToken;
+  const isClosed = !!poll.closed;
+
   return (
     <div className="space-y-6">
       {/* Poll Header */}
@@ -103,6 +117,30 @@ function PollView() {
           </button>
         </div>
       </div>
+
+      {/* Creator tools */}
+      {isCreator && (
+        <AdminBar
+          poll={poll}
+          onRename={(title) => updatePollTitle(pollId, creatorToken, title)}
+          onAddDate={(dateString) => addPollDate(pollId, creatorToken, dateString)}
+          onToggleClosed={() => setPollClosed(pollId, creatorToken, !poll.closed)}
+        />
+      )}
+
+      {/* Closed banner */}
+      {isClosed && (
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-center gap-3">
+          <span className="text-2xl">🔒</span>
+          <div>
+            <p className="font-semibold text-amber-900">Voting is closed</p>
+            <p className="text-sm text-amber-800">
+              The creator has closed this poll. You can still browse the
+              results and comments.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Name Input Section - Prominent and Clear */}
       {!voterName ? (
@@ -173,12 +211,17 @@ function PollView() {
       {/* Calendar View */}
       <div>
         <h3 className="text-2xl font-bold text-gray-900 mb-4">
-          {voterName ? 'Step 2: Click on dates to vote' : 'Available Dates'}
+          {isClosed
+            ? 'Dates and results'
+            : voterName
+              ? 'Step 2: Click on dates to vote'
+              : 'Available Dates'}
         </h3>
         <Calendar
           dates={sortedDates}
           voterId={voterId}
           voterName={voterName}
+          closed={isClosed}
           onDateClick={handleDateClick}
         />
       </div>
@@ -192,8 +235,11 @@ function PollView() {
           dateData={selectedDate}
           voterId={voterId}
           voterName={voterName}
+          isCreator={isCreator}
+          closed={isClosed}
           onVote={handleVote}
           onComment={handleComment}
+          onRemoveDate={(dateId) => removePollDate(pollId, creatorToken, dateId)}
           onClose={() => setSelectedDateId(null)}
         />
       )}

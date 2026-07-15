@@ -25,7 +25,7 @@ features were proposed, 11 accepted, 4 rejected (see bottom).
 
 | # | Feature              | Phase | Status      |
 |---|----------------------|-------|-------------|
-| 1 | Creator controls     | 1     | not started |
+| 1 | Creator controls     | 1     | done        |
 | 2 | Voting deadline      | 1     | not started |
 | 3 | Finalize a date      | 1     | not started |
 | 4 | Availability heatmap | 2     | not started |
@@ -45,7 +45,14 @@ phase 5.
 
 ### 1. Creator controls
 
-Status: not started
+Status: done (15 Jul 2026). Implemented with `creatorToken` on the
+poll document plus `closed` flag, AdminBar component (rename, add
+date, close/reopen), two-step date removal in the date modal, and
+extended Firestore rules. Identity is enforced client-side as
+planned; the updated rules validate shape and immutability only.
+Note for later features: `closed` gating exists and feature 2 can
+reuse it. The updated `firebase-rules.txt` must be applied manually
+before creator actions work against hardened rules.
 
 Goal: polls have an owner who can manage them.
 
@@ -282,3 +289,5 @@ Acceptance criteria: defined during its planning session.
 ## Changelog
 
 - 15 Jul 2026: roadmap created from the feature review session.
+- 15 Jul 2026: feature 1 (creator controls) implemented and verified
+  in the browser; firebase-rules.txt updated (manual deploy needed).

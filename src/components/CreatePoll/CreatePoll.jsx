@@ -1,10 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createPoll } from '../../utils/pollHelpers';
+import { createPoll, MAX_POLL_DATES } from '../../utils/pollHelpers';
 import { generateDateRange } from '../../utils/dateHelpers';
 import confetti from 'canvas-confetti';
-
-const MAX_RANGE_DAYS = 92;
 
 function CreatePoll() {
   const [title, setTitle] = useState('');
@@ -57,14 +55,22 @@ function CreatePoll() {
         return;
       }
 
-      if (dates.length > MAX_RANGE_DAYS) {
-        setError(`Date range is too long (${dates.length} days). Please choose a range of ${MAX_RANGE_DAYS} days or less.`);
+      if (dates.length > MAX_POLL_DATES) {
+        setError(`Date range is too long (${dates.length} days). Please choose a range of ${MAX_POLL_DATES} days or less.`);
         setLoading(false);
         return;
       }
 
       // Create poll in Firebase
-      const pollId = await createPoll(title, dates);
+      const { pollId, creatorToken } = await createPoll(title, dates);
+
+      // Remember that this browser created the poll, unlocking the
+      // creator tools on the poll page
+      try {
+        localStorage.setItem(`creatorToken:${pollId}`, creatorToken);
+      } catch (storageErr) {
+        console.error('Could not persist creator token:', storageErr);
+      }
 
       // 🎆 Fireworks celebration for creating a poll!
       const duration = 1500;

@@ -17,6 +17,8 @@ everyone votes Yes / Maybe / No on each date. Results update in real time.
 - Per-date comments
 - Live results grid ranked by most Yes votes (ties broken by fewest No,
   then most Maybe), with the best date highlighted
+- Creator tools: the browser that created a poll can rename it, add or
+  remove dates, and close or reopen voting
 - Confetti. A lot of confetti.
 
 ## Tech stack
@@ -73,6 +75,8 @@ One Firestore document per poll in the `polls` collection:
 polls/<pollId>
   title: string
   createdAt: timestamp
+  creatorToken: string   (identifies the creator's browser)
+  closed: boolean        (voting closed by the creator)
   dates: [
     { id, date: 'YYYY-MM-DD',
       votes: [{ id, voterId, voterName, response, timestamp }],
@@ -83,6 +87,11 @@ polls/<pollId>
 `voterId` is a random ID generated once per browser and kept in
 localStorage. Votes are matched by it, with a fallback to `voterName`
 for votes recorded before voter IDs existed.
+
+`creatorToken` is generated at poll creation and also stored in the
+creator's localStorage (`creatorToken:<pollId>`); when they match, the
+poll page shows the creator tools. This is client-side gating, not
+real security (see the note in `firebase-rules.txt`).
 
 Votes and comments are written inside Firestore transactions so concurrent
 voters do not overwrite each other.

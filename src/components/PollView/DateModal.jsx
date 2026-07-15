@@ -6,11 +6,14 @@ import { formatDate } from '../../utils/dateHelpers';
 import { getVoteSummary, findUserVote } from '../../utils/pollHelpers';
 import confetti from 'canvas-confetti';
 
-function DateModal({ dateData, voterId, voterName, onVote, onComment, onClose }) {
+function DateModal({ dateData, voterId, voterName, isCreator, closed, onVote, onComment, onRemoveDate, onClose }) {
   const [loading, setLoading] = useState(false);
   const [justVoted, setJustVoted] = useState(false);
   const [votingFor, setVotingFor] = useState(null);
   const [voteError, setVoteError] = useState(false);
+  const [confirmingRemove, setConfirmingRemove] = useState(false);
+  const [removing, setRemoving] = useState(false);
+  const [removeError, setRemoveError] = useState(false);
 
   // Close on Escape and lock background scroll while the modal is open
   useEffect(() => {
@@ -85,6 +88,26 @@ function DateModal({ dateData, voterId, voterName, onVote, onComment, onClose })
   // Show the vote that's being processed, or the actual vote
   const displayedVote = votingFor || currentUserVote?.response;
 
+  // Two-step removal instead of a native confirm dialog
+  const handleRemoveDate = async () => {
+    if (!confirmingRemove) {
+      setConfirmingRemove(true);
+      return;
+    }
+
+    setRemoving(true);
+    setRemoveError(false);
+    try {
+      await onRemoveDate(dateData.id);
+      onClose();
+    } catch (error) {
+      console.error('Error removing date:', error);
+      setRemoveError(true);
+    } finally {
+      setRemoving(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50" onClick={onClose}>
       <div
@@ -139,7 +162,7 @@ function DateModal({ dateData, voterId, voterName, onVote, onComment, onClose })
             </div>
 
             {/* Instruction Banner */}
-            {voterName && !currentUserVote && (
+            {voterName && !currentUserVote && !closed && (
               <div className="bg-blue-50 border border-blue-200 rounded-md p-3 mb-3">
                 <p className="text-sm text-blue-800">
                   💡 <strong>Click a button below to vote.</strong> Your vote will be saved immediately.
@@ -165,7 +188,11 @@ function DateModal({ dateData, voterId, voterName, onVote, onComment, onClose })
               </div>
             )}
 
-            {voterName ? (
+            {closed ? (
+              <p className="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-md p-3">
+                🔒 Voting is closed for this poll
+              </p>
+            ) : voterName ? (
               <div className="flex gap-2">
                 <VoteButton
                   response="yes"
@@ -223,6 +250,37 @@ function DateModal({ dateData, voterId, voterName, onVote, onComment, onClose })
               onComment={onComment}
             />
           </div>
+
+          {/* Creator: remove this date */}
+          {isCreator && (
+            <div className="border-t border-gray-200 pt-4">
+              <button
+                onClick={handleRemoveDate}
+                disabled={removing}
+                className={`text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed ${
+                  confirmingRemove
+                    ? 'text-white bg-red-600 hover:bg-red-700 px-4 py-2 rounded-md'
+                    : 'text-red-600 hover:text-red-700'
+                }`}
+              >
+                {removing
+                  ? 'Removing...'
+                  : confirmingRemove
+                    ? '⚠️ Click again to permanently remove this date'
+                    : 'Remove this date from the poll'}
+              </button>
+              {confirmingRemove && !removing && (
+                <p className="text-xs text-gray-500 mt-1">
+                  All votes and comments on this date will be lost.
+                </p>
+              )}
+              {removeError && (
+                <p className="text-xs text-red-600 mt-1">
+                  Failed to remove the date. Please try again.
+                </p>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Footer */}

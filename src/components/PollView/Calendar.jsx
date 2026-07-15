@@ -117,7 +117,7 @@ function MonthCalendar({ monthDate, dates, voterId, voterName, onDateClick }) {
   );
 }
 
-function Calendar({ dates, voterId, voterName, onDateClick }) {
+function Calendar({ dates, voterId, voterName, closed, onDateClick }) {
   if (dates.length === 0) {
     return null;
   }
@@ -132,7 +132,9 @@ function Calendar({ dates, voterId, voterName, onDateClick }) {
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
       <h3 className="text-lg font-bold text-gray-900 mb-4 text-center">
-        Click on any highlighted date to vote
+        {closed
+          ? 'Voting is closed. Click a date to see details'
+          : 'Click on any highlighted date to vote'}
       </h3>
 
       {/* Legend */}
