@@ -1,7 +1,13 @@
-import { getBestDates, getVoteSummary } from '../../utils/pollHelpers';
+import { getBestDates, groupVotesByResponse } from '../../utils/pollHelpers';
 import { format, parseISO } from 'date-fns';
 
-function Results({ dates }) {
+const RESPONSE_META = [
+  { key: 'yes', icon: '✓', badge: 'bg-green-100 text-green-800' },
+  { key: 'maybe', icon: '?', badge: 'bg-yellow-100 text-yellow-800' },
+  { key: 'no', icon: '✗', badge: 'bg-red-100 text-red-800' }
+];
+
+function Results({ dates, onDateClick }) {
   const bestDates = getBestDates(dates);
 
   if (dates.length === 0) {
@@ -21,24 +27,29 @@ function Results({ dates }) {
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-4">
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-between mb-1">
         <h3 className="text-base font-bold text-gray-900">Results</h3>
         <p className="text-xs text-gray-600">
           {totalVoters} {totalVoters === 1 ? 'voter' : 'voters'}
         </p>
       </div>
+      <p className="text-xs text-gray-400 mb-3">
+        Click any date to see full details and vote
+      </p>
 
       {/* Grid of Results */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
         {bestDates.map((dateData, index) => {
-          const summary = getVoteSummary(dateData.votes);
+          const grouped = groupVotesByResponse(dateData.votes);
           const hasVotes = dateData.votes.length > 0;
-          const totalVotes = summary.yes + summary.maybe + summary.no;
+          const totalVotes = dateData.votes.length;
 
           return (
-            <div
+            <button
               key={dateData.id}
-              className={`border rounded-md p-2 relative ${
+              type="button"
+              onClick={() => onDateClick(dateData)}
+              className={`border rounded-md p-2 relative text-left transition-all hover:shadow-md hover:border-blue-400 cursor-pointer ${
                 index === 0 && hasVotes
                   ? 'border-green-400 bg-green-50'
                   : 'border-gray-200 bg-white'
@@ -61,27 +72,25 @@ function Results({ dates }) {
                 </div>
               </div>
 
-              {/* Vote Counts */}
+              {/* Votes with voter names */}
               {hasVotes ? (
-                <div className="flex gap-1 flex-wrap">
-                  {summary.yes > 0 && (
-                    <div className="inline-flex items-center gap-0.5 bg-green-100 text-green-800 px-1.5 py-0.5 rounded text-[11px] font-medium">
-                      <span>✓</span>
-                      <span>{summary.yes}</span>
-                    </div>
-                  )}
-                  {summary.maybe > 0 && (
-                    <div className="inline-flex items-center gap-0.5 bg-yellow-100 text-yellow-800 px-1.5 py-0.5 rounded text-[11px] font-medium">
-                      <span>?</span>
-                      <span>{summary.maybe}</span>
-                    </div>
-                  )}
-                  {summary.no > 0 && (
-                    <div className="inline-flex items-center gap-0.5 bg-red-100 text-red-800 px-1.5 py-0.5 rounded text-[11px] font-medium">
-                      <span>✗</span>
-                      <span>{summary.no}</span>
-                    </div>
-                  )}
+                <div className="space-y-1">
+                  {RESPONSE_META.map(({ key, icon, badge }) => {
+                    const votes = grouped[key];
+                    if (votes.length === 0) return null;
+
+                    return (
+                      <div key={key} className="flex items-center gap-1 min-w-0">
+                        <span className={`flex-shrink-0 inline-flex items-center gap-0.5 ${badge} px-1.5 py-0.5 rounded text-[11px] font-medium`}>
+                          <span>{icon}</span>
+                          <span>{votes.length}</span>
+                        </span>
+                        <span className="text-[11px] text-gray-600 truncate">
+                          {votes.map(v => v.voterName).join(', ')}
+                        </span>
+                      </div>
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="text-[10px] text-gray-400 italic">No votes</div>
@@ -93,7 +102,7 @@ function Results({ dates }) {
                   {totalVotes} {totalVotes === 1 ? 'vote' : 'votes'}
                 </div>
               )}
-            </div>
+            </button>
           );
         })}
       </div>

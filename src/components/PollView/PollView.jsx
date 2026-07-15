@@ -184,7 +184,7 @@ function PollView() {
       </div>
 
       {/* Results Summary - Below Calendar */}
-      <Results dates={sortedDates} />
+      <Results dates={sortedDates} onDateClick={handleDateClick} />
 
       {/* Date Modal */}
       {selectedDate && (

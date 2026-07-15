@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import VoteButton from './VoteButton';
+import VoterBreakdown from './VoterBreakdown';
 import CommentSection from './CommentSection';
 import { formatDate } from '../../utils/dateHelpers';
 import { getVoteSummary, findUserVote } from '../../utils/pollHelpers';
@@ -196,6 +197,18 @@ function DateModal({ dateData, voterId, voterName, onVote, onComment, onClose })
                 Your vote is shown by the filled button. Click a different button to change it.
               </p>
             )}
+          </div>
+
+          {/* Voter Breakdown - who you'd be playing with */}
+          <div>
+            <h4 className="text-lg font-semibold text-gray-900 mb-3">
+              Who's voted ({dateData.votes.length})
+            </h4>
+            <VoterBreakdown
+              votes={dateData.votes}
+              voterId={voterId}
+              voterName={voterName}
+            />
           </div>
 
           {/* Comments Section */}

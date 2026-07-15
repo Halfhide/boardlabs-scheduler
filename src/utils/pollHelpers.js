@@ -37,7 +37,7 @@ export async function createPoll(title, dateStrings) {
  * Check whether a vote belongs to a voter. Matches by stable voter ID,
  * falling back to name for votes recorded before voter IDs existed.
  */
-function isVoteByVoter(vote, voterId, voterName) {
+export function isVoteByVoter(vote, voterId, voterName) {
   return vote.voterId ? vote.voterId === voterId : vote.voterName === voterName;
 }
 
@@ -177,6 +177,21 @@ export async function addComment(pollId, dateId, voter, text) {
     console.error('Error adding comment:', error);
     throw error;
   }
+}
+
+/**
+ * Group votes by response
+ * @param {Array} votes - Array of vote objects
+ * @returns {{yes: Array, maybe: Array, no: Array}} Votes per response
+ */
+export function groupVotesByResponse(votes) {
+  return votes.reduce(
+    (acc, vote) => {
+      (acc[vote.response] ??= []).push(vote);
+      return acc;
+    },
+    { yes: [], maybe: [], no: [] }
+  );
 }
 
 /**
