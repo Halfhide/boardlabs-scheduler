@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPoll, MAX_POLL_DATES } from '../../utils/pollHelpers';
 import { generateDateRange } from '../../utils/dateHelpers';
-import confetti from 'canvas-confetti';
+import { diceRoll } from '../../utils/diceRoll';
 
 function CreatePoll() {
   const [title, setTitle] = useState('');
@@ -82,10 +82,9 @@ function CreatePoll() {
         console.error('Could not persist creator token:', storageErr);
       }
 
-      // 🎆 Fireworks celebration for creating a poll!
+      // 🎲 Rolling-dice celebration for creating a poll!
       const duration = 1500;
       const animationEnd = Date.now() + duration;
-      const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
 
       function randomInRange(min, max) {
         return Math.random() * (max - min) + min;
@@ -97,22 +96,18 @@ function CreatePoll() {
         if (timeLeft <= 0) {
           clearInterval(confettiIntervalRef.current);
           confettiIntervalRef.current = null;
-          // Navigate to the poll page after fireworks
+          // Navigate to the poll page after the dice settle
           navigate(`/poll/${pollId}`);
           return;
         }
 
-        const particleCount = 50 * (timeLeft / duration);
-
-        confetti({
-          ...defaults,
-          particleCount,
-          origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }
+        diceRoll({
+          count: 5,
+          origin: { x: randomInRange(0.1, 0.3), y: randomInRange(0.1, 0.5) }
         });
-        confetti({
-          ...defaults,
-          particleCount,
-          origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }
+        diceRoll({
+          count: 5,
+          origin: { x: randomInRange(0.7, 0.9), y: randomInRange(0.1, 0.5) }
         });
       }, 250);
     } catch (err) {

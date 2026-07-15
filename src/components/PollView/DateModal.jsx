@@ -4,7 +4,7 @@ import VoterBreakdown from './VoterBreakdown';
 import CommentSection from './CommentSection';
 import { formatDate } from '../../utils/dateHelpers';
 import { getVoteSummary, findUserVote } from '../../utils/pollHelpers';
-import confetti from 'canvas-confetti';
+import { diceRoll } from '../../utils/diceRoll';
 
 function DateModal({ dateData, voterId, voterName, isCreator, closed, finalizedDateId, onVote, onComment, onRemoveDate, onFinalize, onClose }) {
   const [loading, setLoading] = useState(false);
@@ -48,33 +48,13 @@ function DateModal({ dateData, voterId, voterName, isCreator, closed, finalizedD
       await onVote(dateData.id, response);
       setJustVoted(true);
 
-      // 🎊 Different celebrations based on vote type!
+      // 🎲 Rolling dice, sized by how enthusiastic the vote is
       if (response === 'yes') {
-        // Green sparkles for YES
-        confetti({
-          particleCount: 80,
-          spread: 60,
-          colors: ['#10b981', '#34d399', '#6ee7b7'],
-          origin: { y: 0.7 }
-        });
+        diceRoll({ count: 14, origin: { y: 0.55 } });
       } else if (response === 'maybe') {
-        // Yellow stars for MAYBE
-        confetti({
-          particleCount: 60,
-          spread: 50,
-          colors: ['#eab308', '#facc15', '#fde047'],
-          shapes: ['star'],
-          origin: { y: 0.7 }
-        });
+        diceRoll({ count: 8, origin: { y: 0.55 } });
       } else if (response === 'no') {
-        // Subtle red effect for NO
-        confetti({
-          particleCount: 40,
-          spread: 40,
-          colors: ['#ef4444', '#f87171'],
-          ticks: 100,
-          origin: { y: 0.7 }
-        });
+        diceRoll({ count: 4, origin: { y: 0.55 } });
       }
       // Keep success message visible - don't auto-hide
     } catch (error) {
@@ -97,14 +77,9 @@ function DateModal({ dateData, voterId, voterName, isCreator, closed, finalizedD
     setFinalizeError('');
     try {
       await onFinalize(isFinalizedDate ? null : dateData.id);
-      // 🎉 Big celebration when a date is chosen!
+      // 🎲 Big dice roll when a date is chosen!
       if (!isFinalizedDate) {
-        confetti({
-          particleCount: 150,
-          spread: 90,
-          colors: ['#10b981', '#34d399', '#fbbf24', '#f59e0b'],
-          origin: { y: 0.6 }
-        });
+        diceRoll({ count: 26, origin: { y: 0.5 } });
       }
     } catch (error) {
       console.error('Error finalizing date:', error);

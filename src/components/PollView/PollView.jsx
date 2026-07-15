@@ -22,7 +22,7 @@ import AdminBar from './AdminBar';
 import Calendar from './Calendar';
 import DateModal from './DateModal';
 import Results from '../Results/Results';
-import confetti from 'canvas-confetti';
+import { diceRoll } from '../../utils/diceRoll';
 
 function PollView() {
   const { pollId } = useParams();
@@ -66,12 +66,8 @@ function PollView() {
       setVoterName(tempName.trim());
       setTempName('');
 
-      // 🎉 Celebration confetti when name is saved!
-      confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 }
-      });
+      // 🎲 Celebration dice when name is saved!
+      diceRoll({ count: 14, origin: { y: 0.4 } });
     }
   };
 

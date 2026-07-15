@@ -54,3 +54,89 @@ body {
 .animate-sparkle {
   animation: sparkle 1s ease-in-out infinite;
 }
+
+/* 🎲 3D dice bursts (see src/utils/diceRoll.js) */
+.dice-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 9999;
+}
+
+.die3d {
+  position: absolute;
+  animation: die-drift var(--duration) linear var(--delay) both;
+}
+
+.die3d-arc {
+  perspective: 300px;
+  animation: die-arc var(--duration) linear var(--delay) both;
+}
+
+.die3d-cube {
+  position: relative;
+  width: var(--die-size);
+  height: var(--die-size);
+  transform-style: preserve-3d;
+  animation: die-tumble var(--duration) linear var(--delay) both;
+}
+
+.die3d-face {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-rows: repeat(3, 1fr);
+  grid-template-columns: repeat(3, 1fr);
+  padding: 14%;
+  background: linear-gradient(135deg, #ffffff, #d1d5db);
+  border: 1px solid #9ca3af;
+  border-radius: 15%;
+  backface-visibility: hidden;
+}
+
+.die3d-pip {
+  width: 72%;
+  aspect-ratio: 1 / 1;
+  margin: auto;
+  border-radius: 50%;
+  background: #111827;
+}
+
+@keyframes die-drift {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(var(--drift));
+    opacity: 0;
+  }
+}
+
+/* Tossed up first, then gravity wins */
+@keyframes die-arc {
+  0% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0.25, 0.9, 0.45, 1);
+  }
+  30% {
+    transform: translateY(var(--toss));
+    animation-timing-function: cubic-bezier(0.55, 0, 0.85, 0.4);
+  }
+  100% {
+    transform: translateY(var(--fall));
+  }
+}
+
+@keyframes die-tumble {
+  from {
+    transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+  }
+  to {
+    transform: rotateX(var(--rx)) rotateY(var(--ry)) rotateZ(var(--rz));
+  }
+}

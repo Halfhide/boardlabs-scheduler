@@ -25,7 +25,7 @@ everyone votes Yes / Maybe / No on each date. Results update in real time.
   "We're playing on ..." banner with the attendee list, the chosen date
   is highlighted in the calendar and results, and voting closes (it can
   be un-finalized to reopen)
-- Confetti. A lot of confetti.
+- Rolling 3D dice bursts instead of confetti. A lot of dice.
 
 ## Tech stack
 
@@ -34,8 +34,7 @@ everyone votes Yes / Maybe / No on each date. Results update in real time.
 - [Firebase Firestore](https://firebase.google.com/docs/firestore) for
   storage and real-time updates (no authentication)
 - [React Router](https://reactrouter.com/), [date-fns](https://date-fns.org/),
-  [nanoid](https://github.com/ai/nanoid),
-  [canvas-confetti](https://github.com/catdad/canvas-confetti)
+  [nanoid](https://github.com/ai/nanoid)
 
 ## Getting started
 
