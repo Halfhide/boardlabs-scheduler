@@ -32,7 +32,7 @@ features were proposed, 11 accepted, 4 rejected (see bottom).
 | 5 | Doodle-style matrix  | 2     | done        |
 | 6 | My polls list        | 2     | done        |
 | 7 | Player capacity      | 3     | done        |
-| 8 | Game voting          | 3     | not started |
+| 8 | Game voting          | 3     | done        |
 | 9 | Polish + i18n        | 4     | not started |
 | 10 | PWA install         | 4     | not started |
 | 11 | Google sign-in      | 5     | not started |
@@ -242,7 +242,19 @@ Acceptance criteria:
 
 ### 8. Game voting
 
-Status: not started
+Status: done (15 Jul 2026). Optional `games` array on the poll
+document (capped at 30, validated in rules; manual deploy needed).
+New GameVoting section ("What shall we play?") between the matrix
+and results: named participants suggest games (title up to 80 chars,
+optional http(s) link) and toggle one vote per game by voter ID; the
+suggester auto-votes their own suggestion; duplicates are rejected
+case-insensitively. The list sorts by votes with a LEADING badge,
+shows voter names, and the creator can remove suggestions (two-step
+confirm). Game actions lock when the poll is closed. The finalize
+banner shows the leading game with its vote count. The leading game
+lives in the GameVoting card and finalize banner rather than on each
+results card (kept the cards compact). Legacy polls without a games
+field work unchanged.
 Depends on: creator controls recommended first (creator may want to
 curate suggestions).
 
@@ -352,3 +364,6 @@ Acceptance criteria: defined during its planning session.
 - 15 Jul 2026: feature 7 (player capacity) implemented and verified
   in the browser (all three states plus viable-first ranking);
   firebase-rules.txt updated again.
+- 15 Jul 2026: feature 8 (game voting) implemented and verified in
+  the browser with two voters; phase 3 complete. firebase-rules.txt
+  updated again (one manual deploy covers everything to date).

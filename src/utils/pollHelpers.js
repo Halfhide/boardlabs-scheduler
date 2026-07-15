@@ -404,6 +404,129 @@ export async function addComment(pollId, dateId, voter, text) {
   }
 }
 
+// A poll can collect up to this many game suggestions
+export const MAX_GAMES = 30;
+
+/**
+ * Suggest a game to play. Any named participant can do this; the
+ * suggester automatically votes for their own suggestion.
+ * @param {{id: string, name: string}} voter
+ * @param {string} title - Game title
+ * @param {string} url - Optional link (e.g. BoardGameGeek)
+ */
+export async function addGame(pollId, voter, title, url = '') {
+  const trimmed = title.trim();
+  if (!trimmed || trimmed.length > 80) {
+    throw new Error('Game title must be between 1 and 80 characters');
+  }
+  const cleanUrl = (url || '').trim();
+  if (cleanUrl && !/^https?:\/\//i.test(cleanUrl)) {
+    throw new Error('The link must start with http:// or https://');
+  }
+  if (cleanUrl.length > 300) {
+    throw new Error('The link is too long');
+  }
+
+  try {
+    const pollRef = doc(db, 'polls', pollId);
+
+    await runTransaction(db, async (transaction) => {
+      const pollSnap = await transaction.get(pollRef);
+      if (!pollSnap.exists()) {
+        throw new Error('Poll not found');
+      }
+
+      const games = pollSnap.data().games ?? [];
+      if (games.length >= MAX_GAMES) {
+        throw new Error(`A poll can have at most ${MAX_GAMES} game suggestions`);
+      }
+      if (games.some(g => g.title.toLowerCase() === trimmed.toLowerCase())) {
+        throw new Error('That game has already been suggested');
+      }
+
+      const newGame = {
+        id: nanoid(8),
+        title: trimmed,
+        ...(cleanUrl ? { url: cleanUrl } : {}),
+        suggestedById: voter.id,
+        suggestedBy: voter.name,
+        votes: [{ voterId: voter.id, voterName: voter.name }]
+      };
+
+      transaction.update(pollRef, { games: [...games, newGame] });
+    });
+  } catch (error) {
+    console.error('Error suggesting game:', error);
+    throw error;
+  }
+}
+
+/**
+ * Toggle the voter's vote on a game suggestion (one vote per game
+ * per voter)
+ */
+export async function toggleGameVote(pollId, gameId, voter) {
+  try {
+    const pollRef = doc(db, 'polls', pollId);
+
+    await runTransaction(db, async (transaction) => {
+      const pollSnap = await transaction.get(pollRef);
+      if (!pollSnap.exists()) {
+        throw new Error('Poll not found');
+      }
+
+      const games = pollSnap.data().games ?? [];
+      const index = games.findIndex(g => g.id === gameId);
+      if (index === -1) {
+        throw new Error('Game not found');
+      }
+
+      const game = games[index];
+      const hasVoted = game.votes.some(v => v.voterId === voter.id);
+      const votes = hasVoted
+        ? game.votes.filter(v => v.voterId !== voter.id)
+        : [...game.votes, { voterId: voter.id, voterName: voter.name }];
+
+      const updated = [...games];
+      updated[index] = { ...game, votes };
+      transaction.update(pollRef, { games: updated });
+    });
+  } catch (error) {
+    console.error('Error voting on game:', error);
+    throw error;
+  }
+}
+
+/**
+ * Remove a game suggestion (creator only)
+ */
+export async function removeGame(pollId, creatorToken, gameId) {
+  try {
+    await runCreatorUpdate(pollId, creatorToken, (poll) => {
+      const games = poll.games ?? [];
+      const remaining = games.filter(g => g.id !== gameId);
+      if (remaining.length === games.length) {
+        throw new Error('Game not found');
+      }
+      return { games: remaining };
+    });
+  } catch (error) {
+    console.error('Error removing game:', error);
+    throw error;
+  }
+}
+
+/**
+ * The game suggestion with the most votes (ties go to the earlier
+ * suggestion), or null when there are none
+ */
+export function getLeadingGame(games) {
+  if (!games || games.length === 0) return null;
+  return games.reduce((best, game) =>
+    game.votes.length > best.votes.length ? game : best
+  );
+}
+
 /**
  * Group votes by response
  * @param {Array} votes - Array of vote objects

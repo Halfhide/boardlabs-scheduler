@@ -33,7 +33,8 @@ service cloud.firestore {
       // document is publicly readable, so the token cannot act as a
       // server-side secret anyway.
       allow update: if
-        request.resource.data.keys().hasOnly(['id', 'title', 'createdAt', 'dates', 'creatorToken', 'closed', 'deadline', 'finalizedDateId', 'minPlayers', 'maxPlayers']) &&
+        request.resource.data.keys().hasOnly(['id', 'title', 'createdAt', 'dates', 'creatorToken', 'closed', 'deadline', 'finalizedDateId', 'minPlayers', 'maxPlayers', 'games']) &&
+        (!('games' in request.resource.data) || (request.resource.data.games is list && request.resource.data.games.size() <= 30)) &&
         (!('deadline' in request.resource.data) || request.resource.data.deadline is timestamp) &&
         (!('finalizedDateId' in request.resource.data) || request.resource.data.finalizedDateId is string) &&
         (!('minPlayers' in request.resource.data) || (request.resource.data.minPlayers is int && request.resource.data.minPlayers >= 1 && request.resource.data.minPlayers <= 99)) &&

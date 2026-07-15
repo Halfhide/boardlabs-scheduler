@@ -16,6 +16,10 @@ import {
   setPollDeadline,
   setPollCapacity,
   setFinalizedDate,
+  addGame,
+  toggleGameVote,
+  removeGame,
+  getLeadingGame,
   groupVotesByResponse
 } from '../../utils/pollHelpers';
 import { sortDates, formatDate } from '../../utils/dateHelpers';
@@ -23,6 +27,7 @@ import Loading from '../shared/Loading';
 import AdminBar from './AdminBar';
 import Calendar from './Calendar';
 import VoteMatrix from './VoteMatrix';
+import GameVoting from './GameVoting';
 import DateModal from './DateModal';
 import Results from '../Results/Results';
 import { diceRoll } from '../../utils/diceRoll';
@@ -132,6 +137,8 @@ function PollView() {
   const finalizedVotes = finalizedDate
     ? groupVotesByResponse(finalizedDate.votes)
     : null;
+  const games = poll.games ?? [];
+  const leadingGame = getLeadingGame(games);
 
   return (
     <div className="space-y-6">
@@ -174,6 +181,13 @@ function PollView() {
                       Maybe ({finalizedVotes.maybe.length}):
                     </span>{' '}
                     {finalizedVotes.maybe.map((v) => v.voterName).join(', ')}
+                  </p>
+                )}
+                {leadingGame && leadingGame.votes.length > 0 && (
+                  <p>
+                    <span className="font-semibold">🎲 Game:</span>{' '}
+                    {leadingGame.title} ({leadingGame.votes.length}{' '}
+                    {leadingGame.votes.length === 1 ? 'vote' : 'votes'})
                   </p>
                 )}
               </div>
@@ -320,6 +334,22 @@ function PollView() {
         voterName={voterName}
         finalizedDateId={poll.finalizedDateId ?? null}
         onDateClick={handleDateClick}
+      />
+
+      {/* Game suggestions and voting */}
+      <GameVoting
+        games={games}
+        voterId={voterId}
+        voterName={voterName}
+        isCreator={isCreator}
+        closed={isClosed}
+        onAddGame={(title, url) =>
+          addGame(pollId, { id: voterId, name: voterName }, title, url)
+        }
+        onToggleGameVote={(gameId) =>
+          toggleGameVote(pollId, gameId, { id: voterId, name: voterName })
+        }
+        onRemoveGame={(gameId) => removeGame(pollId, creatorToken, gameId)}
       />
 
       {/* Results Summary - Below Calendar */}

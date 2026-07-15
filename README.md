@@ -27,6 +27,9 @@ everyone votes Yes / Maybe / No on each date. Results update in real time.
   be un-finalized to reopen)
 - Player capacity: optional min/max players; dates show "needs X more",
   "enough players" or "full", and viable dates rank first in results
+- Game voting: participants suggest games (with optional links) and
+  vote for favorites; the leading game is highlighted and shown in the
+  finalize banner
 - The homepage lists polls you created or visited in this browser, so
   links don't get lost
 - Rolling 3D dice bursts instead of confetti. A lot of dice.
@@ -90,6 +93,10 @@ polls/<pollId>
   finalizedDateId: string (optional; the chosen date, closes voting)
   minPlayers: number     (optional; player capacity lower bound)
   maxPlayers: number     (optional; player capacity upper bound)
+  games: [               (optional; game suggestions)
+    { id, title, url?, suggestedById, suggestedBy,
+      votes: [{ voterId, voterName }] }
+  ]
   dates: [
     { id, date: 'YYYY-MM-DD',
       votes: [{ id, voterId, voterName, response, timestamp }],
