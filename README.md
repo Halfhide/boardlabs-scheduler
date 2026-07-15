@@ -25,6 +25,8 @@ everyone votes Yes / Maybe / No on each date. Results update in real time.
   "We're playing on ..." banner with the attendee list, the chosen date
   is highlighted in the calendar and results, and voting closes (it can
   be un-finalized to reopen)
+- The homepage lists polls you created or visited in this browser, so
+  links don't get lost
 - Rolling 3D dice bursts instead of confetti. A lot of dice.
 
 ## Tech stack

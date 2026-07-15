@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { nanoid } from 'nanoid';
+import { rememberPoll } from '../../utils/myPolls';
 import { usePoll } from '../../hooks/usePoll';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { useNow } from '../../hooks/useNow';
@@ -38,6 +39,18 @@ function PollView() {
   // Ticking clock so a deadline passing while the page is open
   // flips the poll into its closed state
   const now = useNow(30000);
+
+  // Record the visit in this browser's poll list (keeps the title
+  // fresh after renames; the created-by-me flag is sticky)
+  useEffect(() => {
+    if (!poll) return;
+    const token = localStorage.getItem(`creatorToken:${poll.id}`);
+    rememberPoll({
+      id: poll.id,
+      title: poll.title,
+      createdByMe: !!poll.creatorToken && token === poll.creatorToken
+    });
+  }, [poll]);
 
   // Generate shareable link
   const pollUrl = `${window.location.origin}/poll/${pollId}`;

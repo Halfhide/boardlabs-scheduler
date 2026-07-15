@@ -30,7 +30,7 @@ features were proposed, 11 accepted, 4 rejected (see bottom).
 | 3 | Finalize a date      | 1     | done        |
 | 4 | Availability heatmap | 2     | done        |
 | 5 | Doodle-style matrix  | 2     | done        |
-| 6 | My polls list        | 2     | not started |
+| 6 | My polls list        | 2     | done        |
 | 7 | Player capacity      | 3     | not started |
 | 8 | Game voting          | 3     | not started |
 | 9 | Polish + i18n        | 4     | not started |
@@ -191,7 +191,13 @@ Acceptance criteria:
 
 ### 6. My polls list
 
-Status: not started
+Status: done (15 Jul 2026). localStorage-backed list (utils/myPolls.js,
+key `myPolls`, capped at 50 entries): entries are recorded on poll
+creation and refreshed on every poll visit (title stays current after
+renames, the created-by-me flag is sticky). The homepage shows a
+"Your polls" card under the create form with links, "YOURS" badges,
+last-opened times and per-entry removal. All storage access is
+try/catch guarded. Phase 2 is complete.
 
 Goal: people stop losing poll links.
 
@@ -334,3 +340,5 @@ Acceptance criteria: defined during its planning session.
 - 15 Jul 2026: feature 5 (Doodle-style matrix) implemented and
   verified in the browser, including a 46-date poll and a 390px
   viewport. No data model or rules changes.
+- 15 Jul 2026: feature 6 (my polls list) implemented and verified in
+  the browser; phase 2 complete. No data model or rules changes.

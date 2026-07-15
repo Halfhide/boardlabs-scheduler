@@ -2,7 +2,9 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPoll, MAX_POLL_DATES } from '../../utils/pollHelpers';
 import { generateDateRange } from '../../utils/dateHelpers';
+import { rememberPoll } from '../../utils/myPolls';
 import { diceRoll } from '../../utils/diceRoll';
+import MyPolls from './MyPolls';
 
 function CreatePoll() {
   const [title, setTitle] = useState('');
@@ -82,6 +84,9 @@ function CreatePoll() {
         console.error('Could not persist creator token:', storageErr);
       }
 
+      // Add it to this browser's poll list on the homepage
+      rememberPoll({ id: pollId, title: title.trim(), createdByMe: true });
+
       // 🎲 Rolling-dice celebration for creating a poll!
       const duration = 1500;
       const animationEnd = Date.now() + duration;
@@ -118,6 +123,7 @@ function CreatePoll() {
   };
 
   return (
+    <>
     <div className="bg-white rounded-lg shadow-md p-6 max-w-2xl mx-auto">
       <h2 className="text-2xl font-bold text-gray-900 mb-6">
         Create a New Poll
@@ -220,6 +226,10 @@ function CreatePoll() {
         </ul>
       </div>
     </div>
+
+    {/* Polls created or visited in this browser */}
+    <MyPolls />
+    </>
   );
 }
 
