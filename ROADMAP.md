@@ -28,7 +28,7 @@ features were proposed, 11 accepted, 4 rejected (see bottom).
 | 1 | Creator controls     | 1     | done        |
 | 2 | Voting deadline      | 1     | done        |
 | 3 | Finalize a date      | 1     | done        |
-| 4 | Availability heatmap | 2     | not started |
+| 4 | Availability heatmap | 2     | done        |
 | 5 | Doodle-style matrix  | 2     | not started |
 | 6 | My polls list        | 2     | not started |
 | 7 | Player capacity      | 3     | not started |
@@ -116,7 +116,8 @@ chosen date gets a distinct calendar style plus legend entry and a
 CHOSEN badge in results (replacing BEST). Finalizing closes voting via
 the shared isClosed logic; removing the chosen date is blocked until
 un-finalized. Rules updated for the new optional field. Phase 1 is
-complete.
+complete. (Commit 4f09571; a follow-up, 6512c96, replaced all confetti
+with 3D CSS dice bursts and removed the canvas-confetti dependency.)
 Depends on: creator controls.
 
 Goal: polls conclude with a decision everyone can see.
@@ -141,7 +142,14 @@ playing with" direction from the voter breakdown work.
 
 ### 4. Availability heatmap
 
-Status: not started
+Status: done (15 Jul 2026). "My votes" / "Group availability" toggle
+on the calendar (local state in Calendar.jsx). Group mode shades poll
+dates across five green buckets by score (yes 1, maybe 0.5) relative
+to the poll's unique voter count, shows the yes-count inside each
+cell, uses red for "votes exist but nobody can attend" and the
+available style for unvoted dates; the legend swaps per mode and the
+finalized-date style wins in both modes. Live updates preserve the
+selected mode.
 
 Goal: see at a glance which dates work for the most people.
 
@@ -312,3 +320,7 @@ Acceptance criteria: defined during its planning session.
 - 15 Jul 2026: feature 3 (finalize a date) implemented and verified
   in the browser; phase 1 complete. firebase-rules.txt updated again
   (one manual deploy covers all of phase 1).
+- 15 Jul 2026: all confetti replaced with 3D CSS dice bursts on
+  Adam's request; canvas-confetti dependency removed (commit 6512c96).
+- 15 Jul 2026: feature 4 (availability heatmap) implemented and
+  verified in the browser. No data model or rules changes.
