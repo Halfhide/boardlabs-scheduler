@@ -27,7 +27,7 @@ features were proposed, 11 accepted, 4 rejected (see bottom).
 |---|----------------------|-------|-------------|
 | 1 | Creator controls     | 1     | done        |
 | 2 | Voting deadline      | 1     | done        |
-| 3 | Finalize a date      | 1     | not started |
+| 3 | Finalize a date      | 1     | done        |
 | 4 | Availability heatmap | 2     | not started |
 | 5 | Doodle-style matrix  | 2     | not started |
 | 6 | My polls list        | 2     | not started |
@@ -80,7 +80,7 @@ Acceptance criteria:
 
 ### 2. Voting deadline
 
-Status: done (15 Jul 2026). Optional `deadline` timestamp on the poll
+Status: done (15 Jul 2026, commit 40f2753). Optional `deadline` timestamp on the poll
 document; datetime-local field on the create form; countdown banner
 while open; auto-flip to the closed state via a 30-second useNow tick;
 creator can set, change or remove the deadline from the AdminBar, and
@@ -107,7 +107,16 @@ Acceptance criteria:
 
 ### 3. Finalize a date
 
-Status: not started
+Status: done (15 Jul 2026). Optional `finalizedDateId` on the poll
+document. The creator finalizes (or un-finalizes) from the date modal;
+the AdminBar shows the finalized status with an un-finalize button and
+hides the close-voting toggle while finalized. Everyone sees a green
+"We're playing on ..." banner with yes/maybe attendee lists; the
+chosen date gets a distinct calendar style plus legend entry and a
+CHOSEN badge in results (replacing BEST). Finalizing closes voting via
+the shared isClosed logic; removing the chosen date is blocked until
+un-finalized. Rules updated for the new optional field. Phase 1 is
+complete.
 Depends on: creator controls.
 
 Goal: polls conclude with a decision everyone can see.
@@ -300,3 +309,6 @@ Acceptance criteria: defined during its planning session.
 - 15 Jul 2026: feature 2 (voting deadline) implemented and verified
   in the browser, including watching a live deadline pass and the
   poll close itself; firebase-rules.txt updated again.
+- 15 Jul 2026: feature 3 (finalize a date) implemented and verified
+  in the browser; phase 1 complete. firebase-rules.txt updated again
+  (one manual deploy covers all of phase 1).

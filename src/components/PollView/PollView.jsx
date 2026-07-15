@@ -12,9 +12,11 @@ import {
   addPollDate,
   removePollDate,
   setPollClosed,
-  setPollDeadline
+  setPollDeadline,
+  setFinalizedDate,
+  groupVotesByResponse
 } from '../../utils/pollHelpers';
-import { sortDates } from '../../utils/dateHelpers';
+import { sortDates, formatDate } from '../../utils/dateHelpers';
 import Loading from '../shared/Loading';
 import AdminBar from './AdminBar';
 import Calendar from './Calendar';
@@ -106,12 +108,19 @@ function PollView() {
   const creatorToken = localStorage.getItem(`creatorToken:${pollId}`);
   const isCreator = !!poll.creatorToken && creatorToken === poll.creatorToken;
 
-  // A poll is closed when the creator closed it or its deadline passed
+  // A poll is closed when the creator closed it, its deadline passed,
+  // or a winning date has been finalized
   const deadlineDate = poll.deadline
     ? (poll.deadline.toDate ? poll.deadline.toDate() : new Date(poll.deadline))
     : null;
   const deadlinePassed = !!deadlineDate && deadlineDate.getTime() <= now;
-  const isClosed = !!poll.closed || deadlinePassed;
+  const finalizedDate = poll.finalizedDateId
+    ? sortedDates.find((d) => d.id === poll.finalizedDateId) ?? null
+    : null;
+  const isClosed = !!poll.closed || deadlinePassed || !!finalizedDate;
+  const finalizedVotes = finalizedDate
+    ? groupVotesByResponse(finalizedDate.votes)
+    : null;
 
   return (
     <div className="space-y-6">
@@ -130,12 +139,45 @@ function PollView() {
         </div>
       </div>
 
+      {/* Finalized banner - the decision everyone came for */}
+      {finalizedDate && (
+        <div className="bg-green-50 border-2 border-green-400 rounded-lg p-5">
+          <div className="flex items-start gap-3">
+            <span className="text-3xl">🎉</span>
+            <div className="flex-1">
+              <p className="text-xl font-bold text-green-900">
+                We're playing on {formatDate(finalizedDate.date)}!
+              </p>
+              <div className="mt-2 space-y-1 text-sm text-green-900">
+                <p>
+                  <span className="font-semibold">
+                    Coming ({finalizedVotes.yes.length}):
+                  </span>{' '}
+                  {finalizedVotes.yes.length > 0
+                    ? finalizedVotes.yes.map((v) => v.voterName).join(', ')
+                    : 'nobody has voted yes yet'}
+                </p>
+                {finalizedVotes.maybe.length > 0 && (
+                  <p>
+                    <span className="font-semibold">
+                      Maybe ({finalizedVotes.maybe.length}):
+                    </span>{' '}
+                    {finalizedVotes.maybe.map((v) => v.voterName).join(', ')}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Creator tools */}
       {isCreator && (
         <AdminBar
           poll={poll}
           deadlineDate={deadlineDate}
           deadlinePassed={deadlinePassed}
+          finalizedDate={finalizedDate}
           onRename={(title) => updatePollTitle(pollId, creatorToken, title)}
           onAddDate={(dateString) => addPollDate(pollId, creatorToken, dateString)}
           onToggleClosed={() =>
@@ -143,11 +185,12 @@ function PollView() {
           }
           onSetDeadline={(date) => setPollDeadline(pollId, creatorToken, date)}
           onClearDeadline={() => setPollDeadline(pollId, creatorToken, null)}
+          onUnfinalize={() => setFinalizedDate(pollId, creatorToken, null)}
         />
       )}
 
-      {/* Closed banner */}
-      {isClosed && (
+      {/* Closed banner (the finalized banner already covers closure) */}
+      {isClosed && !finalizedDate && (
         <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-center gap-3">
           <span className="text-2xl">🔒</span>
           <div>
@@ -253,12 +296,17 @@ function PollView() {
           voterId={voterId}
           voterName={voterName}
           closed={isClosed}
+          finalizedDateId={poll.finalizedDateId ?? null}
           onDateClick={handleDateClick}
         />
       </div>
 
       {/* Results Summary - Below Calendar */}
-      <Results dates={sortedDates} onDateClick={handleDateClick} />
+      <Results
+        dates={sortedDates}
+        finalizedDateId={poll.finalizedDateId ?? null}
+        onDateClick={handleDateClick}
+      />
 
       {/* Date Modal */}
       {selectedDate && (
@@ -268,9 +316,11 @@ function PollView() {
           voterName={voterName}
           isCreator={isCreator}
           closed={isClosed}
+          finalizedDateId={poll.finalizedDateId ?? null}
           onVote={handleVote}
           onComment={handleComment}
           onRemoveDate={(dateId) => removePollDate(pollId, creatorToken, dateId)}
+          onFinalize={(dateId) => setFinalizedDate(pollId, creatorToken, dateId)}
           onClose={() => setSelectedDateId(null)}
         />
       )}

@@ -1,7 +1,7 @@
 import { format, parseISO, startOfMonth, endOfMonth, eachDayOfInterval, eachMonthOfInterval, isSameMonth, isSameDay } from 'date-fns';
 import { getVoteSummary, findUserVote } from '../../utils/pollHelpers';
 
-function MonthCalendar({ monthDate, dates, voterId, voterName, onDateClick }) {
+function MonthCalendar({ monthDate, dates, voterId, voterName, finalizedDateId, onDateClick }) {
   const monthStart = startOfMonth(monthDate);
   const monthEnd = endOfMonth(monthDate);
 
@@ -73,8 +73,12 @@ function MonthCalendar({ monthDate, dates, voterId, voterName, onDateClick }) {
           if (pollDateData) {
             hoverEffect = 'hover:shadow-md hover:scale-110 cursor-pointer transition-all';
 
-            // Color based on user's vote
-            if (userVote === 'yes') {
+            // The chosen date outshines everything else
+            if (pollDateData.id === finalizedDateId) {
+              bgColor = 'bg-green-600 ring-2 ring-green-400 ring-offset-1';
+              textColor = 'text-white';
+              borderColor = 'border-green-700';
+            } else if (userVote === 'yes') {
               bgColor = 'bg-green-500';
               textColor = 'text-white';
               borderColor = 'border-green-600';
@@ -117,7 +121,7 @@ function MonthCalendar({ monthDate, dates, voterId, voterName, onDateClick }) {
   );
 }
 
-function Calendar({ dates, voterId, voterName, closed, onDateClick }) {
+function Calendar({ dates, voterId, voterName, closed, finalizedDateId, onDateClick }) {
   if (dates.length === 0) {
     return null;
   }
@@ -139,6 +143,12 @@ function Calendar({ dates, voterId, voterName, closed, onDateClick }) {
 
       {/* Legend */}
       <div className="flex gap-3 mb-6 text-xs text-gray-600 flex-wrap justify-center">
+        {finalizedDateId && (
+          <div className="flex items-center gap-1">
+            <div className="w-5 h-5 bg-green-600 border border-green-700 ring-2 ring-green-400 rounded-sm"></div>
+            <span className="font-semibold">Chosen date</span>
+          </div>
+        )}
         <div className="flex items-center gap-1">
           <div className="w-5 h-5 bg-blue-100 border-2 border-blue-400 rounded-sm"></div>
           <span>Available</span>
@@ -166,6 +176,7 @@ function Calendar({ dates, voterId, voterName, closed, onDateClick }) {
             dates={dates}
             voterId={voterId}
             voterName={voterName}
+            finalizedDateId={finalizedDateId}
             onDateClick={onDateClick}
           />
         ))}

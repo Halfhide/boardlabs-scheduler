@@ -7,7 +7,7 @@ const RESPONSE_META = [
   { key: 'no', icon: '✗', badge: 'bg-red-100 text-red-800' }
 ];
 
-function Results({ dates, onDateClick }) {
+function Results({ dates, finalizedDateId, onDateClick }) {
   const bestDates = getBestDates(dates);
 
   if (dates.length === 0) {
@@ -43,6 +43,9 @@ function Results({ dates, onDateClick }) {
           const grouped = groupVotesByResponse(dateData.votes);
           const hasVotes = dateData.votes.length > 0;
           const totalVotes = dateData.votes.length;
+          const isChosen = dateData.id === finalizedDateId;
+          // Once a date is chosen, the BEST heuristic steps aside
+          const isBest = !finalizedDateId && index === 0 && hasVotes;
 
           return (
             <button
@@ -50,13 +53,20 @@ function Results({ dates, onDateClick }) {
               type="button"
               onClick={() => onDateClick(dateData)}
               className={`border rounded-md p-2 relative text-left transition-all hover:shadow-md hover:border-blue-400 cursor-pointer ${
-                index === 0 && hasVotes
-                  ? 'border-green-400 bg-green-50'
-                  : 'border-gray-200 bg-white'
+                isChosen
+                  ? 'border-green-600 border-2 bg-green-50'
+                  : isBest
+                    ? 'border-green-400 bg-green-50'
+                    : 'border-gray-200 bg-white'
               }`}
             >
-              {/* Best Badge */}
-              {index === 0 && hasVotes && (
+              {/* Chosen / Best Badge */}
+              {isChosen && (
+                <div className="absolute -top-1.5 -right-1.5 bg-green-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                  🎉 CHOSEN
+                </div>
+              )}
+              {isBest && (
                 <div className="absolute -top-1.5 -right-1.5 bg-green-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
                   🏆 BEST
                 </div>

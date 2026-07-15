@@ -154,6 +154,25 @@ export async function addPollDate(pollId, creatorToken, dateString) {
 }
 
 /**
+ * Finalize the poll on a chosen date, or un-finalize it (creator only)
+ * @param {string|null} dateId - The winning date's ID, or null to
+ *   un-finalize and reopen voting
+ */
+export async function setFinalizedDate(pollId, creatorToken, dateId) {
+  try {
+    await runCreatorUpdate(pollId, creatorToken, (poll) => {
+      if (dateId !== null && !poll.dates.some(d => d.id === dateId)) {
+        throw new Error('Date not found');
+      }
+      return { finalizedDateId: dateId ?? deleteField() };
+    });
+  } catch (error) {
+    console.error('Error finalizing poll:', error);
+    throw error;
+  }
+}
+
+/**
  * Remove a date from a poll, including its votes and comments
  * (creator only)
  */
@@ -162,6 +181,9 @@ export async function removePollDate(pollId, creatorToken, dateId) {
     await runCreatorUpdate(pollId, creatorToken, (poll) => {
       if (poll.dates.length <= 1) {
         throw new Error('A poll must keep at least one date');
+      }
+      if (poll.finalizedDateId === dateId) {
+        throw new Error('Un-finalize the poll before removing the chosen date');
       }
 
       const remaining = poll.dates.filter(d => d.id !== dateId);

@@ -21,6 +21,10 @@ everyone votes Yes / Maybe / No on each date. Results update in real time.
   remove dates, close or reopen voting, and set an optional voting
   deadline that closes the poll automatically (with a countdown shown
   to voters)
+- Finalize a date: the creator picks the winning date; everyone sees a
+  "We're playing on ..." banner with the attendee list, the chosen date
+  is highlighted in the calendar and results, and voting closes (it can
+  be un-finalized to reopen)
 - Confetti. A lot of confetti.
 
 ## Tech stack
@@ -80,6 +84,7 @@ polls/<pollId>
   creatorToken: string   (identifies the creator's browser)
   closed: boolean        (voting closed by the creator)
   deadline: timestamp    (optional; voting closes automatically)
+  finalizedDateId: string (optional; the chosen date, closes voting)
   dates: [
     { id, date: 'YYYY-MM-DD',
       votes: [{ id, voterId, voterName, response, timestamp }],

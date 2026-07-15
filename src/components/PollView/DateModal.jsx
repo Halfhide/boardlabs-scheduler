@@ -6,7 +6,7 @@ import { formatDate } from '../../utils/dateHelpers';
 import { getVoteSummary, findUserVote } from '../../utils/pollHelpers';
 import confetti from 'canvas-confetti';
 
-function DateModal({ dateData, voterId, voterName, isCreator, closed, onVote, onComment, onRemoveDate, onClose }) {
+function DateModal({ dateData, voterId, voterName, isCreator, closed, finalizedDateId, onVote, onComment, onRemoveDate, onFinalize, onClose }) {
   const [loading, setLoading] = useState(false);
   const [justVoted, setJustVoted] = useState(false);
   const [votingFor, setVotingFor] = useState(null);
@@ -14,6 +14,8 @@ function DateModal({ dateData, voterId, voterName, isCreator, closed, onVote, on
   const [confirmingRemove, setConfirmingRemove] = useState(false);
   const [removing, setRemoving] = useState(false);
   const [removeError, setRemoveError] = useState(false);
+  const [finalizing, setFinalizing] = useState(false);
+  const [finalizeError, setFinalizeError] = useState('');
 
   // Close on Escape and lock background scroll while the modal is open
   useEffect(() => {
@@ -87,6 +89,30 @@ function DateModal({ dateData, voterId, voterName, isCreator, closed, onVote, on
 
   // Show the vote that's being processed, or the actual vote
   const displayedVote = votingFor || currentUserVote?.response;
+
+  const isFinalizedDate = finalizedDateId === dateData.id;
+
+  const handleFinalize = async () => {
+    setFinalizing(true);
+    setFinalizeError('');
+    try {
+      await onFinalize(isFinalizedDate ? null : dateData.id);
+      // 🎉 Big celebration when a date is chosen!
+      if (!isFinalizedDate) {
+        confetti({
+          particleCount: 150,
+          spread: 90,
+          colors: ['#10b981', '#34d399', '#fbbf24', '#f59e0b'],
+          origin: { y: 0.6 }
+        });
+      }
+    } catch (error) {
+      console.error('Error finalizing date:', error);
+      setFinalizeError(error.message || 'Failed to finalize. Please try again.');
+    } finally {
+      setFinalizing(false);
+    }
+  };
 
   // Two-step removal instead of a native confirm dialog
   const handleRemoveDate = async () => {
@@ -251,9 +277,27 @@ function DateModal({ dateData, voterId, voterName, isCreator, closed, onVote, on
             />
           </div>
 
-          {/* Creator: remove this date */}
+          {/* Creator actions */}
           {isCreator && (
-            <div className="border-t border-gray-200 pt-4">
+            <div className="border-t border-gray-200 pt-4 space-y-3">
+              <button
+                onClick={handleFinalize}
+                disabled={finalizing || removing}
+                className={`w-full py-2.5 px-4 rounded-md text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                  isFinalizedDate
+                    ? 'border border-green-400 text-green-800 hover:bg-green-50'
+                    : 'bg-green-600 text-white hover:bg-green-700'
+                }`}
+              >
+                {finalizing
+                  ? 'Saving...'
+                  : isFinalizedDate
+                    ? 'Un-finalize (reopen voting)'
+                    : '🎉 Finalize: we play on this date!'}
+              </button>
+              {finalizeError && (
+                <p className="text-xs text-red-600">{finalizeError}</p>
+              )}
               <button
                 onClick={handleRemoveDate}
                 disabled={removing}

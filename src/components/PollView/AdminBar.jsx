@@ -1,15 +1,17 @@
 import { useState } from 'react';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 
 function AdminBar({
   poll,
   deadlineDate,
   deadlinePassed,
+  finalizedDate,
   onRename,
   onAddDate,
   onToggleClosed,
   onSetDeadline,
-  onClearDeadline
+  onClearDeadline,
+  onUnfinalize
 }) {
   const [titleDraft, setTitleDraft] = useState(poll.title);
   const [newDate, setNewDate] = useState('');
@@ -61,20 +63,39 @@ function AdminBar({
         <h3 className="text-sm font-bold text-indigo-900">
           🛠️ Creator tools
         </h3>
-        <button
-          onClick={() =>
-            run(onToggleClosed, poll.closed ? 'Voting reopened' : 'Voting closed')
-          }
-          disabled={busy}
-          className={`text-sm font-medium px-3 py-1.5 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
-            poll.closed
-              ? 'bg-green-600 text-white hover:bg-green-700'
-              : 'bg-amber-500 text-white hover:bg-amber-600'
-          }`}
-        >
-          {poll.closed ? 'Reopen voting' : 'Close voting'}
-        </button>
+        {!finalizedDate && (
+          <button
+            onClick={() =>
+              run(onToggleClosed, poll.closed ? 'Voting reopened' : 'Voting closed')
+            }
+            disabled={busy}
+            className={`text-sm font-medium px-3 py-1.5 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+              poll.closed
+                ? 'bg-green-600 text-white hover:bg-green-700'
+                : 'bg-amber-500 text-white hover:bg-amber-600'
+            }`}
+          >
+            {poll.closed ? 'Reopen voting' : 'Close voting'}
+          </button>
+        )}
       </div>
+
+      {/* Finalized status */}
+      {finalizedDate && (
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-green-100 border border-green-300 rounded-md px-3 py-2">
+          <p className="text-xs text-green-900 font-medium">
+            🎉 Finalized: {format(parseISO(finalizedDate.date), 'EEEE, MMMM d, yyyy')}.
+            Voting is closed.
+          </p>
+          <button
+            onClick={() => run(onUnfinalize, 'Poll reopened')}
+            disabled={busy}
+            className="text-xs font-medium px-3 py-1.5 rounded-md border border-green-400 text-green-800 hover:bg-green-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
+          >
+            Un-finalize and reopen voting
+          </button>
+        </div>
+      )}
 
       {/* Rename */}
       <div>
