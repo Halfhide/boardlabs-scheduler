@@ -18,7 +18,9 @@ everyone votes Yes / Maybe / No on each date. Results update in real time.
 - Live results grid ranked by most Yes votes (ties broken by fewest No,
   then most Maybe), with the best date highlighted
 - Creator tools: the browser that created a poll can rename it, add or
-  remove dates, and close or reopen voting
+  remove dates, close or reopen voting, and set an optional voting
+  deadline that closes the poll automatically (with a countdown shown
+  to voters)
 - Confetti. A lot of confetti.
 
 ## Tech stack
@@ -77,6 +79,7 @@ polls/<pollId>
   createdAt: timestamp
   creatorToken: string   (identifies the creator's browser)
   closed: boolean        (voting closed by the creator)
+  deadline: timestamp    (optional; voting closes automatically)
   dates: [
     { id, date: 'YYYY-MM-DD',
       votes: [{ id, voterId, voterName, response, timestamp }],

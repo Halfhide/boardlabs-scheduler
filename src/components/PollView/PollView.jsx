@@ -3,13 +3,16 @@ import { useParams } from 'react-router-dom';
 import { nanoid } from 'nanoid';
 import { usePoll } from '../../hooks/usePoll';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
+import { useNow } from '../../hooks/useNow';
+import { format, formatDistanceToNow } from 'date-fns';
 import {
   addVote,
   addComment,
   updatePollTitle,
   addPollDate,
   removePollDate,
-  setPollClosed
+  setPollClosed,
+  setPollDeadline
 } from '../../utils/pollHelpers';
 import { sortDates } from '../../utils/dateHelpers';
 import Loading from '../shared/Loading';
@@ -29,6 +32,9 @@ function PollView() {
   const [tempName, setTempName] = useState('');
   const [selectedDateId, setSelectedDateId] = useState(null);
   const [copied, setCopied] = useState(false);
+  // Ticking clock so a deadline passing while the page is open
+  // flips the poll into its closed state
+  const now = useNow(30000);
 
   // Generate shareable link
   const pollUrl = `${window.location.origin}/poll/${pollId}`;
@@ -99,7 +105,13 @@ function PollView() {
   // matching token in localStorage
   const creatorToken = localStorage.getItem(`creatorToken:${pollId}`);
   const isCreator = !!poll.creatorToken && creatorToken === poll.creatorToken;
-  const isClosed = !!poll.closed;
+
+  // A poll is closed when the creator closed it or its deadline passed
+  const deadlineDate = poll.deadline
+    ? (poll.deadline.toDate ? poll.deadline.toDate() : new Date(poll.deadline))
+    : null;
+  const deadlinePassed = !!deadlineDate && deadlineDate.getTime() <= now;
+  const isClosed = !!poll.closed || deadlinePassed;
 
   return (
     <div className="space-y-6">
@@ -122,9 +134,15 @@ function PollView() {
       {isCreator && (
         <AdminBar
           poll={poll}
+          deadlineDate={deadlineDate}
+          deadlinePassed={deadlinePassed}
           onRename={(title) => updatePollTitle(pollId, creatorToken, title)}
           onAddDate={(dateString) => addPollDate(pollId, creatorToken, dateString)}
-          onToggleClosed={() => setPollClosed(pollId, creatorToken, !poll.closed)}
+          onToggleClosed={() =>
+            setPollClosed(pollId, creatorToken, !poll.closed, poll.closed && deadlinePassed)
+          }
+          onSetDeadline={(date) => setPollDeadline(pollId, creatorToken, date)}
+          onClearDeadline={() => setPollDeadline(pollId, creatorToken, null)}
         />
       )}
 
@@ -135,10 +153,23 @@ function PollView() {
           <div>
             <p className="font-semibold text-amber-900">Voting is closed</p>
             <p className="text-sm text-amber-800">
-              The creator has closed this poll. You can still browse the
-              results and comments.
+              {poll.closed
+                ? 'The creator has closed this poll.'
+                : `The voting deadline (${format(deadlineDate, "EEE, MMM d 'at' HH:mm")}) has passed.`}{' '}
+              You can still browse the results and comments.
             </p>
           </div>
+        </div>
+      )}
+
+      {/* Deadline countdown */}
+      {!isClosed && deadlineDate && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-center gap-2">
+          <span className="text-xl">⏳</span>
+          <p className="text-sm text-blue-900">
+            Voting closes {formatDistanceToNow(deadlineDate, { addSuffix: true })}{' '}
+            ({format(deadlineDate, "EEE, MMM d 'at' HH:mm")})
+          </p>
         </div>
       )}
 

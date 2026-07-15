@@ -26,7 +26,7 @@ features were proposed, 11 accepted, 4 rejected (see bottom).
 | # | Feature              | Phase | Status      |
 |---|----------------------|-------|-------------|
 | 1 | Creator controls     | 1     | done        |
-| 2 | Voting deadline      | 1     | not started |
+| 2 | Voting deadline      | 1     | done        |
 | 3 | Finalize a date      | 1     | not started |
 | 4 | Availability heatmap | 2     | not started |
 | 5 | Doodle-style matrix  | 2     | not started |
@@ -45,7 +45,7 @@ phase 5.
 
 ### 1. Creator controls
 
-Status: done (15 Jul 2026). Implemented with `creatorToken` on the
+Status: done (15 Jul 2026, commit e071ec0). Implemented with `creatorToken` on the
 poll document plus `closed` flag, AdminBar component (rename, add
 date, close/reopen), two-step date removal in the date modal, and
 extended Firestore rules. Identity is enforced client-side as
@@ -80,7 +80,13 @@ Acceptance criteria:
 
 ### 2. Voting deadline
 
-Status: not started
+Status: done (15 Jul 2026). Optional `deadline` timestamp on the poll
+document; datetime-local field on the create form; countdown banner
+while open; auto-flip to the closed state via a 30-second useNow tick;
+creator can set, change or remove the deadline from the AdminBar, and
+reopening a manually closed poll clears a passed deadline so reopening
+actually reopens. Enforcement is client-side as planned. Rules updated
+for the new optional field (manual deploy needed).
 Depends on: creator controls (creation form fields, admin bar).
 
 Goal: polls can close automatically at a chosen moment.
@@ -291,3 +297,6 @@ Acceptance criteria: defined during its planning session.
 - 15 Jul 2026: roadmap created from the feature review session.
 - 15 Jul 2026: feature 1 (creator controls) implemented and verified
   in the browser; firebase-rules.txt updated (manual deploy needed).
+- 15 Jul 2026: feature 2 (voting deadline) implemented and verified
+  in the browser, including watching a live deadline pass and the
+  poll close itself; firebase-rules.txt updated again.

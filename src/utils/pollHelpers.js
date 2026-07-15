@@ -1,4 +1,4 @@
-import { doc, setDoc, runTransaction } from 'firebase/firestore';
+import { doc, setDoc, runTransaction, deleteField } from 'firebase/firestore';
 import { nanoid } from 'nanoid';
 import { db } from '../firebase';
 
@@ -10,9 +10,10 @@ export const MAX_POLL_DATES = 92;
  * Create a new poll
  * @param {string} title - Poll title
  * @param {string[]} dateStrings - Array of ISO date strings
+ * @param {Date|null} deadline - Optional voting deadline
  * @returns {Promise<{pollId: string, creatorToken: string}>} Poll ID and creator token
  */
-export async function createPoll(title, dateStrings) {
+export async function createPoll(title, dateStrings, deadline = null) {
   try {
     const pollId = nanoid(10);
     const creatorToken = nanoid(16);
@@ -24,6 +25,7 @@ export async function createPoll(title, dateStrings) {
       createdAt: new Date(),
       creatorToken,
       closed: false,
+      ...(deadline ? { deadline } : {}),
       dates: dateStrings.map((dateString, index) => ({
         id: `date${index}`,
         date: dateString,
@@ -85,12 +87,37 @@ export async function updatePollTitle(pollId, creatorToken, title) {
 
 /**
  * Close or reopen voting on a poll (creator only)
+ * @param {boolean} clearDeadline - Also remove the deadline; used when
+ *   reopening a poll whose deadline has passed, which would otherwise
+ *   keep it closed
  */
-export async function setPollClosed(pollId, creatorToken, closed) {
+export async function setPollClosed(pollId, creatorToken, closed, clearDeadline = false) {
   try {
-    await runCreatorUpdate(pollId, creatorToken, () => ({ closed }));
+    await runCreatorUpdate(pollId, creatorToken, () => ({
+      closed,
+      ...(clearDeadline ? { deadline: deleteField() } : {})
+    }));
   } catch (error) {
     console.error('Error updating poll closed state:', error);
+    throw error;
+  }
+}
+
+/**
+ * Set or remove the voting deadline (creator only)
+ * @param {Date|null} deadline - New deadline, or null to remove it
+ */
+export async function setPollDeadline(pollId, creatorToken, deadline) {
+  if (deadline !== null && (!(deadline instanceof Date) || isNaN(deadline.getTime()))) {
+    throw new Error('Invalid deadline');
+  }
+
+  try {
+    await runCreatorUpdate(pollId, creatorToken, () => ({
+      deadline: deadline ?? deleteField()
+    }));
+  } catch (error) {
+    console.error('Error updating poll deadline:', error);
     throw error;
   }
 }

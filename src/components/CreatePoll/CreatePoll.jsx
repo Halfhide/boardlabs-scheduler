@@ -8,6 +8,7 @@ function CreatePoll() {
   const [title, setTitle] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [deadline, setDeadline] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -43,6 +44,15 @@ function CreatePoll() {
       return;
     }
 
+    let deadlineDate = null;
+    if (deadline) {
+      deadlineDate = new Date(deadline);
+      if (isNaN(deadlineDate.getTime()) || deadlineDate.getTime() <= Date.now()) {
+        setError('The voting deadline must be in the future');
+        return;
+      }
+    }
+
     setLoading(true);
 
     try {
@@ -62,7 +72,7 @@ function CreatePoll() {
       }
 
       // Create poll in Firebase
-      const { pollId, creatorToken } = await createPoll(title, dates);
+      const { pollId, creatorToken } = await createPoll(title, dates, deadlineDate);
 
       // Remember that this browser created the poll, unlocking the
       // creator tools on the poll page
@@ -166,6 +176,24 @@ function CreatePoll() {
               disabled={loading}
             />
           </div>
+        </div>
+
+        {/* Optional Voting Deadline */}
+        <div>
+          <label htmlFor="deadline" className="block text-sm font-medium text-gray-700 mb-2">
+            Voting Deadline <span className="text-gray-400 font-normal">(optional)</span>
+          </label>
+          <input
+            type="datetime-local"
+            id="deadline"
+            value={deadline}
+            onChange={(e) => setDeadline(e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            disabled={loading}
+          />
+          <p className="mt-1 text-xs text-gray-500">
+            Voting closes automatically at this time. Leave empty for no deadline.
+          </p>
         </div>
 
         {/* Error Message */}
