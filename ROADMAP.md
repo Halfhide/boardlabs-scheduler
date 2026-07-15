@@ -29,7 +29,7 @@ features were proposed, 11 accepted, 4 rejected (see bottom).
 | 2 | Voting deadline      | 1     | done        |
 | 3 | Finalize a date      | 1     | done        |
 | 4 | Availability heatmap | 2     | done        |
-| 5 | Doodle-style matrix  | 2     | not started |
+| 5 | Doodle-style matrix  | 2     | done        |
 | 6 | My polls list        | 2     | not started |
 | 7 | Player capacity      | 3     | not started |
 | 8 | Game voting          | 3     | not started |
@@ -166,7 +166,14 @@ Acceptance criteria:
 
 ### 5. Doodle-style matrix
 
-Status: not started
+Status: done (15 Jul 2026). New VoteMatrix component between the
+calendar and results: rows are participants (current user pinned
+first and highlighted), columns are dates with clickable headers
+that open the date modal, colored vote marks, a "Can attend" totals
+row, sticky name column, chosen-date highlight, and horizontal
+scrolling contained inside the card (verified: page overflow-x stays
+false at 390px and with a 46-date poll). Hidden until the poll has
+at least one voter.
 
 Goal: full-group availability table like Doodle.
 
@@ -324,3 +331,6 @@ Acceptance criteria: defined during its planning session.
   Adam's request; canvas-confetti dependency removed (commit 6512c96).
 - 15 Jul 2026: feature 4 (availability heatmap) implemented and
   verified in the browser. No data model or rules changes.
+- 15 Jul 2026: feature 5 (Doodle-style matrix) implemented and
+  verified in the browser, including a 46-date poll and a 390px
+  viewport. No data model or rules changes.

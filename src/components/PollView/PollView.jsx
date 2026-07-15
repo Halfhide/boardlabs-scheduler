@@ -20,6 +20,7 @@ import { sortDates, formatDate } from '../../utils/dateHelpers';
 import Loading from '../shared/Loading';
 import AdminBar from './AdminBar';
 import Calendar from './Calendar';
+import VoteMatrix from './VoteMatrix';
 import DateModal from './DateModal';
 import Results from '../Results/Results';
 import { diceRoll } from '../../utils/diceRoll';
@@ -296,6 +297,15 @@ function PollView() {
           onDateClick={handleDateClick}
         />
       </div>
+
+      {/* Doodle-style availability matrix */}
+      <VoteMatrix
+        dates={sortedDates}
+        voterId={voterId}
+        voterName={voterName}
+        finalizedDateId={poll.finalizedDateId ?? null}
+        onDateClick={handleDateClick}
+      />
 
       {/* Results Summary - Below Calendar */}
       <Results
