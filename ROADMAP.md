@@ -339,7 +339,8 @@ Acceptance criteria:
 
 ### 9. Polish + i18n
 
-Status: done (16 Jul 2026). Dependency-free i18n in src/i18n/:
+Status: done (16 Jul 2026, commit b153d1f). Dependency-free i18n in
+src/i18n/:
 translations.js (all UI strings for en and pl, {param} interpolation,
 plural forms with proper Polish rules), LanguageProvider + context +
 useTranslation hook exposing t(), lang, setLang and the matching
