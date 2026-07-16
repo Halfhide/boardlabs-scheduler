@@ -1,5 +1,6 @@
 import { getBestDates, groupVotesByResponse, getCapacityStatus } from '../../utils/pollHelpers';
 import { format, parseISO } from 'date-fns';
+import { useTranslation } from '../../i18n/useTranslation';
 
 const RESPONSE_META = [
   { key: 'yes', icon: '✓', badge: 'bg-green-100 text-green-800' },
@@ -14,6 +15,7 @@ const CAPACITY_STYLES = {
 };
 
 function Results({ dates, finalizedDateId, minPlayers, maxPlayers, onDateClick }) {
+  const { t, dateLocale } = useTranslation();
   const bestDates = getBestDates(dates, minPlayers);
 
   if (dates.length === 0) {
@@ -34,13 +36,13 @@ function Results({ dates, finalizedDateId, minPlayers, maxPlayers, onDateClick }
   return (
     <div className="bg-white rounded-lg shadow-sm p-4">
       <div className="flex items-center justify-between mb-1">
-        <h3 className="text-base font-bold text-gray-900">Results</h3>
+        <h3 className="text-base font-bold text-gray-900">{t('resultsHeading')}</h3>
         <p className="text-xs text-gray-600">
-          {totalVoters} {totalVoters === 1 ? 'voter' : 'voters'}
+          {t('voters', { count: totalVoters })}
         </p>
       </div>
       <p className="text-xs text-gray-400 mb-3">
-        Click any date to see full details and vote
+        {t('clickAnyDate')}
       </p>
 
       {/* Grid of Results */}
@@ -70,19 +72,19 @@ function Results({ dates, finalizedDateId, minPlayers, maxPlayers, onDateClick }
               {/* Chosen / Best Badge */}
               {isChosen && (
                 <div className="absolute -top-1.5 -right-1.5 bg-green-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
-                  🎉 CHOSEN
+                  {t('chosenBadge')}
                 </div>
               )}
               {isBest && (
                 <div className="absolute -top-1.5 -right-1.5 bg-green-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
-                  🏆 BEST
+                  {t('bestBadge')}
                 </div>
               )}
 
               {/* Date */}
               <div className="mb-1.5">
                 <div className="text-xs font-semibold text-gray-900 leading-tight">
-                  {format(parseISO(dateData.date), 'EEE, MMM d')}
+                  {format(parseISO(dateData.date), t('resultDateFormat'), { locale: dateLocale })}
                 </div>
                 <div className="text-[10px] text-gray-500">
                   {format(parseISO(dateData.date), 'yyyy')}
@@ -110,14 +112,14 @@ function Results({ dates, finalizedDateId, minPlayers, maxPlayers, onDateClick }
                   })}
                 </div>
               ) : (
-                <div className="text-[10px] text-gray-400 italic">No votes</div>
+                <div className="text-[10px] text-gray-400 italic">{t('noVotes')}</div>
               )}
 
               {/* Player capacity state */}
               {capacity && (
                 <div className="mt-1">
                   <span className={`inline-block text-[10px] font-medium px-1.5 py-0.5 rounded ${CAPACITY_STYLES[capacity.key]}`}>
-                    {capacity.label}
+                    {t(`capacity${capacity.key.charAt(0).toUpperCase()}${capacity.key.slice(1)}`, { count: capacity.needed })}
                   </span>
                 </div>
               )}
@@ -125,7 +127,7 @@ function Results({ dates, finalizedDateId, minPlayers, maxPlayers, onDateClick }
               {/* Total votes indicator */}
               {hasVotes && (
                 <div className="mt-1 text-[10px] text-gray-500">
-                  {totalVotes} {totalVotes === 1 ? 'vote' : 'votes'}
+                  {t('votes', { count: totalVotes })}
                 </div>
               )}
             </button>

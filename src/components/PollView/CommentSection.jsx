@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { format } from 'date-fns';
+import { useTranslation } from '../../i18n/useTranslation';
 
 function CommentSection({ comments, dateId, voterName, onComment }) {
+  const { t, dateLocale } = useTranslation();
   const [commentText, setCommentText] = useState('');
   const [loading, setLoading] = useState(false);
   const [submitError, setSubmitError] = useState(false);
@@ -37,8 +39,8 @@ function CommentSection({ comments, dateId, voterName, onComment }) {
                 </span>
                 <span className="text-xs text-gray-500">
                   {comment.timestamp?.toDate
-                    ? format(comment.timestamp.toDate(), 'MMM d, h:mm a')
-                    : 'Just now'}
+                    ? format(comment.timestamp.toDate(), t('commentTimeFormat'), { locale: dateLocale })
+                    : t('justNow')}
                 </span>
               </div>
               <p className="text-sm text-gray-700">{comment.text}</p>
@@ -53,7 +55,7 @@ function CommentSection({ comments, dateId, voterName, onComment }) {
           type="text"
           value={commentText}
           onChange={(e) => setCommentText(e.target.value)}
-          placeholder="Add a comment..."
+          placeholder={t('addCommentPlaceholder')}
           className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           disabled={loading || !voterName}
         />
@@ -62,19 +64,19 @@ function CommentSection({ comments, dateId, voterName, onComment }) {
           disabled={loading || !commentText.trim() || !voterName}
           className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
-          {loading ? 'Sending...' : 'Send'}
+          {loading ? t('sending') : t('send')}
         </button>
       </form>
 
       {submitError && (
         <p className="text-xs text-red-600">
-          Failed to add comment. Please try again.
+          {t('commentFailed')}
         </p>
       )}
 
       {!voterName && (
         <p className="text-xs text-gray-500 italic">
-          Please enter your name to add comments
+          {t('enterNameToComment')}
         </p>
       )}
     </div>

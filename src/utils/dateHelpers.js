@@ -3,11 +3,13 @@ import { format, parseISO, eachDayOfInterval, isValid } from 'date-fns';
 /**
  * Format a date string to a readable format
  * @param {string} dateString - ISO date string (YYYY-MM-DD)
+ * @param {Object} [options] - date-fns format options (e.g. { locale })
+ * @param {string} [pattern] - date-fns format pattern override
  * @returns {string} Formatted date (e.g., "Friday, March 15, 2026")
  */
-export function formatDate(dateString) {
+export function formatDate(dateString, options = {}, pattern = 'EEEE, MMMM d, yyyy') {
   try {
-    return format(parseISO(dateString), 'EEEE, MMMM d, yyyy');
+    return format(parseISO(dateString), pattern, options);
   } catch (error) {
     console.error('Error formatting date:', error);
     return dateString;

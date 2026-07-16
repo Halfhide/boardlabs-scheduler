@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { searchBggGames } from '../../utils/bggSearch';
+import { useTranslation } from '../../i18n/useTranslation';
 
 const MIN_QUERY_LENGTH = 2;
 const DEBOUNCE_MS = 300;
@@ -8,6 +9,7 @@ const DEBOUNCE_MS = 300;
 // always keeps working: suggestions are optional, and any BGG failure
 // fails silent (no dropdown, no error).
 function GameSearchInput({ value, onChange, onSelect, disabled }) {
+  const { t } = useTranslation();
   const [suggestions, setSuggestions] = useState([]);
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
@@ -98,7 +100,7 @@ function GameSearchInput({ value, onChange, onSelect, disabled }) {
         onKeyDown={handleKeyDown}
         onBlur={close}
         maxLength={80}
-        placeholder="Suggest a game (e.g., Catan)"
+        placeholder={t('suggestGamePlaceholder')}
         role="combobox"
         aria-expanded={open}
         aria-autocomplete="list"
@@ -139,7 +141,7 @@ function GameSearchInput({ value, onChange, onSelect, disabled }) {
             </li>
           ))}
           <li className="px-3 pt-1 mt-1 border-t border-gray-100 text-[10px] text-gray-400">
-            From BoardGameGeek. Not listed? Just keep typing.
+            {t('bggFooterHint')}
           </li>
         </ul>
       )}

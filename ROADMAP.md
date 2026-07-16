@@ -34,7 +34,7 @@ features were proposed, 11 accepted, 4 rejected (see bottom).
 | 7 | Player capacity      | 3     | done        |
 | 8 | Game voting          | 3     | done        |
 | 12 | BGG game search     | 3     | done (needs BGG token) |
-| 9 | Polish + i18n        | 4     | not started |
+| 9 | Polish + i18n        | 4     | done        |
 | 10 | PWA install         | 4     | not started |
 | 11 | Google sign-in      | 5     | not started |
 
@@ -339,7 +339,24 @@ Acceptance criteria:
 
 ### 9. Polish + i18n
 
-Status: not started
+Status: done (16 Jul 2026). Dependency-free i18n in src/i18n/:
+translations.js (all UI strings for en and pl, {param} interpolation,
+plural forms with proper Polish rules), LanguageProvider + context +
+useTranslation hook exposing t(), lang, setLang and the matching
+date-fns locale. EN/PL toggle in the header; persisted under the
+localStorage key `language`; default from navigator.language. All
+date formatting goes through date-fns with the active locale, format
+patterns live in the dictionary (Polish gets "d MMMM yyyy" style and
+24h times), and the calendar starts weeks per locale (Monday in
+Polish, Sunday in English) with translated weekday letters. Errors
+thrown by pollHelpers now carry a `code` translation key (message
+stays English for the console) and translateError() renders them;
+getCapacityStatus returns {key, needed} instead of an English label;
+usePoll returns error keys. Verified in the browser in both
+languages: create form, poll page, calendar (week start + month
+names), matrix, game voting, results, date modal, voting flow,
+AdminBar, capacity plurals, relative times, toggle persistence
+across reload.
 
 Goal: full UI in Polish and English.
 
@@ -437,3 +454,8 @@ Acceptance criteria: defined during its planning session.
   401). Discovered BGG now requires app registration and a Bearer
   token; Adam must register and set BGG_API_TOKEN before live
   suggestions work. No Firestore rules changes.
+- 16 Jul 2026: feature 9 (Polish + i18n) implemented and verified in
+  the browser in both languages, including locale-aware calendars
+  (Monday-first Polish weeks), Polish plural forms, translated error
+  paths, and a persisted EN/PL header toggle. No data model or rules
+  changes.

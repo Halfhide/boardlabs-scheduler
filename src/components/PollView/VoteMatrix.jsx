@@ -1,5 +1,6 @@
 import { format, parseISO } from 'date-fns';
 import { getVoteSummary } from '../../utils/pollHelpers';
+import { useTranslation } from '../../i18n/useTranslation';
 
 const MARK_STYLES = {
   yes: 'bg-green-500 text-white',
@@ -10,6 +11,7 @@ const MARK_STYLES = {
 const MARK_LABELS = { yes: '✓', maybe: '?', no: '✗' };
 
 function VoteMatrix({ dates, voterId, voterName, finalizedDateId, onDateClick }) {
+  const { t, dateLocale } = useTranslation();
   // Collect unique participants (by stable voter ID, name for legacy
   // votes) and index their vote per date
   const participantsByKey = new Map();
@@ -40,13 +42,13 @@ function VoteMatrix({ dates, voterId, voterName, finalizedDateId, onDateClick })
   return (
     <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
       <div className="flex items-center justify-between mb-1">
-        <h3 className="text-base font-bold text-gray-900">Availability table</h3>
+        <h3 className="text-base font-bold text-gray-900">{t('availabilityTable')}</h3>
         <p className="text-xs text-gray-600">
-          {participants.length} {participants.length === 1 ? 'participant' : 'participants'}
+          {t('participants', { count: participants.length })}
         </p>
       </div>
       <p className="text-xs text-gray-400 mb-3">
-        Click a date column for details and voting
+        {t('clickColumnHint')}
       </p>
 
       {/* The table scrolls horizontally inside this card so the page
@@ -56,7 +58,7 @@ function VoteMatrix({ dates, voterId, voterName, finalizedDateId, onDateClick })
           <thead>
             <tr>
               <th className="sticky left-0 bg-white z-10 text-left text-xs font-medium text-gray-500 pr-3 align-bottom min-w-28">
-                Participant
+                {t('participantHeader')}
               </th>
               {dates.map((d) => {
                 const isChosen = d.id === finalizedDateId;
@@ -71,10 +73,10 @@ function VoteMatrix({ dates, voterId, voterName, finalizedDateId, onDateClick })
                     >
                       {isChosen && <span className="block text-[10px]">🎉</span>}
                       <span className="block text-[10px] font-medium text-gray-500 uppercase">
-                        {format(parseISO(d.date), 'EEE')}
+                        {format(parseISO(d.date), 'EEE', { locale: dateLocale })}
                       </span>
                       <span className="block text-xs font-semibold text-gray-900 whitespace-nowrap">
-                        {format(parseISO(d.date), 'd MMM')}
+                        {format(parseISO(d.date), 'd MMM', { locale: dateLocale })}
                       </span>
                     </button>
                   </th>
@@ -86,7 +88,7 @@ function VoteMatrix({ dates, voterId, voterName, finalizedDateId, onDateClick })
             {/* Totals row */}
             <tr>
               <th className="sticky left-0 bg-white z-10 text-left text-[11px] font-medium text-gray-500 pr-3">
-                Can attend
+                {t('canAttend')}
               </th>
               {dates.map((d) => {
                 const summary = getVoteSummary(d.votes);
@@ -114,7 +116,7 @@ function VoteMatrix({ dates, voterId, voterName, finalizedDateId, onDateClick })
                     }`}
                   >
                     {p.name}
-                    {you && <span className="font-normal text-blue-600"> (you)</span>}
+                    {you && <span className="font-normal text-blue-600"> {t('you')}</span>}
                   </th>
                   {dates.map((d) => {
                     const response = p.votes[d.id];

@@ -5,8 +5,10 @@ import { generateDateRange } from '../../utils/dateHelpers';
 import { rememberPoll } from '../../utils/myPolls';
 import { diceRoll } from '../../utils/diceRoll';
 import MyPolls from './MyPolls';
+import { useTranslation } from '../../i18n/useTranslation';
 
 function CreatePoll() {
+  const { t } = useTranslation();
   const [title, setTitle] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -34,17 +36,17 @@ function CreatePoll() {
 
     // Validation
     if (!title.trim()) {
-      setError('Please enter a poll title');
+      setError(t('errTitleRequired'));
       return;
     }
 
     if (!startDate || !endDate) {
-      setError('Please select both start and end dates');
+      setError(t('errDatesRequired'));
       return;
     }
 
     if (new Date(startDate) > new Date(endDate)) {
-      setError('Start date must be before or equal to end date');
+      setError(t('errDateOrder'));
       return;
     }
 
@@ -52,7 +54,7 @@ function CreatePoll() {
     if (deadline) {
       deadlineDate = new Date(deadline);
       if (isNaN(deadlineDate.getTime()) || deadlineDate.getTime() <= Date.now()) {
-        setError('The voting deadline must be in the future');
+        setError(t('errDeadlineFuture'));
         return;
       }
     }
@@ -62,11 +64,11 @@ function CreatePoll() {
     const max = parsePlayers(maxPlayers);
     const invalidBound = (v) => v !== null && (!Number.isInteger(v) || v < 1 || v > 99);
     if (invalidBound(min) || invalidBound(max)) {
-      setError('Player counts must be whole numbers between 1 and 99');
+      setError(t('errPlayersRange'));
       return;
     }
     if (min !== null && max !== null && max < min) {
-      setError('Maximum players cannot be lower than minimum players');
+      setError(t('errMaxBelowMin'));
       return;
     }
 
@@ -77,13 +79,13 @@ function CreatePoll() {
       const dates = generateDateRange(startDate, endDate);
 
       if (dates.length === 0) {
-        setError('No dates generated. Please check your date range.');
+        setError(t('errNoDates'));
         setLoading(false);
         return;
       }
 
       if (dates.length > MAX_POLL_DATES) {
-        setError(`Date range is too long (${dates.length} days). Please choose a range of ${MAX_POLL_DATES} days or less.`);
+        setError(t('errTooManyDatesRange', { count: dates.length, max: MAX_POLL_DATES }));
         setLoading(false);
         return;
       }
@@ -136,7 +138,7 @@ function CreatePoll() {
       }, 250);
     } catch (err) {
       console.error('Error creating poll:', err);
-      setError('Failed to create poll. Please try again.');
+      setError(t('errCreateFailed'));
       setLoading(false);
     }
   };
@@ -145,21 +147,21 @@ function CreatePoll() {
     <>
     <div className="bg-white rounded-lg shadow-md p-6 max-w-2xl mx-auto">
       <h2 className="text-2xl font-bold text-gray-900 mb-6">
-        Create a New Poll
+        {t('createTitle')}
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Title Input */}
         <div>
           <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
-            Poll Title
+            {t('pollTitleLabel')}
           </label>
           <input
             type="text"
             id="title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="e.g., Board Game Night - January"
+            placeholder={t('pollTitlePlaceholder')}
             maxLength={100}
             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             disabled={loading}
@@ -170,7 +172,7 @@ function CreatePoll() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 mb-2">
-              Start Date
+              {t('startDate')}
             </label>
             <input
               type="date"
@@ -184,7 +186,7 @@ function CreatePoll() {
 
           <div>
             <label htmlFor="endDate" className="block text-sm font-medium text-gray-700 mb-2">
-              End Date
+              {t('endDate')}
             </label>
             <input
               type="date"
@@ -201,7 +203,7 @@ function CreatePoll() {
         {/* Optional Voting Deadline */}
         <div>
           <label htmlFor="deadline" className="block text-sm font-medium text-gray-700 mb-2">
-            Voting Deadline <span className="text-gray-400 font-normal">(optional)</span>
+            {t('votingDeadlineLabel')} <span className="text-gray-400 font-normal">{t('optional')}</span>
           </label>
           <input
             type="datetime-local"
@@ -212,7 +214,7 @@ function CreatePoll() {
             disabled={loading}
           />
           <p className="mt-1 text-xs text-gray-500">
-            Voting closes automatically at this time. Leave empty for no deadline.
+            {t('deadlineHelp')}
           </p>
         </div>
 
@@ -220,7 +222,7 @@ function CreatePoll() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label htmlFor="minPlayers" className="block text-sm font-medium text-gray-700 mb-2">
-              Min Players <span className="text-gray-400 font-normal">(optional)</span>
+              {t('minPlayersLabel')} <span className="text-gray-400 font-normal">{t('optional')}</span>
             </label>
             <input
               type="number"
@@ -229,14 +231,14 @@ function CreatePoll() {
               max={99}
               value={minPlayers}
               onChange={(e) => setMinPlayers(e.target.value)}
-              placeholder="e.g., 3"
+              placeholder={t('minPlayersPlaceholder')}
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               disabled={loading}
             />
           </div>
           <div>
             <label htmlFor="maxPlayers" className="block text-sm font-medium text-gray-700 mb-2">
-              Max Players <span className="text-gray-400 font-normal">(optional)</span>
+              {t('maxPlayersLabel')} <span className="text-gray-400 font-normal">{t('optional')}</span>
             </label>
             <input
               type="number"
@@ -245,15 +247,14 @@ function CreatePoll() {
               max={99}
               value={maxPlayers}
               onChange={(e) => setMaxPlayers(e.target.value)}
-              placeholder="e.g., 6"
+              placeholder={t('maxPlayersPlaceholder')}
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               disabled={loading}
             />
           </div>
         </div>
         <p className="-mt-4 text-xs text-gray-500">
-          Board games have player counts: dates will show whether enough
-          people can attend.
+          {t('capacityHelp')}
         </p>
 
         {/* Error Message */}
@@ -269,19 +270,19 @@ function CreatePoll() {
           disabled={loading}
           className="w-full bg-blue-600 text-white font-medium py-3 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
-          {loading ? 'Creating Poll...' : 'Create Poll'}
+          {loading ? t('creatingPoll') : t('createPoll')}
         </button>
       </form>
 
       {/* Instructions */}
       <div className="mt-6 p-4 bg-blue-50 rounded-md">
-        <h3 className="text-sm font-medium text-blue-900 mb-2">How it works:</h3>
+        <h3 className="text-sm font-medium text-blue-900 mb-2">{t('howItWorks')}</h3>
         <ul className="text-sm text-blue-700 space-y-1 list-disc list-inside">
-          <li>Enter a title for your poll</li>
-          <li>Select a date range for possible meeting dates</li>
-          <li>Share the generated link with participants</li>
-          <li>Everyone votes YES/NO/MAYBE on each date</li>
-          <li>See results in real-time!</li>
+          <li>{t('howItWorks1')}</li>
+          <li>{t('howItWorks2')}</li>
+          <li>{t('howItWorks3')}</li>
+          <li>{t('howItWorks4')}</li>
+          <li>{t('howItWorks5')}</li>
         </ul>
       </div>
     </div>

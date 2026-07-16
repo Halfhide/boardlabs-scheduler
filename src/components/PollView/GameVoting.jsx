@@ -2,8 +2,10 @@ import { useRef, useState } from 'react';
 import { diceRoll } from '../../utils/diceRoll';
 import { bggGameUrl } from '../../utils/bggSearch';
 import GameSearchInput from './GameSearchInput';
+import { useTranslation, translateError } from '../../i18n/useTranslation';
 
 function GameVoting({ games, voterId, voterName, isCreator, closed, onAddGame, onToggleGameVote, onRemoveGame }) {
+  const { t } = useTranslation();
   const [title, setTitle] = useState('');
   const [url, setUrl] = useState('');
   // Last BGG autocomplete pick; lets a later title edit drop the
@@ -42,7 +44,7 @@ function GameVoting({ games, voterId, voterName, isCreator, closed, onAddGame, o
       await action();
     } catch (err) {
       console.error('Game action failed:', err);
-      setError(err.message || 'Something went wrong. Please try again.');
+      setError(translateError(t, err, 'somethingWentWrong'));
     } finally {
       setBusy(false);
     }
@@ -72,14 +74,14 @@ function GameVoting({ games, voterId, voterName, isCreator, closed, onAddGame, o
     <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
       <div className="flex items-center justify-between mb-1">
         <h3 className="text-base font-bold text-gray-900">
-          🎲 What shall we play?
+          {t('whatShallWePlay')}
         </h3>
         <p className="text-xs text-gray-600">
-          {games.length} {games.length === 1 ? 'suggestion' : 'suggestions'}
+          {t('suggestions', { count: games.length })}
         </p>
       </div>
       <p className="text-xs text-gray-400 mb-3">
-        Suggest games and vote for your favorites
+        {t('suggestHint')}
       </p>
 
       {/* Suggestions */}
@@ -99,7 +101,7 @@ function GameVoting({ games, voterId, voterName, isCreator, closed, onAddGame, o
                 <button
                   onClick={() => run(() => onToggleGameVote(game.id))}
                   disabled={busy || closed || !voterName}
-                  title={youVoted ? 'Remove your vote' : 'Vote for this game'}
+                  title={youVoted ? t('removeGameVote') : t('voteForGame')}
                   className={`flex-shrink-0 inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                     youVoted
                       ? 'bg-blue-600 text-white hover:bg-blue-700'
@@ -127,12 +129,12 @@ function GameVoting({ games, voterId, voterName, isCreator, closed, onAddGame, o
                     )}
                     {isLeading && (
                       <span className="flex-shrink-0 text-[10px] font-bold uppercase bg-green-600 text-white px-1.5 py-0.5 rounded-full">
-                        🏆 Leading
+                        {t('leadingBadge')}
                       </span>
                     )}
                   </div>
                   <p className="text-xs text-gray-500 truncate">
-                    Suggested by {game.suggestedBy}
+                    {t('suggestedBy', { name: game.suggestedBy })}
                     {game.votes.length > 0 &&
                       ` · ${game.votes.map((v) => v.voterName).join(', ')}`}
                   </p>
@@ -148,7 +150,7 @@ function GameVoting({ games, voterId, voterName, isCreator, closed, onAddGame, o
                         : 'text-gray-400 hover:text-red-600'
                     }`}
                   >
-                    {confirmingRemoveId === game.id ? 'Confirm remove' : '×'}
+                    {confirmingRemoveId === game.id ? t('confirmRemove') : '×'}
                   </button>
                 )}
               </li>
@@ -160,7 +162,7 @@ function GameVoting({ games, voterId, voterName, isCreator, closed, onAddGame, o
       {/* Suggest form */}
       {closed ? (
         <p className="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-md p-3">
-          🔒 Voting is closed, so game suggestions are locked too
+          {t('gamesLocked')}
         </p>
       ) : voterName ? (
         <form onSubmit={handleSuggest} className="flex flex-col sm:flex-row gap-2">
@@ -174,7 +176,7 @@ function GameVoting({ games, voterId, voterName, isCreator, closed, onAddGame, o
             type="url"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            placeholder="Link (optional)"
+            placeholder={t('linkPlaceholder')}
             className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             disabled={busy}
           />
@@ -183,13 +185,12 @@ function GameVoting({ games, voterId, voterName, isCreator, closed, onAddGame, o
             disabled={busy || !title.trim()}
             className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            Suggest
+            {t('suggestButton')}
           </button>
         </form>
       ) : (
         <p className="text-xs text-gray-500 italic">
-          Please enter your name at the top of the page to suggest and vote
-          on games
+          {t('enterNameForGames')}
         </p>
       )}
 

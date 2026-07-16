@@ -31,8 +31,10 @@ import GameVoting from './GameVoting';
 import DateModal from './DateModal';
 import Results from '../Results/Results';
 import { diceRoll } from '../../utils/diceRoll';
+import { useTranslation } from '../../i18n/useTranslation';
 
 function PollView() {
+  const { t, dateLocale } = useTranslation();
   const { pollId } = useParams();
   const { poll, loading, error } = usePoll(pollId);
   const [voterName, setVoterName] = useLocalStorage('voterName', '');
@@ -96,14 +98,14 @@ function PollView() {
   };
 
   if (loading) {
-    return <Loading message="Loading poll..." />;
+    return <Loading message={t('loadingPoll')} />;
   }
 
   if (error) {
     return (
       <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-        <h2 className="text-xl font-semibold text-red-900 mb-2">Error</h2>
-        <p className="text-red-700">{error}</p>
+        <h2 className="text-xl font-semibold text-red-900 mb-2">{t('errorHeading')}</h2>
+        <p className="text-red-700">{t(error)}</p>
       </div>
     );
   }
@@ -152,7 +154,7 @@ function PollView() {
             onClick={handleCopyLink}
             className="text-sm text-blue-600 hover:text-blue-700 font-medium px-3 py-1 rounded-md hover:bg-blue-50 transition-colors"
           >
-            {copied ? '✓ Copied!' : '📋 Share Poll'}
+            {copied ? t('copied') : t('sharePoll')}
           </button>
         </div>
       </div>
@@ -164,30 +166,29 @@ function PollView() {
             <span className="text-3xl">🎉</span>
             <div className="flex-1">
               <p className="text-xl font-bold text-green-900">
-                We're playing on {formatDate(finalizedDate.date)}!
+                {t('playingOn', { date: formatDate(finalizedDate.date, { locale: dateLocale }, t('finalizedDateFormat')) })}
               </p>
               <div className="mt-2 space-y-1 text-sm text-green-900">
                 <p>
                   <span className="font-semibold">
-                    Coming ({finalizedVotes.yes.length}):
+                    {t('coming', { count: finalizedVotes.yes.length })}
                   </span>{' '}
                   {finalizedVotes.yes.length > 0
                     ? finalizedVotes.yes.map((v) => v.voterName).join(', ')
-                    : 'nobody has voted yes yet'}
+                    : t('nobodyYesYet')}
                 </p>
                 {finalizedVotes.maybe.length > 0 && (
                   <p>
                     <span className="font-semibold">
-                      Maybe ({finalizedVotes.maybe.length}):
+                      {t('maybeComing', { count: finalizedVotes.maybe.length })}
                     </span>{' '}
                     {finalizedVotes.maybe.map((v) => v.voterName).join(', ')}
                   </p>
                 )}
                 {leadingGame && leadingGame.votes.length > 0 && (
                   <p>
-                    <span className="font-semibold">🎲 Game:</span>{' '}
-                    {leadingGame.title} ({leadingGame.votes.length}{' '}
-                    {leadingGame.votes.length === 1 ? 'vote' : 'votes'})
+                    <span className="font-semibold">{t('gameLabel')}</span>{' '}
+                    {leadingGame.title} ({t('votes', { count: leadingGame.votes.length })})
                   </p>
                 )}
               </div>
@@ -220,12 +221,14 @@ function PollView() {
         <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-center gap-3">
           <span className="text-2xl">🔒</span>
           <div>
-            <p className="font-semibold text-amber-900">Voting is closed</p>
+            <p className="font-semibold text-amber-900">{t('votingClosed')}</p>
             <p className="text-sm text-amber-800">
               {poll.closed
-                ? 'The creator has closed this poll.'
-                : `The voting deadline (${format(deadlineDate, "EEE, MMM d 'at' HH:mm")}) has passed.`}{' '}
-              You can still browse the results and comments.
+                ? t('closedByCreator')
+                : t('closedByDeadline', {
+                    date: format(deadlineDate, t('deadlineAtFormat'), { locale: dateLocale })
+                  })}{' '}
+              {t('browseResults')}
             </p>
           </div>
         </div>
@@ -236,8 +239,10 @@ function PollView() {
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-center gap-2">
           <span className="text-xl">⏳</span>
           <p className="text-sm text-blue-900">
-            Voting closes {formatDistanceToNow(deadlineDate, { addSuffix: true })}{' '}
-            ({format(deadlineDate, "EEE, MMM d 'at' HH:mm")})
+            {t('votingClosesIn', {
+              relative: formatDistanceToNow(deadlineDate, { addSuffix: true, locale: dateLocale }),
+              date: format(deadlineDate, t('deadlineAtFormat'), { locale: dateLocale })
+            })}
           </p>
         </div>
       )}
@@ -251,17 +256,17 @@ function PollView() {
             </div>
             <div className="flex-1 w-full">
               <h3 className="text-lg sm:text-xl font-bold mb-2">
-                Step 1: Enter Your Name
+                {t('step1Heading')}
               </h3>
               <p className="text-blue-100 text-sm sm:text-base mb-4">
-                Please provide your name to start voting and commenting on dates. This helps everyone see who has voted.
+                {t('step1Help')}
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
                 <input
                   type="text"
                   value={tempName}
                   onChange={(e) => setTempName(e.target.value)}
-                  placeholder="Enter your name (e.g., John Smith)"
+                  placeholder={t('namePlaceholder')}
                   className="flex-1 px-4 py-3 rounded-md bg-white text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-blue-600 w-full"
                   autoFocus
                   onKeyDown={(e) => {
@@ -273,7 +278,7 @@ function PollView() {
                   disabled={!tempName.trim()}
                   className="w-full sm:w-auto px-6 py-3 bg-white text-blue-600 font-semibold rounded-md hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
                 >
-                  Continue
+                  {t('continueButton')}
                 </button>
               </div>
             </div>
@@ -288,7 +293,7 @@ function PollView() {
               </div>
               <div>
                 <p className="text-sm text-green-700 font-medium">
-                  You're voting as:
+                  {t('votingAs')}
                 </p>
                 <p className="text-lg font-bold text-green-900">
                   {voterName}
@@ -302,7 +307,7 @@ function PollView() {
               }}
               className="text-sm text-green-700 hover:text-green-900 font-medium underline"
             >
-              Change Name
+              {t('changeName')}
             </button>
           </div>
         </div>
@@ -312,10 +317,10 @@ function PollView() {
       <div>
         <h3 className="text-2xl font-bold text-gray-900 mb-4">
           {isClosed
-            ? 'Dates and results'
+            ? t('datesAndResults')
             : voterName
-              ? 'Step 2: Click on dates to vote'
-              : 'Available Dates'}
+              ? t('step2Heading')
+              : t('availableDates')}
         </h3>
         <Calendar
           dates={sortedDates}

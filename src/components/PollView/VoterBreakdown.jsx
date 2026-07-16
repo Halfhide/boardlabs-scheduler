@@ -1,16 +1,18 @@
 import { groupVotesByResponse, isVoteByVoter } from '../../utils/pollHelpers';
+import { useTranslation } from '../../i18n/useTranslation';
 
 const RESPONSE_META = [
-  { key: 'yes', label: '✓ Yes', badge: 'bg-green-100 text-green-800' },
-  { key: 'maybe', label: '? Maybe', badge: 'bg-yellow-100 text-yellow-800' },
-  { key: 'no', label: '✗ No', badge: 'bg-red-100 text-red-800' }
+  { key: 'yes', labelKey: 'voteYes', badge: 'bg-green-100 text-green-800' },
+  { key: 'maybe', labelKey: 'voteMaybe', badge: 'bg-yellow-100 text-yellow-800' },
+  { key: 'no', labelKey: 'voteNo', badge: 'bg-red-100 text-red-800' }
 ];
 
 function VoterBreakdown({ votes, voterId, voterName }) {
+  const { t } = useTranslation();
   if (votes.length === 0) {
     return (
       <p className="text-sm text-gray-500 italic">
-        No votes yet. Be the first to vote!
+        {t('noVotesBeFirst')}
       </p>
     );
   }
@@ -19,14 +21,14 @@ function VoterBreakdown({ votes, voterId, voterName }) {
 
   return (
     <div className="space-y-2">
-      {RESPONSE_META.map(({ key, label, badge }) => {
+      {RESPONSE_META.map(({ key, labelKey, badge }) => {
         const groupVotes = grouped[key];
         if (groupVotes.length === 0) return null;
 
         return (
           <div key={key} className="flex items-start gap-2">
             <span className={`flex-shrink-0 text-xs font-semibold px-2 py-1 rounded ${badge}`}>
-              {label} ({groupVotes.length})
+              {t(labelKey)} ({groupVotes.length})
             </span>
             <div className="flex flex-wrap gap-1 pt-0.5">
               {groupVotes.map((vote) => {
@@ -41,7 +43,7 @@ function VoterBreakdown({ votes, voterId, voterName }) {
                     }`}
                   >
                     {vote.voterName}
-                    {isYou && ' (you)'}
+                    {isYou && ` ${t('you')}`}
                   </span>
                 );
               })}

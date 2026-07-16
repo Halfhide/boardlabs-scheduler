@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { getMyPolls, forgetPoll } from '../../utils/myPolls';
+import { useTranslation } from '../../i18n/useTranslation';
 
 function MyPolls() {
+  const { t, dateLocale } = useTranslation();
   const [polls, setPolls] = useState(() => getMyPolls());
 
   if (polls.length === 0) {
@@ -17,9 +19,9 @@ function MyPolls() {
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6 max-w-2xl mx-auto mt-6">
-      <h3 className="text-lg font-bold text-gray-900 mb-1">Your polls</h3>
+      <h3 className="text-lg font-bold text-gray-900 mb-1">{t('yourPolls')}</h3>
       <p className="text-xs text-gray-400 mb-2">
-        Polls you created or visited in this browser
+        {t('yourPollsHint')}
       </p>
       <ul className="divide-y divide-gray-100">
         {polls.map((p) => (
@@ -29,18 +31,23 @@ function MyPolls() {
                 {p.title}
               </span>
               <span className="block text-xs text-gray-500">
-                Last opened {formatDistanceToNow(p.lastSeen, { addSuffix: true })}
+                {t('lastOpened', {
+                  time: formatDistanceToNow(p.lastSeen, {
+                    addSuffix: true,
+                    locale: dateLocale
+                  })
+                })}
               </span>
             </Link>
             {p.createdByMe && (
               <span className="flex-shrink-0 text-[10px] font-bold uppercase bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">
-                yours
+                {t('yoursBadge')}
               </span>
             )}
             <button
               onClick={() => handleRemove(p.id)}
-              aria-label={`Remove "${p.title}" from the list`}
-              title="Remove from list"
+              aria-label={t('removeFromListAria', { title: p.title })}
+              title={t('removeFromList')}
               className="flex-shrink-0 text-gray-400 hover:text-red-600 text-xl leading-none px-1"
             >
               ×

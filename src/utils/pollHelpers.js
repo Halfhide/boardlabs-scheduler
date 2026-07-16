@@ -6,6 +6,12 @@ import { db } from '../firebase';
 // under it and matches the create-form range limit
 export const MAX_POLL_DATES = 92;
 
+// Errors shown to users carry a `code` matching a translation key
+// (plus optional params); the message stays English for the console
+function appError(code, message, params) {
+  return Object.assign(new Error(message), { code, params });
+}
+
 /**
  * Create a new poll
  * @param {string} title - Poll title
@@ -59,13 +65,13 @@ async function runCreatorUpdate(pollId, creatorToken, mutate) {
     const pollSnap = await transaction.get(pollRef);
 
     if (!pollSnap.exists()) {
-      throw new Error('Poll not found');
+      throw appError('errPollNotFound', 'Poll not found');
     }
 
     const poll = pollSnap.data();
 
     if (!poll.creatorToken || poll.creatorToken !== creatorToken) {
-      throw new Error('Only the poll creator can do this');
+      throw appError('errNotCreator', 'Only the poll creator can do this');
     }
 
     transaction.update(pollRef, mutate(poll));
@@ -78,7 +84,7 @@ async function runCreatorUpdate(pollId, creatorToken, mutate) {
 export async function updatePollTitle(pollId, creatorToken, title) {
   const trimmed = title.trim();
   if (!trimmed || trimmed.length > 100) {
-    throw new Error('Title must be between 1 and 100 characters');
+    throw appError('errTitleLength', 'Title must be between 1 and 100 characters');
   }
 
   try {
@@ -113,7 +119,7 @@ export async function setPollClosed(pollId, creatorToken, closed, clearDeadline 
  */
 export async function setPollDeadline(pollId, creatorToken, deadline) {
   if (deadline !== null && (!(deadline instanceof Date) || isNaN(deadline.getTime()))) {
-    throw new Error('Invalid deadline');
+    throw appError('errInvalidDeadline', 'Invalid deadline');
   }
 
   try {
@@ -132,16 +138,16 @@ export async function setPollDeadline(pollId, creatorToken, deadline) {
  */
 export async function addPollDate(pollId, creatorToken, dateString) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
-    throw new Error('Invalid date');
+    throw appError('errInvalidDate', 'Invalid date');
   }
 
   try {
     await runCreatorUpdate(pollId, creatorToken, (poll) => {
       if (poll.dates.some(d => d.date === dateString)) {
-        throw new Error('That date is already in the poll');
+        throw appError('errDateExists', 'That date is already in the poll');
       }
       if (poll.dates.length >= MAX_POLL_DATES) {
-        throw new Error(`A poll can have at most ${MAX_POLL_DATES} dates`);
+        throw appError('errTooManyDates', `A poll can have at most ${MAX_POLL_DATES} dates`, { max: MAX_POLL_DATES });
       }
 
       return {
@@ -164,13 +170,13 @@ export async function addPollDate(pollId, creatorToken, dateString) {
 export async function setPollCapacity(pollId, creatorToken, minPlayers, maxPlayers) {
   const validate = (value, label) => {
     if (value !== null && (!Number.isInteger(value) || value < 1 || value > 99)) {
-      throw new Error(`${label} must be a whole number between 1 and 99`);
+      throw appError('errPlayersRange', `${label} must be a whole number between 1 and 99`);
     }
   };
   validate(minPlayers, 'Minimum players');
   validate(maxPlayers, 'Maximum players');
   if (minPlayers !== null && maxPlayers !== null && maxPlayers < minPlayers) {
-    throw new Error('Maximum players cannot be lower than minimum players');
+    throw appError('errMaxBelowMin', 'Maximum players cannot be lower than minimum players');
   }
 
   try {
@@ -189,8 +195,10 @@ export async function setPollCapacity(pollId, creatorToken, minPlayers, maxPlaye
  * @param {Array} votes - The date's votes
  * @param {number|null} minPlayers
  * @param {number|null} maxPlayers
- * @returns {{key: 'needs'|'enough'|'full', label: string}|null} null
- *   when the poll has no capacity settings
+ * @returns {{key: 'needs'|'enough'|'full', needed: number}|null} null
+ *   when the poll has no capacity settings; `needed` is how many more
+ *   yes-votes reach the minimum (0 unless key is 'needs'). Rendered
+ *   via the capacityFull/capacityEnough/capacityNeeds i18n keys.
  */
 export function getCapacityStatus(votes, minPlayers, maxPlayers) {
   const min = minPlayers ?? null;
@@ -200,16 +208,12 @@ export function getCapacityStatus(votes, minPlayers, maxPlayers) {
   const summary = getVoteSummary(votes);
 
   if (max && summary.yes >= max) {
-    return { key: 'full', label: 'Full' };
+    return { key: 'full', needed: 0 };
   }
   if (min && summary.yes < min) {
-    const needed = min - summary.yes;
-    return {
-      key: 'needs',
-      label: `Needs ${needed} more player${needed === 1 ? '' : 's'}`
-    };
+    return { key: 'needs', needed: min - summary.yes };
   }
-  return { key: 'enough', label: 'Enough players' };
+  return { key: 'enough', needed: 0 };
 }
 
 /**
@@ -221,7 +225,7 @@ export async function setFinalizedDate(pollId, creatorToken, dateId) {
   try {
     await runCreatorUpdate(pollId, creatorToken, (poll) => {
       if (dateId !== null && !poll.dates.some(d => d.id === dateId)) {
-        throw new Error('Date not found');
+        throw appError('errDateNotFound', 'Date not found');
       }
       return { finalizedDateId: dateId ?? deleteField() };
     });
@@ -239,15 +243,15 @@ export async function removePollDate(pollId, creatorToken, dateId) {
   try {
     await runCreatorUpdate(pollId, creatorToken, (poll) => {
       if (poll.dates.length <= 1) {
-        throw new Error('A poll must keep at least one date');
+        throw appError('errLastDate', 'A poll must keep at least one date');
       }
       if (poll.finalizedDateId === dateId) {
-        throw new Error('Un-finalize the poll before removing the chosen date');
+        throw appError('errUnfinalizeFirst', 'Un-finalize the poll before removing the chosen date');
       }
 
       const remaining = poll.dates.filter(d => d.id !== dateId);
       if (remaining.length === poll.dates.length) {
-        throw new Error('Date not found');
+        throw appError('errDateNotFound', 'Date not found');
       }
 
       return { dates: remaining };
@@ -294,14 +298,14 @@ export async function addVote(pollId, dateId, voter, response) {
       const pollSnap = await transaction.get(pollRef);
 
       if (!pollSnap.exists()) {
-        throw new Error('Poll not found');
+        throw appError('errPollNotFound', 'Poll not found');
       }
 
       const poll = pollSnap.data();
       const dateIndex = poll.dates.findIndex(d => d.id === dateId);
 
       if (dateIndex === -1) {
-        throw new Error('Date not found');
+        throw appError('errDateNotFound', 'Date not found');
       }
 
       // Check if voter already voted on this date
@@ -369,14 +373,14 @@ export async function addComment(pollId, dateId, voter, text) {
       const pollSnap = await transaction.get(pollRef);
 
       if (!pollSnap.exists()) {
-        throw new Error('Poll not found');
+        throw appError('errPollNotFound', 'Poll not found');
       }
 
       const poll = pollSnap.data();
       const dateIndex = poll.dates.findIndex(d => d.id === dateId);
 
       if (dateIndex === -1) {
-        throw new Error('Date not found');
+        throw appError('errDateNotFound', 'Date not found');
       }
 
       const newComment = {
@@ -417,14 +421,14 @@ export const MAX_GAMES = 30;
 export async function addGame(pollId, voter, title, url = '') {
   const trimmed = title.trim();
   if (!trimmed || trimmed.length > 80) {
-    throw new Error('Game title must be between 1 and 80 characters');
+    throw appError('errGameTitleLength', 'Game title must be between 1 and 80 characters');
   }
   const cleanUrl = (url || '').trim();
   if (cleanUrl && !/^https?:\/\//i.test(cleanUrl)) {
-    throw new Error('The link must start with http:// or https://');
+    throw appError('errGameLink', 'The link must start with http:// or https://');
   }
   if (cleanUrl.length > 300) {
-    throw new Error('The link is too long');
+    throw appError('errGameLinkLong', 'The link is too long');
   }
 
   try {
@@ -433,15 +437,15 @@ export async function addGame(pollId, voter, title, url = '') {
     await runTransaction(db, async (transaction) => {
       const pollSnap = await transaction.get(pollRef);
       if (!pollSnap.exists()) {
-        throw new Error('Poll not found');
+        throw appError('errPollNotFound', 'Poll not found');
       }
 
       const games = pollSnap.data().games ?? [];
       if (games.length >= MAX_GAMES) {
-        throw new Error(`A poll can have at most ${MAX_GAMES} game suggestions`);
+        throw appError('errTooManyGames', `A poll can have at most ${MAX_GAMES} game suggestions`, { max: MAX_GAMES });
       }
       if (games.some(g => g.title.toLowerCase() === trimmed.toLowerCase())) {
-        throw new Error('That game has already been suggested');
+        throw appError('errDuplicateGame', 'That game has already been suggested');
       }
 
       const newGame = {
@@ -472,13 +476,13 @@ export async function toggleGameVote(pollId, gameId, voter) {
     await runTransaction(db, async (transaction) => {
       const pollSnap = await transaction.get(pollRef);
       if (!pollSnap.exists()) {
-        throw new Error('Poll not found');
+        throw appError('errPollNotFound', 'Poll not found');
       }
 
       const games = pollSnap.data().games ?? [];
       const index = games.findIndex(g => g.id === gameId);
       if (index === -1) {
-        throw new Error('Game not found');
+        throw appError('errGameNotFound', 'Game not found');
       }
 
       const game = games[index];
@@ -506,7 +510,7 @@ export async function removeGame(pollId, creatorToken, gameId) {
       const games = poll.games ?? [];
       const remaining = games.filter(g => g.id !== gameId);
       if (remaining.length === games.length) {
-        throw new Error('Game not found');
+        throw appError('errGameNotFound', 'Game not found');
       }
       return { games: remaining };
     });

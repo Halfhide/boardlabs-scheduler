@@ -10,7 +10,8 @@ import { db } from '../firebase';
 export function usePoll(pollId) {
   const [poll, setPoll] = useState(null);
   const [loading, setLoading] = useState(!!pollId);
-  const [error, setError] = useState(!pollId ? 'No poll ID provided' : null);
+  // Errors are i18n keys, translated where they are rendered
+  const [error, setError] = useState(!pollId ? 'errNoPollId' : null);
   const [prevPollId, setPrevPollId] = useState(pollId);
 
   // Reset state during render when the poll ID changes, so a stale
@@ -19,7 +20,7 @@ export function usePoll(pollId) {
     setPrevPollId(pollId);
     setPoll(null);
     setLoading(!!pollId);
-    setError(!pollId ? 'No poll ID provided' : null);
+    setError(!pollId ? 'errNoPollId' : null);
   }
 
   useEffect(() => {
@@ -37,14 +38,14 @@ export function usePoll(pollId) {
           setPoll({ id: snapshot.id, ...snapshot.data() });
           setError(null);
         } else {
-          setError('Poll not found');
+          setError('errPollNotFound');
           setPoll(null);
         }
         setLoading(false);
       },
       (err) => {
         console.error('Error fetching poll:', err);
-        setError('Failed to load poll. Please try again.');
+        setError('errLoadPoll');
         setLoading(false);
       }
     );

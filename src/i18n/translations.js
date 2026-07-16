@@ -1,0 +1,502 @@
+// All UI strings, keyed per language. A value is either a string
+// (with optional {param} placeholders) or an array of plural forms
+// picked by params.count: en [one, other], pl [one, few, many].
+
+export const LANGUAGES = ['en', 'pl'];
+
+const pluralIndex = {
+  en: (n) => (n === 1 ? 0 : 1),
+  pl: (n) => {
+    if (n === 1) return 0;
+    const ones = n % 10;
+    const tens = n % 100;
+    if (ones >= 2 && ones <= 4 && !(tens >= 12 && tens <= 14)) return 1;
+    return 2;
+  }
+};
+
+export const translations = {
+  en: {
+    // App shell
+    loading: 'Loading...',
+
+    // Create poll form
+    createTitle: 'Create a New Poll',
+    pollTitleLabel: 'Poll Title',
+    pollTitlePlaceholder: 'e.g., Board Game Night - January',
+    startDate: 'Start Date',
+    endDate: 'End Date',
+    optional: '(optional)',
+    votingDeadlineLabel: 'Voting Deadline',
+    deadlineHelp: 'Voting closes automatically at this time. Leave empty for no deadline.',
+    minPlayersLabel: 'Min Players',
+    maxPlayersLabel: 'Max Players',
+    minPlayersPlaceholder: 'e.g., 3',
+    maxPlayersPlaceholder: 'e.g., 6',
+    capacityHelp: 'Board games have player counts: dates will show whether enough people can attend.',
+    creatingPoll: 'Creating Poll...',
+    createPoll: 'Create Poll',
+    howItWorks: 'How it works:',
+    howItWorks1: 'Enter a title for your poll',
+    howItWorks2: 'Select a date range for possible meeting dates',
+    howItWorks3: 'Share the generated link with participants',
+    howItWorks4: 'Everyone votes YES/NO/MAYBE on each date',
+    howItWorks5: 'See results in real-time!',
+    errTitleRequired: 'Please enter a poll title',
+    errDatesRequired: 'Please select both start and end dates',
+    errDateOrder: 'Start date must be before or equal to end date',
+    errDeadlineFuture: 'The voting deadline must be in the future',
+    errPlayersRange: 'Player counts must be whole numbers between 1 and 99',
+    errMaxBelowMin: 'Maximum players cannot be lower than minimum players',
+    errNoDates: 'No dates generated. Please check your date range.',
+    errTooManyDatesRange: 'Date range is too long ({count} days). Please choose a range of {max} days or less.',
+    errCreateFailed: 'Failed to create poll. Please try again.',
+
+    // My polls list
+    yourPolls: 'Your polls',
+    yourPollsHint: 'Polls you created or visited in this browser',
+    lastOpened: 'Last opened {time}',
+    yoursBadge: 'yours',
+    removeFromList: 'Remove from list',
+    removeFromListAria: 'Remove "{title}" from the list',
+
+    // Poll page
+    loadingPoll: 'Loading poll...',
+    errorHeading: 'Error',
+    errNoPollId: 'No poll ID provided',
+    errPollNotFound: 'Poll not found',
+    errLoadPoll: 'Failed to load poll. Please try again.',
+    copied: '✓ Copied!',
+    sharePoll: '📋 Share Poll',
+    playingOn: "We're playing on {date}!",
+    coming: 'Coming ({count}):',
+    nobodyYesYet: 'nobody has voted yes yet',
+    maybeComing: 'Maybe ({count}):',
+    gameLabel: '🎲 Game:',
+    votes: ['{count} vote', '{count} votes'],
+    votingClosed: 'Voting is closed',
+    closedByCreator: 'The creator has closed this poll.',
+    closedByDeadline: 'The voting deadline ({date}) has passed.',
+    browseResults: 'You can still browse the results and comments.',
+    votingClosesIn: 'Voting closes {relative} ({date})',
+    deadlineAtFormat: "EEE, MMM d 'at' HH:mm",
+    step1Heading: 'Step 1: Enter Your Name',
+    step1Help: 'Please provide your name to start voting and commenting on dates. This helps everyone see who has voted.',
+    namePlaceholder: 'Enter your name (e.g., John Smith)',
+    continueButton: 'Continue',
+    votingAs: "You're voting as:",
+    changeName: 'Change Name',
+    datesAndResults: 'Dates and results',
+    step2Heading: 'Step 2: Click on dates to vote',
+    availableDates: 'Available Dates',
+
+    // Admin bar
+    creatorTools: '🛠️ Creator tools',
+    reopenVoting: 'Reopen voting',
+    closeVoting: 'Close voting',
+    votingReopenedNotice: 'Voting reopened',
+    votingClosedNotice: 'Voting closed',
+    finalizedStatus: '🎉 Finalized: {date}. Voting is closed.',
+    finalizedDateFormat: 'EEEE, MMMM d, yyyy',
+    unfinalizeReopen: 'Un-finalize and reopen voting',
+    pollReopenedNotice: 'Poll reopened',
+    renameButton: 'Rename',
+    titleUpdatedNotice: 'Title updated',
+    addDateLabel: 'Add another date option for participants to vote on',
+    addDateButton: 'Add date option',
+    dateAddedNotice: 'Date option added to the poll',
+    removeDateHint: 'To remove a date option, open it in the calendar and use "{button}".',
+    deadlineLabel: 'Voting deadline (voting closes automatically at this time)',
+    setDeadline: 'Set deadline',
+    removeDeadline: 'Remove deadline',
+    deadlineUpdatedNotice: 'Deadline updated',
+    deadlineRemovedNotice: 'Deadline removed',
+    deadlinePassedHint: 'The deadline ({date}) has passed and voting is closed. Change or remove it to reopen.',
+    deadlineClosesHint: 'Voting closes {date}.',
+    noDeadline: 'No voting deadline set.',
+    deadlineShortFormat: 'MMM d, HH:mm',
+    errValidDateTime: 'Please pick a valid date and time',
+    capacityLabel: 'Player capacity (dates show whether enough people can attend)',
+    minPlaceholder: 'Min',
+    maxPlaceholder: 'Max',
+    minPlayersAria: 'Minimum players',
+    maxPlayersAria: 'Maximum players',
+    saveCapacity: 'Save capacity',
+    removeCapacity: 'Remove capacity',
+    capacityUpdatedNotice: 'Player capacity updated',
+    capacityRemovedNotice: 'Player capacity removed',
+    capacityCurrent: 'Current: {min} min, {max} max.',
+    noBound: 'no',
+    noCapacity: 'No player capacity set.',
+    actionFailed: 'Action failed. Please try again.',
+
+    // Calendar
+    closedClickDetails: 'Voting is closed. Click a date to see details',
+    clickToVote: 'Click on any highlighted date to vote',
+    myVotes: 'My votes',
+    groupAvailability: 'Group availability',
+    chosenDate: 'Chosen date',
+    fewer: 'Fewer',
+    moreCanAttend: 'more can attend',
+    nobodyCan: 'Nobody can',
+    noVotesYet: 'No votes yet',
+    availableLegend: 'Available',
+    yes: 'Yes',
+    maybe: 'Maybe',
+    no: 'No',
+    monthHeaderFormat: 'MMMM yyyy',
+    weekDays: 'S,M,T,W,T,F,S',
+
+    // Availability matrix
+    availabilityTable: 'Availability table',
+    participants: ['{count} participant', '{count} participants'],
+    clickColumnHint: 'Click a date column for details and voting',
+    participantHeader: 'Participant',
+    canAttend: 'Can attend',
+    you: '(you)',
+
+    // Voter breakdown
+    noVotesBeFirst: 'No votes yet. Be the first to vote!',
+
+    // Date modal
+    castYourVote: 'Cast Your Vote',
+    youVotedYes: '✓ You voted Yes',
+    youVotedMaybe: '? You voted Maybe',
+    youVotedNo: '✗ You voted No',
+    clickButtonBelow: 'Click a button below to vote.',
+    savedImmediately: 'Your vote will be saved immediately.',
+    voteFailed: 'Failed to save your vote. Please try again.',
+    voteSaved: '✨ Vote saved! The calendar will update automatically.',
+    votingClosedForPoll: '🔒 Voting is closed for this poll',
+    enterNameToVote: 'Please enter your name at the top of the page to vote',
+    changeVoteHint: 'Your vote is shown by the filled button. Click a different button to change it.',
+    whosVoted: "Who's voted ({count})",
+    commentsHeading: 'Comments ({count})',
+    saving: 'Saving...',
+    unfinalizeButton: 'Un-finalize (reopen voting)',
+    finalizeButton: '🎉 Finalize: we play on this date!',
+    errFinalizeFailed: 'Failed to finalize. Please try again.',
+    removingEllipsis: 'Removing...',
+    confirmRemoveDate: '⚠️ Click again to permanently remove this date',
+    removeDateButton: 'Remove this date from the poll',
+    removeDateWarning: 'All votes and comments on this date will be lost.',
+    removeDateFailed: 'Failed to remove the date. Please try again.',
+    closeButton: 'Close',
+    yesCount: '{count} Yes',
+    maybeCount: '{count} Maybe',
+    noCount: '{count} No',
+
+    // Vote buttons
+    voteYes: '✓ Yes',
+    voteMaybe: '? Maybe',
+    voteNo: '✗ No',
+
+    // Comments
+    justNow: 'Just now',
+    commentTimeFormat: 'MMM d, h:mm a',
+    addCommentPlaceholder: 'Add a comment...',
+    sending: 'Sending...',
+    send: 'Send',
+    commentFailed: 'Failed to add comment. Please try again.',
+    enterNameToComment: 'Please enter your name to add comments',
+
+    // Game voting
+    whatShallWePlay: '🎲 What shall we play?',
+    suggestions: ['{count} suggestion', '{count} suggestions'],
+    suggestHint: 'Suggest games and vote for your favorites',
+    voteForGame: 'Vote for this game',
+    removeGameVote: 'Remove your vote',
+    leadingBadge: '🏆 Leading',
+    suggestedBy: 'Suggested by {name}',
+    confirmRemove: 'Confirm remove',
+    gamesLocked: '🔒 Voting is closed, so game suggestions are locked too',
+    suggestGamePlaceholder: 'Suggest a game (e.g., Catan)',
+    linkPlaceholder: 'Link (optional)',
+    suggestButton: 'Suggest',
+    somethingWentWrong: 'Something went wrong. Please try again.',
+    enterNameForGames: 'Please enter your name at the top of the page to suggest and vote on games',
+    bggFooterHint: 'From BoardGameGeek. Not listed? Just keep typing.',
+
+    // Results
+    resultsHeading: 'Results',
+    voters: ['{count} voter', '{count} voters'],
+    clickAnyDate: 'Click any date to see full details and vote',
+    chosenBadge: '🎉 CHOSEN',
+    bestBadge: '🏆 BEST',
+    noVotes: 'No votes',
+    resultDateFormat: 'EEE, MMM d',
+
+    // Capacity states
+    capacityFull: 'Full',
+    capacityEnough: 'Enough players',
+    capacityNeeds: ['Needs {count} more player', 'Needs {count} more players'],
+
+    // Errors thrown by poll helpers (matched by err.code)
+    errNotCreator: 'Only the poll creator can do this',
+    errTitleLength: 'Title must be between 1 and 100 characters',
+    errInvalidDeadline: 'Invalid deadline',
+    errInvalidDate: 'Invalid date',
+    errDateExists: 'That date is already in the poll',
+    errTooManyDates: 'A poll can have at most {max} dates',
+    errDateNotFound: 'Date not found',
+    errLastDate: 'A poll must keep at least one date',
+    errUnfinalizeFirst: 'Un-finalize the poll before removing the chosen date',
+    errGameTitleLength: 'Game title must be between 1 and 80 characters',
+    errGameLink: 'The link must start with http:// or https://',
+    errGameLinkLong: 'The link is too long',
+    errTooManyGames: 'A poll can have at most {max} game suggestions',
+    errDuplicateGame: 'That game has already been suggested',
+    errGameNotFound: 'Game not found'
+  },
+
+  pl: {
+    // App shell
+    loading: 'Wczytywanie...',
+
+    // Create poll form
+    createTitle: 'Utwórz nową ankietę',
+    pollTitleLabel: 'Tytuł ankiety',
+    pollTitlePlaceholder: 'np. Planszówki - styczeń',
+    startDate: 'Data początkowa',
+    endDate: 'Data końcowa',
+    optional: '(opcjonalnie)',
+    votingDeadlineLabel: 'Termin głosowania',
+    deadlineHelp: 'Głosowanie zamknie się automatycznie o tej porze. Zostaw puste, jeśli bez terminu.',
+    minPlayersLabel: 'Min. graczy',
+    maxPlayersLabel: 'Maks. graczy',
+    minPlayersPlaceholder: 'np. 3',
+    maxPlayersPlaceholder: 'np. 6',
+    capacityHelp: 'Gry planszowe mają liczbę graczy: przy datach zobaczysz, czy zbierze się komplet.',
+    creatingPoll: 'Tworzenie ankiety...',
+    createPoll: 'Utwórz ankietę',
+    howItWorks: 'Jak to działa:',
+    howItWorks1: 'Podaj tytuł ankiety',
+    howItWorks2: 'Wybierz zakres możliwych dat spotkania',
+    howItWorks3: 'Udostępnij wygenerowany link uczestnikom',
+    howItWorks4: 'Każdy głosuje TAK/NIE/MOŻE na każdą datę',
+    howItWorks5: 'Wyniki widać na żywo!',
+    errTitleRequired: 'Podaj tytuł ankiety',
+    errDatesRequired: 'Wybierz datę początkową i końcową',
+    errDateOrder: 'Data początkowa nie może być po końcowej',
+    errDeadlineFuture: 'Termin głosowania musi być w przyszłości',
+    errPlayersRange: 'Liczba graczy musi być liczbą całkowitą od 1 do 99',
+    errMaxBelowMin: 'Maksimum graczy nie może być mniejsze niż minimum',
+    errNoDates: 'Nie powstała żadna data. Sprawdź zakres dat.',
+    errTooManyDatesRange: 'Zakres dat jest za długi ({count} dni). Wybierz najwyżej {max} dni.',
+    errCreateFailed: 'Nie udało się utworzyć ankiety. Spróbuj ponownie.',
+
+    // My polls list
+    yourPolls: 'Twoje ankiety',
+    yourPollsHint: 'Ankiety utworzone lub odwiedzone w tej przeglądarce',
+    lastOpened: 'Ostatnio otwarta {time}',
+    yoursBadge: 'twoja',
+    removeFromList: 'Usuń z listy',
+    removeFromListAria: 'Usuń "{title}" z listy',
+
+    // Poll page
+    loadingPoll: 'Wczytywanie ankiety...',
+    errorHeading: 'Błąd',
+    errNoPollId: 'Brak identyfikatora ankiety',
+    errPollNotFound: 'Nie znaleziono ankiety',
+    errLoadPoll: 'Nie udało się wczytać ankiety. Spróbuj ponownie.',
+    copied: '✓ Skopiowano!',
+    sharePoll: '📋 Udostępnij',
+    playingOn: 'Gramy {date}!',
+    coming: 'Będą ({count}):',
+    nobodyYesYet: 'nikt jeszcze nie zagłosował na tak',
+    maybeComing: 'Może ({count}):',
+    gameLabel: '🎲 Gra:',
+    votes: ['{count} głos', '{count} głosy', '{count} głosów'],
+    votingClosed: 'Głosowanie zamknięte',
+    closedByCreator: 'Twórca zamknął tę ankietę.',
+    closedByDeadline: 'Termin głosowania ({date}) minął.',
+    browseResults: 'Nadal możesz przeglądać wyniki i komentarze.',
+    votingClosesIn: 'Głosowanie kończy się {relative} ({date})',
+    deadlineAtFormat: "EEE, d MMM 'o' HH:mm",
+    step1Heading: 'Krok 1: Podaj swoje imię',
+    step1Help: 'Podaj imię, aby głosować i komentować daty. Dzięki temu wszyscy widzą, kto już zagłosował.',
+    namePlaceholder: 'Wpisz swoje imię (np. Jan Kowalski)',
+    continueButton: 'Dalej',
+    votingAs: 'Głosujesz jako:',
+    changeName: 'Zmień imię',
+    datesAndResults: 'Daty i wyniki',
+    step2Heading: 'Krok 2: Klikaj daty, aby głosować',
+    availableDates: 'Dostępne daty',
+
+    // Admin bar
+    creatorTools: '🛠️ Narzędzia twórcy',
+    reopenVoting: 'Otwórz głosowanie ponownie',
+    closeVoting: 'Zamknij głosowanie',
+    votingReopenedNotice: 'Głosowanie otwarte ponownie',
+    votingClosedNotice: 'Głosowanie zamknięte',
+    finalizedStatus: '🎉 Wybrano: {date}. Głosowanie zamknięte.',
+    finalizedDateFormat: 'EEEE, d MMMM yyyy',
+    unfinalizeReopen: 'Cofnij wybór i otwórz głosowanie',
+    pollReopenedNotice: 'Ankieta otwarta ponownie',
+    renameButton: 'Zmień nazwę',
+    titleUpdatedNotice: 'Tytuł zapisany',
+    addDateLabel: 'Dodaj kolejną datę do głosowania',
+    addDateButton: 'Dodaj datę',
+    dateAddedNotice: 'Data dodana do ankiety',
+    removeDateHint: 'Aby usunąć datę, otwórz ją w kalendarzu i użyj "{button}".',
+    deadlineLabel: 'Termin głosowania (głosowanie zamknie się automatycznie)',
+    setDeadline: 'Ustaw termin',
+    removeDeadline: 'Usuń termin',
+    deadlineUpdatedNotice: 'Termin zapisany',
+    deadlineRemovedNotice: 'Termin usunięty',
+    deadlinePassedHint: 'Termin ({date}) minął i głosowanie jest zamknięte. Zmień go lub usuń, aby otworzyć ponownie.',
+    deadlineClosesHint: 'Głosowanie kończy się {date}.',
+    noDeadline: 'Bez terminu głosowania.',
+    deadlineShortFormat: 'd MMM, HH:mm',
+    errValidDateTime: 'Wybierz poprawną datę i godzinę',
+    capacityLabel: 'Liczba graczy (daty pokażą, czy zbierze się komplet)',
+    minPlaceholder: 'Min',
+    maxPlaceholder: 'Maks',
+    minPlayersAria: 'Minimalna liczba graczy',
+    maxPlayersAria: 'Maksymalna liczba graczy',
+    saveCapacity: 'Zapisz limit',
+    removeCapacity: 'Usuń limit',
+    capacityUpdatedNotice: 'Limit graczy zapisany',
+    capacityRemovedNotice: 'Limit graczy usunięty',
+    capacityCurrent: 'Obecnie: min {min}, maks {max}.',
+    noBound: 'brak',
+    noCapacity: 'Bez limitu graczy.',
+    actionFailed: 'Nie udało się. Spróbuj ponownie.',
+
+    // Calendar
+    closedClickDetails: 'Głosowanie zamknięte. Kliknij datę, aby zobaczyć szczegóły',
+    clickToVote: 'Kliknij podświetloną datę, aby zagłosować',
+    myVotes: 'Moje głosy',
+    groupAvailability: 'Dostępność grupy',
+    chosenDate: 'Wybrana data',
+    fewer: 'Mniej',
+    moreCanAttend: 'więcej osób może',
+    nobodyCan: 'Nikt nie może',
+    noVotesYet: 'Brak głosów',
+    availableLegend: 'Do wyboru',
+    yes: 'Tak',
+    maybe: 'Może',
+    no: 'Nie',
+    monthHeaderFormat: 'LLLL yyyy',
+    weekDays: 'P,W,Ś,C,P,S,N',
+
+    // Availability matrix
+    availabilityTable: 'Tabela dostępności',
+    participants: ['{count} uczestnik', '{count} uczestników', '{count} uczestników'],
+    clickColumnHint: 'Kliknij kolumnę daty, aby zobaczyć szczegóły i głosować',
+    participantHeader: 'Uczestnik',
+    canAttend: 'Może przyjść',
+    you: '(ty)',
+
+    // Voter breakdown
+    noVotesBeFirst: 'Brak głosów. Zagłosuj jako pierwszy!',
+
+    // Date modal
+    castYourVote: 'Oddaj swój głos',
+    youVotedYes: '✓ Twój głos: Tak',
+    youVotedMaybe: '? Twój głos: Może',
+    youVotedNo: '✗ Twój głos: Nie',
+    clickButtonBelow: 'Kliknij przycisk poniżej, aby zagłosować.',
+    savedImmediately: 'Twój głos zapisze się od razu.',
+    voteFailed: 'Nie udało się zapisać głosu. Spróbuj ponownie.',
+    voteSaved: '✨ Głos zapisany! Kalendarz zaktualizuje się automatycznie.',
+    votingClosedForPoll: '🔒 Głosowanie w tej ankiecie jest zamknięte',
+    enterNameToVote: 'Podaj swoje imię na górze strony, aby głosować',
+    changeVoteHint: 'Twój głos to wypełniony przycisk. Kliknij inny, aby go zmienić.',
+    whosVoted: 'Kto zagłosował ({count})',
+    commentsHeading: 'Komentarze ({count})',
+    saving: 'Zapisywanie...',
+    unfinalizeButton: 'Cofnij wybór (otwórz głosowanie)',
+    finalizeButton: '🎉 Zatwierdź: gramy w tym terminie!',
+    errFinalizeFailed: 'Nie udało się zatwierdzić. Spróbuj ponownie.',
+    removingEllipsis: 'Usuwanie...',
+    confirmRemoveDate: '⚠️ Kliknij ponownie, aby trwale usunąć tę datę',
+    removeDateButton: 'Usuń tę datę z ankiety',
+    removeDateWarning: 'Wszystkie głosy i komentarze przy tej dacie przepadną.',
+    removeDateFailed: 'Nie udało się usunąć daty. Spróbuj ponownie.',
+    closeButton: 'Zamknij',
+    yesCount: '{count} Tak',
+    maybeCount: '{count} Może',
+    noCount: '{count} Nie',
+
+    // Vote buttons
+    voteYes: '✓ Tak',
+    voteMaybe: '? Może',
+    voteNo: '✗ Nie',
+
+    // Comments
+    justNow: 'Przed chwilą',
+    commentTimeFormat: 'd MMM, HH:mm',
+    addCommentPlaceholder: 'Dodaj komentarz...',
+    sending: 'Wysyłanie...',
+    send: 'Wyślij',
+    commentFailed: 'Nie udało się dodać komentarza. Spróbuj ponownie.',
+    enterNameToComment: 'Podaj swoje imię, aby komentować',
+
+    // Game voting
+    whatShallWePlay: '🎲 W co gramy?',
+    suggestions: ['{count} propozycja', '{count} propozycje', '{count} propozycji'],
+    suggestHint: 'Proponuj gry i głosuj na ulubione',
+    voteForGame: 'Zagłosuj na tę grę',
+    removeGameVote: 'Cofnij głos',
+    leadingBadge: '🏆 Prowadzi',
+    suggestedBy: 'Proponuje {name}',
+    confirmRemove: 'Potwierdź usunięcie',
+    gamesLocked: '🔒 Głosowanie zamknięte, propozycje gier również',
+    suggestGamePlaceholder: 'Zaproponuj grę (np. Catan)',
+    linkPlaceholder: 'Link (opcjonalnie)',
+    suggestButton: 'Zaproponuj',
+    somethingWentWrong: 'Coś poszło nie tak. Spróbuj ponownie.',
+    enterNameForGames: 'Podaj swoje imię na górze strony, aby proponować gry i głosować',
+    bggFooterHint: 'Z BoardGameGeek. Nie ma na liście? Pisz dalej.',
+
+    // Results
+    resultsHeading: 'Wyniki',
+    voters: ['{count} głosujący', '{count} głosujących', '{count} głosujących'],
+    clickAnyDate: 'Kliknij datę, aby zobaczyć szczegóły i zagłosować',
+    chosenBadge: '🎉 WYBRANA',
+    bestBadge: '🏆 NAJLEPSZA',
+    noVotes: 'Brak głosów',
+    resultDateFormat: 'EEE, d MMM',
+
+    // Capacity states
+    capacityFull: 'Komplet',
+    capacityEnough: 'Wystarczy graczy',
+    capacityNeeds: ['Brakuje {count} gracza', 'Brakuje {count} graczy', 'Brakuje {count} graczy'],
+
+    // Errors thrown by poll helpers (matched by err.code)
+    errNotCreator: 'Tylko twórca ankiety może to zrobić',
+    errTitleLength: 'Tytuł musi mieć od 1 do 100 znaków',
+    errInvalidDeadline: 'Nieprawidłowy termin',
+    errInvalidDate: 'Nieprawidłowa data',
+    errDateExists: 'Ta data już jest w ankiecie',
+    errTooManyDates: 'Ankieta może mieć najwyżej {max} dat',
+    errDateNotFound: 'Nie znaleziono daty',
+    errLastDate: 'Ankieta musi mieć co najmniej jedną datę',
+    errUnfinalizeFirst: 'Najpierw cofnij wybór daty, dopiero potem ją usuń',
+    errGameTitleLength: 'Tytuł gry musi mieć od 1 do 80 znaków',
+    errGameLink: 'Link musi zaczynać się od http:// lub https://',
+    errGameLinkLong: 'Link jest za długi',
+    errTooManyGames: 'Ankieta może mieć najwyżej {max} propozycji gier',
+    errDuplicateGame: 'Ta gra już została zaproponowana',
+    errGameNotFound: 'Nie znaleziono gry'
+  }
+};
+
+/**
+ * Resolve a translation key for a language, with {param}
+ * interpolation. Array values are plural forms picked by
+ * params.count. Falls back to English, then to the key itself.
+ */
+export function translate(lang, key, params = {}) {
+  let value = translations[lang]?.[key] ?? translations.en[key] ?? key;
+  if (Array.isArray(value)) {
+    const forms = value;
+    const count = params.count ?? 0;
+    const index = Math.min(pluralIndex[lang]?.(count) ?? 0, forms.length - 1);
+    value = forms[index];
+  }
+  return value.replace(/\{(\w+)\}/g, (match, name) =>
+    params[name] !== undefined ? String(params[name]) : match
+  );
+}

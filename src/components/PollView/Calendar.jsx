@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { format, parseISO, startOfMonth, endOfMonth, eachDayOfInterval, eachMonthOfInterval, isSameMonth, isSameDay } from 'date-fns';
 import { getVoteSummary, findUserVote } from '../../utils/pollHelpers';
+import { useTranslation } from '../../i18n/useTranslation';
 
 // Heatmap shading for group mode, from "few can attend" to "most can
 // attend" (static class strings so Tailwind generates them)
@@ -15,19 +16,20 @@ const HEAT_BUCKETS = [
 const HEAT_ZERO = 'bg-red-100 border-red-300 text-red-900';
 
 function MonthCalendar({ monthDate, dates, voterId, voterName, finalizedDateId, mode, totalVoters, onDateClick }) {
+  const { t, dateLocale } = useTranslation();
   const monthStart = startOfMonth(monthDate);
   const monthEnd = endOfMonth(monthDate);
 
   // Get all days in the month
   const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
 
-  // Get day of week for first day (0 = Sunday, 6 = Saturday)
-  const firstDayOfWeek = monthStart.getDay();
+  // Week layout follows the locale (Sunday-first in English,
+  // Monday-first in Polish); pad until the month's first day
+  const weekStartsOn = dateLocale.options?.weekStartsOn ?? 0;
+  const padding = (monthStart.getDay() - weekStartsOn + 7) % 7;
+  const calendarDays = Array(padding).fill(null).concat(daysInMonth);
 
-  // Create array of days with padding for week alignment
-  const calendarDays = Array(firstDayOfWeek).fill(null).concat(daysInMonth);
-
-  const weekDays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+  const weekDays = t('weekDays').split(',');
 
   // Check if a date is a poll date
   const isPollDate = (day) => {
@@ -52,7 +54,7 @@ function MonthCalendar({ monthDate, dates, voterId, voterName, finalizedDateId, 
     <div className="flex-1">
       {/* Month Header */}
       <h4 className="text-center font-bold text-gray-900 mb-2 text-sm">
-        {format(monthDate, 'MMMM yyyy')}
+        {format(monthDate, t('monthHeaderFormat'), { locale: dateLocale })}
       </h4>
 
       {/* Week day headers */}
@@ -161,6 +163,7 @@ function MonthCalendar({ monthDate, dates, voterId, voterName, finalizedDateId, 
 }
 
 function Calendar({ dates, voterId, voterName, closed, finalizedDateId, onDateClick }) {
+  const { t } = useTranslation();
   // 'mine' shows your own votes; 'group' shades dates by how many
   // people can attend
   const [mode, setMode] = useState('mine');
@@ -190,8 +193,8 @@ function Calendar({ dates, voterId, voterName, closed, finalizedDateId, onDateCl
     <div className="bg-white rounded-lg shadow-md p-6">
       <h3 className="text-lg font-bold text-gray-900 mb-4 text-center">
         {closed
-          ? 'Voting is closed. Click a date to see details'
-          : 'Click on any highlighted date to vote'}
+          ? t('closedClickDetails')
+          : t('clickToVote')}
       </h3>
 
       {/* View mode toggle */}
@@ -201,13 +204,13 @@ function Calendar({ dates, voterId, voterName, closed, finalizedDateId, onDateCl
             onClick={() => setMode('mine')}
             className={`px-4 py-1.5 transition-colors ${modeButton('mine')}`}
           >
-            My votes
+            {t('myVotes')}
           </button>
           <button
             onClick={() => setMode('group')}
             className={`px-4 py-1.5 border-l border-gray-300 transition-colors ${modeButton('group')}`}
           >
-            Group availability
+            {t('groupAvailability')}
           </button>
         </div>
       </div>
@@ -218,25 +221,25 @@ function Calendar({ dates, voterId, voterName, closed, finalizedDateId, onDateCl
           {finalizedDateId && (
             <div className="flex items-center gap-1">
               <div className="w-5 h-5 bg-green-600 border border-green-700 ring-2 ring-green-400 rounded-sm"></div>
-              <span className="font-semibold">Chosen date</span>
+              <span className="font-semibold">{t('chosenDate')}</span>
             </div>
           )}
           <div className="flex items-center gap-1">
-            <span>Fewer</span>
+            <span>{t('fewer')}</span>
             <div className="w-4 h-4 bg-green-100 border border-green-300 rounded-sm"></div>
             <div className="w-4 h-4 bg-green-200 border border-green-400 rounded-sm"></div>
             <div className="w-4 h-4 bg-green-300 border border-green-500 rounded-sm"></div>
             <div className="w-4 h-4 bg-green-400 border border-green-600 rounded-sm"></div>
             <div className="w-4 h-4 bg-green-600 border border-green-700 rounded-sm"></div>
-            <span>more can attend</span>
+            <span>{t('moreCanAttend')}</span>
           </div>
           <div className="flex items-center gap-1">
             <div className="w-5 h-5 bg-red-100 border border-red-300 rounded-sm"></div>
-            <span>Nobody can</span>
+            <span>{t('nobodyCan')}</span>
           </div>
           <div className="flex items-center gap-1">
             <div className="w-5 h-5 bg-blue-100 border-2 border-blue-400 rounded-sm"></div>
-            <span>No votes yet</span>
+            <span>{t('noVotesYet')}</span>
           </div>
         </div>
       ) : (
@@ -244,24 +247,24 @@ function Calendar({ dates, voterId, voterName, closed, finalizedDateId, onDateCl
           {finalizedDateId && (
             <div className="flex items-center gap-1">
               <div className="w-5 h-5 bg-green-600 border border-green-700 ring-2 ring-green-400 rounded-sm"></div>
-              <span className="font-semibold">Chosen date</span>
+              <span className="font-semibold">{t('chosenDate')}</span>
             </div>
           )}
           <div className="flex items-center gap-1">
             <div className="w-5 h-5 bg-blue-100 border-2 border-blue-400 rounded-sm"></div>
-            <span>Available</span>
+            <span>{t('availableLegend')}</span>
           </div>
           <div className="flex items-center gap-1">
             <div className="w-5 h-5 bg-green-500 border border-green-600 rounded-sm"></div>
-            <span>Yes</span>
+            <span>{t('yes')}</span>
           </div>
           <div className="flex items-center gap-1">
             <div className="w-5 h-5 bg-yellow-400 border border-yellow-500 rounded-sm"></div>
-            <span>Maybe</span>
+            <span>{t('maybe')}</span>
           </div>
           <div className="flex items-center gap-1">
             <div className="w-5 h-5 bg-red-500 border border-red-600 rounded-sm"></div>
-            <span>No</span>
+            <span>{t('no')}</span>
           </div>
         </div>
       )}

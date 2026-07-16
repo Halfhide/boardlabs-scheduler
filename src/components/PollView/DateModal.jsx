@@ -5,6 +5,7 @@ import CommentSection from './CommentSection';
 import { formatDate } from '../../utils/dateHelpers';
 import { getVoteSummary, findUserVote, getCapacityStatus } from '../../utils/pollHelpers';
 import { diceRoll } from '../../utils/diceRoll';
+import { useTranslation, translateError } from '../../i18n/useTranslation';
 
 const CAPACITY_STYLES = {
   needs: 'bg-amber-100 text-amber-800',
@@ -13,6 +14,7 @@ const CAPACITY_STYLES = {
 };
 
 function DateModal({ dateData, voterId, voterName, isCreator, closed, finalizedDateId, minPlayers, maxPlayers, onVote, onComment, onRemoveDate, onFinalize, onClose }) {
+  const { t, dateLocale } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [justVoted, setJustVoted] = useState(false);
   const [votingFor, setVotingFor] = useState(null);
@@ -90,7 +92,7 @@ function DateModal({ dateData, voterId, voterName, isCreator, closed, finalizedD
       }
     } catch (error) {
       console.error('Error finalizing date:', error);
-      setFinalizeError(error.message || 'Failed to finalize. Please try again.');
+      setFinalizeError(translateError(t, error, 'errFinalizeFailed'));
     } finally {
       setFinalizing(false);
     }
@@ -123,27 +125,27 @@ function DateModal({ dateData, voterId, voterName, isCreator, closed, finalizedD
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
-        aria-label={formatDate(dateData.date)}
+        aria-label={formatDate(dateData.date, { locale: dateLocale }, t('finalizedDateFormat'))}
       >
         {/* Header */}
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-start">
           <div>
             <h3 className="text-2xl font-bold text-gray-900">
-              {formatDate(dateData.date)}
+              {formatDate(dateData.date, { locale: dateLocale }, t('finalizedDateFormat'))}
             </h3>
             <div className="flex gap-4 mt-2 text-sm">
               <span className="text-green-600 font-medium">
-                {voteSummary.yes} Yes
+                {t('yesCount', { count: voteSummary.yes })}
               </span>
               <span className="text-yellow-600 font-medium">
-                {voteSummary.maybe} Maybe
+                {t('maybeCount', { count: voteSummary.maybe })}
               </span>
               <span className="text-red-600 font-medium">
-                {voteSummary.no} No
+                {t('noCount', { count: voteSummary.no })}
               </span>
               {capacity && (
                 <span className={`text-xs font-medium px-2 py-0.5 rounded-full self-center ${CAPACITY_STYLES[capacity.key]}`}>
-                  {capacity.label}
+                  {t(`capacity${capacity.key.charAt(0).toUpperCase()}${capacity.key.slice(1)}`, { count: capacity.needed })}
                 </span>
               )}
             </div>
@@ -151,7 +153,7 @@ function DateModal({ dateData, voterId, voterName, isCreator, closed, finalizedD
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 text-3xl leading-none font-light"
-            aria-label="Close"
+            aria-label={t('closeButton')}
           >
             ×
           </button>
@@ -163,13 +165,13 @@ function DateModal({ dateData, voterId, voterName, isCreator, closed, finalizedD
           <div>
             <div className="flex items-center justify-between mb-3">
               <h4 className="text-lg font-semibold text-gray-900">
-                Cast Your Vote
+                {t('castYourVote')}
               </h4>
               {currentUserVote && !loading && (
                 <span className="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
-                  {currentUserVote.response === 'yes' && '✓ You voted Yes'}
-                  {currentUserVote.response === 'maybe' && '? You voted Maybe'}
-                  {currentUserVote.response === 'no' && '✗ You voted No'}
+                  {currentUserVote.response === 'yes' && t('youVotedYes')}
+                  {currentUserVote.response === 'maybe' && t('youVotedMaybe')}
+                  {currentUserVote.response === 'no' && t('youVotedNo')}
                 </span>
               )}
             </div>
@@ -178,7 +180,7 @@ function DateModal({ dateData, voterId, voterName, isCreator, closed, finalizedD
             {voterName && !currentUserVote && !closed && (
               <div className="bg-blue-50 border border-blue-200 rounded-md p-3 mb-3">
                 <p className="text-sm text-blue-800">
-                  💡 <strong>Click a button below to vote.</strong> Your vote will be saved immediately.
+                  💡 <strong>{t('clickButtonBelow')}</strong> {t('savedImmediately')}
                 </p>
               </div>
             )}
@@ -187,7 +189,7 @@ function DateModal({ dateData, voterId, voterName, isCreator, closed, finalizedD
             {voteError && (
               <div className="bg-red-50 border border-red-200 rounded-md p-3 mb-3">
                 <p className="text-sm text-red-800 font-medium">
-                  Failed to save your vote. Please try again.
+                  {t('voteFailed')}
                 </p>
               </div>
             )}
@@ -196,14 +198,14 @@ function DateModal({ dateData, voterId, voterName, isCreator, closed, finalizedD
             {justVoted && (
               <div className="bg-green-50 border border-green-200 rounded-md p-3 mb-3 animate-bounce-in">
                 <p className="text-sm text-green-800 font-medium">
-                  ✨ Vote saved! The calendar will update automatically.
+                  {t('voteSaved')}
                 </p>
               </div>
             )}
 
             {closed ? (
               <p className="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-md p-3">
-                🔒 Voting is closed for this poll
+                {t('votingClosedForPoll')}
               </p>
             ) : voterName ? (
               <div className="flex gap-2">
@@ -228,13 +230,13 @@ function DateModal({ dateData, voterId, voterName, isCreator, closed, finalizedD
               </div>
             ) : (
               <p className="text-sm text-gray-600 italic bg-yellow-50 border border-yellow-200 rounded-md p-3">
-                Please enter your name at the top of the page to vote
+                {t('enterNameToVote')}
               </p>
             )}
 
             {currentUserVote && !loading && !justVoted && (
               <p className="text-xs text-gray-500 mt-2 text-center">
-                Your vote is shown by the filled button. Click a different button to change it.
+                {t('changeVoteHint')}
               </p>
             )}
           </div>
@@ -242,7 +244,7 @@ function DateModal({ dateData, voterId, voterName, isCreator, closed, finalizedD
           {/* Voter Breakdown - who you'd be playing with */}
           <div>
             <h4 className="text-lg font-semibold text-gray-900 mb-3">
-              Who's voted ({dateData.votes.length})
+              {t('whosVoted', { count: dateData.votes.length })}
             </h4>
             <VoterBreakdown
               votes={dateData.votes}
@@ -254,7 +256,7 @@ function DateModal({ dateData, voterId, voterName, isCreator, closed, finalizedD
           {/* Comments Section */}
           <div>
             <h4 className="text-lg font-semibold text-gray-900 mb-3">
-              Comments ({dateData.comments.length})
+              {t('commentsHeading', { count: dateData.comments.length })}
             </h4>
             <CommentSection
               comments={dateData.comments}
@@ -277,10 +279,10 @@ function DateModal({ dateData, voterId, voterName, isCreator, closed, finalizedD
                 }`}
               >
                 {finalizing
-                  ? 'Saving...'
+                  ? t('saving')
                   : isFinalizedDate
-                    ? 'Un-finalize (reopen voting)'
-                    : '🎉 Finalize: we play on this date!'}
+                    ? t('unfinalizeButton')
+                    : t('finalizeButton')}
               </button>
               {finalizeError && (
                 <p className="text-xs text-red-600">{finalizeError}</p>
@@ -295,19 +297,19 @@ function DateModal({ dateData, voterId, voterName, isCreator, closed, finalizedD
                 }`}
               >
                 {removing
-                  ? 'Removing...'
+                  ? t('removingEllipsis')
                   : confirmingRemove
-                    ? '⚠️ Click again to permanently remove this date'
-                    : 'Remove this date from the poll'}
+                    ? t('confirmRemoveDate')
+                    : t('removeDateButton')}
               </button>
               {confirmingRemove && !removing && (
                 <p className="text-xs text-gray-500 mt-1">
-                  All votes and comments on this date will be lost.
+                  {t('removeDateWarning')}
                 </p>
               )}
               {removeError && (
                 <p className="text-xs text-red-600 mt-1">
-                  Failed to remove the date. Please try again.
+                  {t('removeDateFailed')}
                 </p>
               )}
             </div>
@@ -320,7 +322,7 @@ function DateModal({ dateData, voterId, voterName, isCreator, closed, finalizedD
             onClick={onClose}
             className="w-full bg-gray-600 text-white font-medium py-3 px-4 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
           >
-            Close
+            {t('closeButton')}
           </button>
         </div>
       </div>

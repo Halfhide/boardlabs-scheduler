@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { format, parseISO } from 'date-fns';
+import { useTranslation, translateError } from '../../i18n/useTranslation';
 
 function AdminBar({
   poll,
@@ -14,6 +15,7 @@ function AdminBar({
   onSetCapacity,
   onUnfinalize
 }) {
+  const { t, dateLocale } = useTranslation();
   const [titleDraft, setTitleDraft] = useState(poll.title);
   const [newDate, setNewDate] = useState('');
   const [deadlineDraft, setDeadlineDraft] = useState(
@@ -34,7 +36,7 @@ function AdminBar({
       if (successNotice) setNotice(successNotice);
     } catch (err) {
       console.error('Creator action failed:', err);
-      setError(err.message || 'Action failed. Please try again.');
+      setError(translateError(t, err));
     } finally {
       setBusy(false);
     }
@@ -46,32 +48,32 @@ function AdminBar({
     run(async () => {
       const parsed = new Date(deadlineDraft);
       if (isNaN(parsed.getTime())) {
-        throw new Error('Please pick a valid date and time');
+        throw Object.assign(new Error('Invalid date/time'), { code: 'errValidDateTime' });
       }
       if (parsed.getTime() <= Date.now()) {
-        throw new Error('The deadline must be in the future');
+        throw Object.assign(new Error('Deadline in the past'), { code: 'errDeadlineFuture' });
       }
       await onSetDeadline(parsed);
-    }, 'Deadline updated');
+    }, t('deadlineUpdatedNotice'));
 
   const handleClearDeadline = () =>
     run(async () => {
       await onClearDeadline();
       setDeadlineDraft('');
-    }, 'Deadline removed');
+    }, t('deadlineRemovedNotice'));
 
   const handleSaveCapacity = () =>
     run(async () => {
       const parse = (v) => (v === '' ? null : parseInt(v, 10));
       await onSetCapacity(parse(minDraft), parse(maxDraft));
-    }, 'Player capacity updated');
+    }, t('capacityUpdatedNotice'));
 
   const handleClearCapacity = () =>
     run(async () => {
       await onSetCapacity(null, null);
       setMinDraft('');
       setMaxDraft('');
-    }, 'Player capacity removed');
+    }, t('capacityRemovedNotice'));
 
   const hasCapacity = poll.minPlayers != null || poll.maxPlayers != null;
 
@@ -79,12 +81,12 @@ function AdminBar({
     <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4 space-y-3">
       <div className="flex items-center justify-between gap-3">
         <h3 className="text-sm font-bold text-indigo-900">
-          🛠️ Creator tools
+          {t('creatorTools')}
         </h3>
         {!finalizedDate && (
           <button
             onClick={() =>
-              run(onToggleClosed, poll.closed ? 'Voting reopened' : 'Voting closed')
+              run(onToggleClosed, poll.closed ? t('votingReopenedNotice') : t('votingClosedNotice'))
             }
             disabled={busy}
             className={`text-sm font-medium px-3 py-1.5 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
@@ -93,7 +95,7 @@ function AdminBar({
                 : 'bg-amber-500 text-white hover:bg-amber-600'
             }`}
           >
-            {poll.closed ? 'Reopen voting' : 'Close voting'}
+            {poll.closed ? t('reopenVoting') : t('closeVoting')}
           </button>
         )}
       </div>
@@ -102,15 +104,16 @@ function AdminBar({
       {finalizedDate && (
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-green-100 border border-green-300 rounded-md px-3 py-2">
           <p className="text-xs text-green-900 font-medium">
-            🎉 Finalized: {format(parseISO(finalizedDate.date), 'EEEE, MMMM d, yyyy')}.
-            Voting is closed.
+            {t('finalizedStatus', {
+              date: format(parseISO(finalizedDate.date), t('finalizedDateFormat'), { locale: dateLocale })
+            })}
           </p>
           <button
-            onClick={() => run(onUnfinalize, 'Poll reopened')}
+            onClick={() => run(onUnfinalize, t('pollReopenedNotice'))}
             disabled={busy}
             className="text-xs font-medium px-3 py-1.5 rounded-md border border-green-400 text-green-800 hover:bg-green-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
           >
-            Un-finalize and reopen voting
+            {t('unfinalizeReopen')}
           </button>
         </div>
       )}
@@ -118,7 +121,7 @@ function AdminBar({
       {/* Rename */}
       <div>
         <label htmlFor="admin-title" className="block text-xs font-medium text-indigo-900 mb-1">
-          Poll title
+          {t('pollTitleLabel')}
         </label>
         <div className="flex flex-col sm:flex-row gap-2">
           <input
@@ -131,11 +134,11 @@ function AdminBar({
             disabled={busy}
           />
           <button
-            onClick={() => run(() => onRename(trimmedDraft), 'Title updated')}
+            onClick={() => run(() => onRename(trimmedDraft), t('titleUpdatedNotice'))}
             disabled={busy || !trimmedDraft || trimmedDraft === poll.title}
             className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            Rename
+            {t('renameButton')}
           </button>
         </div>
       </div>
@@ -143,7 +146,7 @@ function AdminBar({
       {/* Add a date option */}
       <div>
         <label htmlFor="admin-new-date" className="block text-xs font-medium text-indigo-900 mb-1">
-          Add another date option for participants to vote on
+          {t('addDateLabel')}
         </label>
         <div className="flex flex-col sm:flex-row gap-2">
           <input
@@ -159,24 +162,23 @@ function AdminBar({
               run(async () => {
                 await onAddDate(newDate);
                 setNewDate('');
-              }, 'Date option added to the poll')
+              }, t('dateAddedNotice'))
             }
             disabled={busy || !newDate}
             className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            Add date option
+            {t('addDateButton')}
           </button>
         </div>
         <p className="mt-1 text-xs text-indigo-700">
-          To remove a date option, open it in the calendar and use "Remove
-          this date from the poll".
+          {t('removeDateHint', { button: t('removeDateButton') })}
         </p>
       </div>
 
       {/* Voting deadline */}
       <div>
         <label htmlFor="admin-deadline" className="block text-xs font-medium text-indigo-900 mb-1">
-          Voting deadline (voting closes automatically at this time)
+          {t('deadlineLabel')}
         </label>
         <div className="flex flex-col sm:flex-row gap-2">
           <input
@@ -192,7 +194,7 @@ function AdminBar({
             disabled={busy || !deadlineDraft}
             className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            Set deadline
+            {t('setDeadline')}
           </button>
           {deadlineDate && (
             <button
@@ -200,23 +202,27 @@ function AdminBar({
               disabled={busy}
               className="px-4 py-2 border border-indigo-300 text-indigo-700 text-sm font-medium rounded-md hover:bg-indigo-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              Remove deadline
+              {t('removeDeadline')}
             </button>
           )}
         </div>
         <p className="mt-1 text-xs text-indigo-700">
           {deadlineDate
             ? deadlinePassed
-              ? `The deadline (${format(deadlineDate, 'MMM d, HH:mm')}) has passed and voting is closed. Change or remove it to reopen.`
-              : `Voting closes ${format(deadlineDate, 'MMM d, HH:mm')}.`
-            : 'No voting deadline set.'}
+              ? t('deadlinePassedHint', {
+                  date: format(deadlineDate, t('deadlineShortFormat'), { locale: dateLocale })
+                })
+              : t('deadlineClosesHint', {
+                  date: format(deadlineDate, t('deadlineShortFormat'), { locale: dateLocale })
+                })
+            : t('noDeadline')}
         </p>
       </div>
 
       {/* Player capacity */}
       <div>
         <label htmlFor="admin-min-players" className="block text-xs font-medium text-indigo-900 mb-1">
-          Player capacity (dates show whether enough people can attend)
+          {t('capacityLabel')}
         </label>
         <div className="flex flex-col sm:flex-row gap-2">
           <input
@@ -226,8 +232,8 @@ function AdminBar({
             max={99}
             value={minDraft}
             onChange={(e) => setMinDraft(e.target.value)}
-            placeholder="Min"
-            aria-label="Minimum players"
+            placeholder={t('minPlaceholder')}
+            aria-label={t('minPlayersAria')}
             className="w-full sm:w-24 px-3 py-2 border border-indigo-200 rounded-md text-sm bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
             disabled={busy}
           />
@@ -238,8 +244,8 @@ function AdminBar({
             max={99}
             value={maxDraft}
             onChange={(e) => setMaxDraft(e.target.value)}
-            placeholder="Max"
-            aria-label="Maximum players"
+            placeholder={t('maxPlaceholder')}
+            aria-label={t('maxPlayersAria')}
             className="w-full sm:w-24 px-3 py-2 border border-indigo-200 rounded-md text-sm bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
             disabled={busy}
           />
@@ -248,7 +254,7 @@ function AdminBar({
             disabled={busy || (minDraft === '' && maxDraft === '')}
             className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            Save capacity
+            {t('saveCapacity')}
           </button>
           {hasCapacity && (
             <button
@@ -256,14 +262,17 @@ function AdminBar({
               disabled={busy}
               className="px-4 py-2 border border-indigo-300 text-indigo-700 text-sm font-medium rounded-md hover:bg-indigo-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              Remove capacity
+              {t('removeCapacity')}
             </button>
           )}
         </div>
         <p className="mt-1 text-xs text-indigo-700">
           {hasCapacity
-            ? `Current: ${poll.minPlayers ?? 'no'} min, ${poll.maxPlayers ?? 'no'} max.`
-            : 'No player capacity set.'}
+            ? t('capacityCurrent', {
+                min: poll.minPlayers ?? t('noBound'),
+                max: poll.maxPlayers ?? t('noBound')
+              })
+            : t('noCapacity')}
         </p>
       </div>
 
