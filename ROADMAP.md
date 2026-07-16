@@ -35,7 +35,7 @@ features were proposed, 11 accepted, 4 rejected (see bottom).
 | 8 | Game voting          | 3     | done        |
 | 12 | BGG game search     | 3     | done (needs BGG token) |
 | 9 | Polish + i18n        | 4     | done        |
-| 10 | PWA install         | 4     | not started |
+| 10 | PWA install         | 4     | done        |
 | 11 | Google sign-in      | 5     | not started |
 
 ## Phase 1: Poll lifecycle (foundations)
@@ -375,7 +375,23 @@ Acceptance criteria:
 
 ### 10. PWA install
 
-Status: not started
+Status: done (16 Jul 2026). vite-plugin-pwa (generateSW, autoUpdate)
+with a full manifest: name, standalone display, theme color #2563eb,
+and generated dice icons (192/512 any + 512 maskable + 180 Apple
+touch icon; produced by a dependency-free Node PNG script, blue die
+with white pips). The precached app shell is served for all
+navigations (navigateFallback to index.html, /api/ excluded so BGG
+search fails cleanly), poll data stays live from Firestore. A
+translated OfflineBanner (navigator.onLine + online/offline events)
+shows a clear notice when the connection drops. Verified against the
+production build (vite preview): SW activated, manifest correct,
+shell + deep poll links load with the server killed, banner appears
+and clears in both languages, live data still flows through the SW.
+Installability criteria checked programmatically (SW + valid
+manifest with required icons); a full Lighthouse run was not
+performed. Housekeeping in the same change: `npm audit fix` cleared
+all 11 reported vulnerabilities (firebase 12.11, react-router-dom
+7.18.1, vite 7.3.6; semver-compatible bumps only).
 
 Goal: installable app that feels native on phones.
 
@@ -460,3 +476,9 @@ Acceptance criteria: defined during its planning session.
   (Monday-first Polish weeks), Polish plural forms, translated error
   paths, and a persisted EN/PL header toggle. No data model or rules
   changes.
+- 16 Jul 2026: feature 10 (PWA install) implemented and verified
+  against the production build: installable manifest with generated
+  dice icons, service worker app shell (works with the server down,
+  deep links included), translated offline notice. Phase 4 complete.
+  npm audit fix applied alongside (0 vulnerabilities left). No data
+  model or rules changes.

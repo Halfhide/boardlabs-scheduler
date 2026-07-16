@@ -3,6 +3,7 @@ import CreatePoll from './components/CreatePoll/CreatePoll';
 import PollView from './components/PollView/PollView';
 import LanguageProvider from './i18n/LanguageProvider';
 import { useTranslation } from './i18n/useTranslation';
+import OfflineBanner from './components/shared/OfflineBanner';
 
 function LanguageToggle() {
   const { lang, setLang } = useTranslation();
@@ -34,6 +35,7 @@ function App() {
     <LanguageProvider>
       <Router>
         <div className="min-h-screen bg-gray-50">
+          <OfflineBanner />
           <header className="bg-white shadow-sm">
             <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
               <h1 className="text-2xl font-bold text-gray-900">

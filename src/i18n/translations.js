@@ -19,6 +19,7 @@ export const translations = {
   en: {
     // App shell
     loading: 'Loading...',
+    offlineNotice: 'You are offline. Poll data needs a connection; changes cannot be saved right now.',
 
     // Create poll form
     createTitle: 'Create a New Poll',
@@ -252,6 +253,7 @@ export const translations = {
   pl: {
     // App shell
     loading: 'Wczytywanie...',
+    offlineNotice: 'Brak połączenia z internetem. Dane ankiet wymagają połączenia; zmiany nie zostaną teraz zapisane.',
 
     // Create poll form
     createTitle: 'Utwórz nową ankietę',
