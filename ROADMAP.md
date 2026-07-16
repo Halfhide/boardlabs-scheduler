@@ -375,7 +375,8 @@ Acceptance criteria:
 
 ### 10. PWA install
 
-Status: done (16 Jul 2026). vite-plugin-pwa (generateSW, autoUpdate)
+Status: done (16 Jul 2026, commit b472f70). vite-plugin-pwa
+(generateSW, autoUpdate)
 with a full manifest: name, standalone display, theme color #2563eb,
 and generated dice icons (192/512 any + 512 maskable + 180 Apple
 touch icon; produced by a dependency-free Node PNG script, blue die
