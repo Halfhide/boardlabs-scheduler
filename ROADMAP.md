@@ -277,7 +277,8 @@ Acceptance criteria:
 
 ### 12. BoardGameGeek game search (added 15 Jul 2026 on Adam's request)
 
-Status: done, pending BGG token (16 Jul 2026). Implemented end to end:
+Status: done, pending BGG token (16 Jul 2026, commit f5d413a).
+Implemented end to end:
 `api/bgg-search.js` (the repo's first serverless function) proxies BGG
 XML API2 search and returns trimmed JSON; the same handler is mounted
 on the Vite dev server by vite.config.js, so `npm run dev` serves it
