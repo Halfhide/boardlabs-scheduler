@@ -33,7 +33,7 @@ features were proposed, 11 accepted, 4 rejected (see bottom).
 | 6 | My polls list        | 2     | done        |
 | 7 | Player capacity      | 3     | done        |
 | 8 | Game voting          | 3     | done        |
-| 12 | BGG game search     | 3     | not started |
+| 12 | BGG game search     | 3     | done (needs BGG token) |
 | 9 | Polish + i18n        | 4     | not started |
 | 10 | PWA install         | 4     | not started |
 | 11 | Google sign-in      | 5     | not started |
@@ -277,7 +277,29 @@ Acceptance criteria:
 
 ### 12. BoardGameGeek game search (added 15 Jul 2026 on Adam's request)
 
-Status: not started
+Status: done, pending BGG token (16 Jul 2026). Implemented end to end:
+`api/bgg-search.js` (the repo's first serverless function) proxies BGG
+XML API2 search and returns trimmed JSON; the same handler is mounted
+on the Vite dev server by vite.config.js, so `npm run dev` serves it
+too. GameSearchInput adds debounced (300ms, min 2 chars) autocomplete
+to the game suggestion form: keyboard and mouse selection fill title
+plus BGG link, Escape dismisses, plain Enter still submits free text,
+and any BGG failure fails silent. Editing the title after picking a
+suggestion clears the auto-filled link so it cannot point at the
+wrong game.
+IMPORTANT: since July 2025 BGG requires a registered application and
+a Bearer token (the roadmap's "needs no API key" assumption is
+outdated, see https://boardgamegeek.com/using_the_xml_api). Until
+Adam registers at https://boardgamegeek.com/applications (approval
+can take a week or more) and sets BGG_API_TOKEN in Vercel env and in
+.env locally, BGG answers 401 and the UI falls back to plain
+free-text entry, which was verified to work. The dropdown UI was
+verified in the browser against a temporary canned-data mock; the
+proxy's parsing, ranking, 202-retry and error paths were verified
+with mocked BGG responses. Live BGG responses remain unverified
+until a token exists. Public-facing apps must also show the
+"Powered by BGG" logo per their terms; revisit once the token works.
+
 Depends on: game voting (feature 8, done).
 
 Goal: when suggesting a game, typing its name shows live suggestions
@@ -408,3 +430,9 @@ Acceptance criteria: defined during its planning session.
 - 15 Jul 2026: Adam requested a Game Voting extension: live game
   name autocomplete from the BoardGameGeek API. Added as feature 12
   in phase 3 (next in line before phase 4).
+- 16 Jul 2026: feature 12 (BGG game search) implemented: serverless
+  proxy plus autocomplete UI, verified in the browser (dropdown flows
+  against canned data, silent free-text fallback against the real
+  401). Discovered BGG now requires app registration and a Bearer
+  token; Adam must register and set BGG_API_TOKEN before live
+  suggestions work. No Firestore rules changes.

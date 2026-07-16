@@ -49,6 +49,11 @@ listed there as rejected.
   and tell Adam. One such poll already exists: `RjwDCzmNa8`.
 - `.env` holds the Firebase web config (gitignored). Do not print its
   values into chat, commits, or files.
+- BGG autocomplete (`api/bgg-search.js`, proxied into the dev server
+  by vite.config.js) needs `BGG_API_TOKEN` (in `.env` locally, Vercel
+  env in prod). BGG requires a registered application since Jul 2025;
+  without the token BGG answers 401 and the UI silently falls back to
+  free-text entry.
 
 ## Working conventions
 

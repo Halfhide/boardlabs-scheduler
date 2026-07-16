@@ -1,9 +1,30 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { diceRoll } from '../../utils/diceRoll';
+import { bggGameUrl } from '../../utils/bggSearch';
+import GameSearchInput from './GameSearchInput';
 
 function GameVoting({ games, voterId, voterName, isCreator, closed, onAddGame, onToggleGameVote, onRemoveGame }) {
   const [title, setTitle] = useState('');
   const [url, setUrl] = useState('');
+  // Last BGG autocomplete pick; lets a later title edit drop the
+  // auto-filled link so it cannot point at the wrong game
+  const bggPickRef = useRef(null);
+
+  const handleTitleChange = (value) => {
+    setTitle(value);
+    const pick = bggPickRef.current;
+    if (pick && value !== pick.name) {
+      setUrl((current) => (current === pick.url ? '' : current));
+      bggPickRef.current = null;
+    }
+  };
+
+  const handleGameSelect = (game) => {
+    const pick = { name: game.name, url: bggGameUrl(game.id) };
+    bggPickRef.current = pick;
+    setTitle(pick.name);
+    setUrl(pick.url);
+  };
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [confirmingRemoveId, setConfirmingRemoveId] = useState(null);
@@ -143,13 +164,10 @@ function GameVoting({ games, voterId, voterName, isCreator, closed, onAddGame, o
         </p>
       ) : voterName ? (
         <form onSubmit={handleSuggest} className="flex flex-col sm:flex-row gap-2">
-          <input
-            type="text"
+          <GameSearchInput
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            maxLength={80}
-            placeholder="Suggest a game (e.g., Catan)"
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            onChange={handleTitleChange}
+            onSelect={handleGameSelect}
             disabled={busy}
           />
           <input
