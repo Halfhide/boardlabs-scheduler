@@ -33,7 +33,7 @@ features were proposed, 11 accepted, 4 rejected (see bottom).
 | 6 | My polls list        | 2     | done        |
 | 7 | Player capacity      | 3     | done        |
 | 8 | Game voting          | 3     | done        |
-| 12 | BGG game search     | 3     | done (needs BGG token) |
+| 12 | BGG game search     | 3     | done        |
 | 9 | Polish + i18n        | 4     | done        |
 | 10 | PWA install         | 4     | done        |
 | 11 | Google sign-in      | 5     | not started |
@@ -277,8 +277,11 @@ Acceptance criteria:
 
 ### 12. BoardGameGeek game search (added 15 Jul 2026 on Adam's request)
 
-Status: done, pending BGG token (16 Jul 2026, commit f5d413a).
-Implemented end to end:
+Status: done (16 Jul 2026, commit f5d413a; completed 23 Jul 2026
+after BGG approved Adam's application: token configured, live API
+verified in the browser, official "Powered by BGG" logo added to the
+game voting card linking back to boardgamegeek.com as their terms
+require). Implemented end to end:
 `api/bgg-search.js` (the repo's first serverless function) proxies BGG
 XML API2 search and returns trimmed JSON; the same handler is mounted
 on the Vite dev server by vite.config.js, so `npm run dev` serves it
@@ -483,3 +486,8 @@ Acceptance criteria: defined during its planning session.
   deep links included), translated offline notice. Phase 4 complete.
   npm audit fix applied alongside (0 vulnerabilities left). No data
   model or rules changes.
+- 23 Jul 2026: BGG approved the API application. BGG_API_TOKEN set
+  locally and in Vercel; live autocomplete verified in the browser
+  (real search results, exact-match ranking, selection fills the
+  real BGG link). Official "Powered by BGG" logo bundled and shown
+  in the game voting card. Feature 12 fully closed.

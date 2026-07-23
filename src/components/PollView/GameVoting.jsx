@@ -195,6 +195,22 @@ function GameVoting({ games, voterId, voterName, isCreator, closed, onAddGame, o
       )}
 
       {error && <p className="mt-2 text-xs text-red-600 font-medium">{error}</p>}
+
+      {/* Required by BGG's API terms for public-facing apps */}
+      <div className="mt-4 flex justify-end">
+        <a
+          href="https://boardgamegeek.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          title="BoardGameGeek"
+        >
+          <img
+            src="/powered-by-bgg.svg"
+            alt="Powered by BoardGameGeek"
+            className="h-8"
+          />
+        </a>
+      </div>
     </div>
   );
 }
