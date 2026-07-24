@@ -36,7 +36,14 @@ features were proposed, 11 accepted, 4 rejected (see bottom).
 | 12 | BGG game search     | 3     | done        |
 | 9 | Polish + i18n        | 4     | done        |
 | 10 | PWA install         | 4     | done        |
-| 11 | Google sign-in      | 5     | not started |
+| 11a | Auth foundation    | 5     | not started |
+| 11b | Identity merge     | 5     | not started |
+| 11c | My polls sync      | 5     | not started |
+| 11d | Poll deletion      | 5     | not started |
+| 11e | Poll auto-expiry   | 5     | not started |
+| 11f | Rules + App Check  | 5     | not started |
+| 11g | Privacy note       | 5     | not started |
+| 13 | Design system align | 6     | blocked (awaiting design) |
 
 ## Phase 1: Poll lifecycle (foundations)
 
@@ -410,27 +417,129 @@ Acceptance criteria:
   to the homepage; offline visit shows the shell with a clear
   offline notice.
 
-## Phase 5: Accounts
+## Phase 5: Accounts + public launch
 
-### 11. Optional Google sign-in
+Planned with Adam on 23 Jul 2026. Goal: the app is safe and complete
+enough to share publicly. Decisions made: sign-in methods are Google
+plus email magic link (no passwords, ever); sign-in stays fully
+optional for everyone (voting and creating keep working signed out);
+account features include cross-device "my polls", owner poll
+deletion, and poll auto-expiry; the full hardening package ships in
+the same phase (rules rewrite, Firebase App Check, privacy note in
+PL and EN).
+
+Known ceiling, accepted: because anonymous voting stays allowed,
+Firestore rules can only enforce true per-vote ownership for
+signed-in users. Anti-abuse for anonymous traffic rests on App
+Check, shape validation, and size caps. Poll deletion requires
+being signed in as the owner (a browser token is too weak to
+authorize permanent deletion; anonymous creators sign in first and
+ownership is claimed automatically).
+
+Work through the sub-features in order; each follows the usual
+rules (status updates, browser verification, lint/build green).
+
+### 11a. Auth foundation
 
 Status: not started
-Depends on: phases 1-3 stable. This is a big architectural step;
-plan it in its own session with Adam before writing code.
 
-Goal: stable identity across devices and real security.
+Firebase Auth with Google and email-link providers. Header UI:
+sign-in button, account menu with avatar/name and sign-out. Magic
+link flow: enter email, click the link from the inbox, signed in
+(handle the return URL and the cross-device email re-prompt). An
+AuthContext exposes the current user app-wide. Signed-out behavior
+is byte-for-byte today's app.
+MANUAL (Adam, Firebase console): enable Google and Email link
+(passwordless) sign-in providers; confirm the Vercel domain is in
+Auth's authorized domains.
 
-Scope (outline, refine before implementation):
-- Firebase Auth with Google provider; signing in is optional and
-  merges with the anonymous voter ID (existing votes by the local
-  voter ID get claimed by the account).
-- Creator rights verified by auth UID instead of the creator token
-  (migrate: token holders can attach their UID once).
-- Firestore rules rewritten to validate vote ownership properly for
-  signed-in users.
-- Signed-out users keep working exactly as today.
+### 11b. Identity merge and ownership claim
 
-Acceptance criteria: defined during its planning session.
+Status: not started
+
+Signed-in users act under their UID: new votes/comments/games carry
+it. On visiting a poll while signed in, votes matching the local
+anonymous voterId are claimed (transaction) by the UID, and if the
+browser holds the poll's creatorToken, an ownerUid is attached to
+the poll (one-time claim). Creator tools then key off ownerUid when
+signed in, token as the legacy fallback.
+
+### 11c. My polls synced to account
+
+Status: not started
+
+Per-user poll list in Firestore (users/{uid} document), merged with
+the localStorage list; the homepage shows the union and syncs new
+visits/creations for signed-in users. Rules: only the owner reads
+and writes their user document.
+
+### 11d. Poll deletion by owner
+
+Status: not started
+
+Signed-in owners can delete their poll (two-step confirm in the
+AdminBar). Rules allow delete only when request.auth.uid matches
+the poll's ownerUid. The my-polls lists handle dangling entries
+gracefully.
+
+### 11e. Poll auto-expiry
+
+Status: not started
+
+A Vercel cron (vercel.json) hits a serverless function using the
+Firebase Admin SDK to delete polls whose latest date is more than
+12 months in the past (window adjustable). Admin SDK bypasses
+rules, so the function must verify a shared secret (CRON_SECRET)
+sent by Vercel cron.
+MANUAL (Adam): generate a Firebase service-account key and set it
+plus CRON_SECRET in Vercel env vars.
+
+### 11f. Hardening: rules + App Check
+
+Status: not started
+
+Firestore rules rewritten: strict shape validation and size caps
+everywhere, ownership checks wherever auth is present (poll
+management by ownerUid, user docs, vote claims). Firebase App Check
+with reCAPTCHA v3 enforced on Firestore so only the real app can
+talk to the database.
+MANUAL (Adam): register the app for App Check in the Firebase
+console (reCAPTCHA v3 site key), then enable enforcement AFTER the
+App Check client code is deployed and confirmed working (enforcing
+too early locks everyone out).
+
+### 11g. Privacy note
+
+Status: not started
+
+A short /privacy page in Polish and English: what is stored (poll
+titles, dates, first names or nicks, votes, comments, optional
+account email), where (Google Firebase, EU visitors included), how
+long (auto-expiry window), and how to get data removed (contact
+Adam; owners can delete their polls). Footer link on both pages.
+
+Acceptance criteria for the phase: signed-out experience unchanged;
+sign-in works via Google and via magic link on desktop and phone;
+identity and creator rights follow the account across devices;
+owners can delete polls and deletion is rules-enforced; expired
+polls disappear on schedule; App Check enforcement is on without
+breaking real users; privacy page reachable in both languages.
+
+## Phase 6: Pre-launch polish
+
+### 13. Design system alignment (added 23 Jul 2026)
+
+Status: blocked, waiting on Adam's visual identity work
+
+Adam is developing a visual identity and design system in parallel
+(outside this repo). Once it exists, align the app to it as the
+last step before the public launch, after phase 5 is functionally
+complete. Implementation intent: express the design system as
+Tailwind v4 @theme tokens (semantic palette, type scale, radius and
+shadow values) so the swap is centralized, then do a component
+polish pass, and regenerate the PWA icons, favicon, and manifest
+theme color to match the new identity. Do not start restyling
+before the design system is delivered.
 
 ## Rejected features (do not build unless Adam changes his mind)
 
@@ -491,3 +600,8 @@ Acceptance criteria: defined during its planning session.
   (real search results, exact-match ranking, selection fills the
   real BGG link). Official "Powered by BGG" logo bundled and shown
   in the game voting card. Feature 12 fully closed.
+- 23 Jul 2026: phase 5 planned with Adam and expanded into
+  sub-features 11a-11g (Google + magic link sign-in, fully optional;
+  identity merge; synced my-polls; owner deletion; auto-expiry;
+  rules + App Check hardening; privacy note) targeting a public
+  launch.
