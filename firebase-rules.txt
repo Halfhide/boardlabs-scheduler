@@ -58,6 +58,24 @@ service cloud.firestore {
         request.resource.data.dates.size() > 0 &&
         request.resource.data.dates.size() <= 92;
 
+      // Only the signed-in owner can delete a poll. Polls without an
+      // ownerUid (anonymous, never claimed) cannot be deleted; their
+      // creator signs in first and ownership is claimed on visit.
+      allow delete: if
+        request.auth != null &&
+        resource.data.get('ownerUid', '') == request.auth.uid;
+    }
+
+    // Per-account document holding the user's synced poll list.
+    // Only the signed-in owner can read or write it; the shape is a
+    // single `polls` map (entries validated in the 11f rules pass).
+    match /users/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow create, update: if
+        request.auth != null &&
+        request.auth.uid == userId &&
+        request.resource.data.keys().hasOnly(['polls']) &&
+        request.resource.data.polls is map;
       allow delete: if false;
     }
   }
@@ -65,7 +83,7 @@ service cloud.firestore {
 
 // Note: without authentication these rules cannot stop a determined
 // visitor from rewriting votes or poll settings of a poll whose link
-// they have. They do prevent deletion, malformed or oversized
-// documents, forging a poll's identity fields, and touching any other
-// collection. This app is intended for friendly groups, not
-// adversarial environments.
+// they have. They do prevent deletion by anyone but the signed-in
+// owner, malformed or oversized documents, forging a poll's identity
+// fields, and touching any other collection. This app is intended
+// for friendly groups, not adversarial environments.

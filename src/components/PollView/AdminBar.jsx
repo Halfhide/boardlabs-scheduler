@@ -7,13 +7,15 @@ function AdminBar({
   deadlineDate,
   deadlinePassed,
   finalizedDate,
+  canDelete,
   onRename,
   onAddDate,
   onToggleClosed,
   onSetDeadline,
   onClearDeadline,
   onSetCapacity,
-  onUnfinalize
+  onUnfinalize,
+  onDelete
 }) {
   const { t, dateLocale } = useTranslation();
   const [titleDraft, setTitleDraft] = useState(poll.title);
@@ -26,6 +28,7 @@ function AdminBar({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const run = async (action, successNotice) => {
     setBusy(true);
@@ -274,6 +277,38 @@ function AdminBar({
               })
             : t('noCapacity')}
         </p>
+      </div>
+
+      {/* Danger zone: permanent deletion (signed-in owner only) */}
+      <div className="pt-3 border-t border-indigo-200">
+        {canDelete ? (
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+            <button
+              onClick={() => {
+                if (!confirmDelete) {
+                  setConfirmDelete(true);
+                  return;
+                }
+                run(onDelete);
+              }}
+              disabled={busy}
+              className={`text-sm font-medium px-4 py-2 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap ${
+                confirmDelete
+                  ? 'bg-red-600 text-white hover:bg-red-700'
+                  : 'border border-red-300 text-red-700 hover:bg-red-50'
+              }`}
+            >
+              {busy && confirmDelete
+                ? t('deletingPoll')
+                : confirmDelete
+                  ? t('confirmDeletePoll')
+                  : t('deletePollButton')}
+            </button>
+            <p className="text-xs text-indigo-700">{t('deletePollWarning')}</p>
+          </div>
+        ) : (
+          <p className="text-xs text-indigo-700">{t('signInToDelete')}</p>
+        )}
       </div>
 
       {error && <p className="text-xs text-red-600 font-medium">{error}</p>}

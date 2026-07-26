@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { nanoid } from 'nanoid';
-import { rememberPoll } from '../../utils/myPolls';
+import { rememberPoll, forgetPoll } from '../../utils/myPolls';
+import { rememberPollForUser, forgetPollForUser } from '../../utils/userPolls';
 import { usePoll } from '../../hooks/usePoll';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { useNow } from '../../hooks/useNow';
@@ -20,6 +21,7 @@ import {
   toggleGameVote,
   removeGame,
   claimPollIdentity,
+  deletePoll,
   getLeadingGame,
   groupVotesByResponse
 } from '../../utils/pollHelpers';
@@ -38,6 +40,7 @@ import { useTranslation } from '../../i18n/useTranslation';
 function PollView() {
   const { t, dateLocale } = useTranslation();
   const { pollId } = useParams();
+  const navigate = useNavigate();
   const { poll, loading, error } = usePoll(pollId);
   const { user } = useAuth();
   const [voterName, setVoterName] = useLocalStorage('voterName', '');
@@ -55,17 +58,23 @@ function PollView() {
   const now = useNow(30000);
 
   // Record the visit in this browser's poll list (keeps the title
-  // fresh after renames; the created-by-me flag is sticky)
+  // fresh after renames; the created-by-me flag is sticky) and, for
+  // signed-in users, in the account's cloud list. The ref keeps the
+  // cloud write to real changes instead of every vote snapshot.
+  const lastCloudSyncRef = useRef('');
   useEffect(() => {
     if (!poll) return;
     const token = localStorage.getItem(`creatorToken:${poll.id}`);
-    rememberPoll({
-      id: poll.id,
-      title: poll.title,
-      createdByMe:
-        (!!poll.creatorToken && token === poll.creatorToken) ||
-        (!!voterUid && poll.ownerUid === voterUid)
-    });
+    const createdByMe =
+      (!!poll.creatorToken && token === poll.creatorToken) ||
+      (!!voterUid && poll.ownerUid === voterUid);
+    rememberPoll({ id: poll.id, title: poll.title, createdByMe });
+
+    if (!voterUid) return;
+    const syncKey = `${voterUid}|${poll.id}|${poll.title}|${createdByMe}`;
+    if (lastCloudSyncRef.current === syncKey) return;
+    lastCloudSyncRef.current = syncKey;
+    rememberPollForUser(voterUid, { id: poll.id, title: poll.title, createdByMe });
   }, [poll, voterUid]);
 
   // Signed-in visitors claim their earlier anonymous activity: votes
@@ -76,6 +85,14 @@ function PollView() {
     const token = localStorage.getItem(`creatorToken:${poll.id}`);
     claimPollIdentity(poll.id, { voterId, uid: voterUid, creatorToken: token });
   }, [poll?.id, voterUid, voterId]);
+
+  // A poll that no longer exists (deleted by its owner) drops out of
+  // the remembered lists instead of lingering as a dead link
+  useEffect(() => {
+    if (error !== 'errPollNotFound' || !pollId) return;
+    forgetPoll(pollId);
+    if (voterUid) forgetPollForUser(voterUid, pollId);
+  }, [error, pollId, voterUid]);
 
   // Generate shareable link
   const pollUrl = `${window.location.origin}/poll/${pollId}`;
@@ -146,6 +163,16 @@ function PollView() {
     (!!poll.creatorToken && creatorToken === poll.creatorToken);
   // Identity handed to creator actions; either credential authorizes
   const creatorAuth = { creatorToken, uid: voterUid };
+  // Deletion is stricter than the other creator tools: rules only
+  // accept it from the signed-in owner account
+  const canDelete = !!voterUid && poll.ownerUid === voterUid;
+
+  const handleDeletePoll = async () => {
+    await deletePoll(pollId, voterUid);
+    forgetPoll(pollId);
+    if (voterUid) forgetPollForUser(voterUid, pollId);
+    navigate('/');
+  };
 
   // A poll is closed when the creator closed it, its deadline passed,
   // or a winning date has been finalized
@@ -225,6 +252,8 @@ function PollView() {
           deadlineDate={deadlineDate}
           deadlinePassed={deadlinePassed}
           finalizedDate={finalizedDate}
+          canDelete={canDelete}
+          onDelete={handleDeletePoll}
           onRename={(title) => updatePollTitle(pollId, creatorAuth, title)}
           onAddDate={(dateString) => addPollDate(pollId, creatorAuth, dateString)}
           onToggleClosed={() =>

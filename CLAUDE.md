@@ -43,10 +43,12 @@ listed there as rejected.
 - Firestore rules live in `firebase-rules.txt` but are applied
   MANUALLY by Adam in the Firebase console. If you change them, say
   so explicitly and loudly in your summary.
-- Polls cannot be deleted by clients (rules forbid it). Avoid creating
-  test polls in the real database unless needed for verification; if
-  you create one, label it clearly ("Test poll ... safe to ignore")
-  and tell Adam. One such poll already exists: `RjwDCzmNa8`.
+- Polls can only be deleted by their signed-in owner (rules enforce
+  uid == ownerUid; anonymous or unclaimed polls are undeletable).
+  Avoid creating test polls in the real database unless needed for
+  verification; if you create one, label it clearly ("Test poll ...
+  safe to ignore"), tell Adam, and delete it when done if you can.
+  One legacy unclaimed test poll exists: `RjwDCzmNa8`.
 - `.env` holds the Firebase web config (gitignored). Do not print its
   values into chat, commits, or files.
 - BGG autocomplete (`api/bgg-search.js`, proxied into the dev server

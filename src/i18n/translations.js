@@ -83,6 +83,7 @@ export const translations = {
     // My polls list
     yourPolls: 'Your polls',
     yourPollsHint: 'Polls you created or visited in this browser',
+    yourPollsHintSynced: 'Polls you created or visited, synced to your account',
     lastOpened: 'Last opened {time}',
     yoursBadge: 'yours',
     removeFromList: 'Remove from list',
@@ -157,6 +158,11 @@ export const translations = {
     noBound: 'no',
     noCapacity: 'No player capacity set.',
     actionFailed: 'Action failed. Please try again.',
+    deletePollButton: 'Delete this poll',
+    confirmDeletePoll: '⚠️ Click again to permanently delete',
+    deletingPoll: 'Deleting...',
+    deletePollWarning: 'Deletes the poll for everyone, with all votes and comments. This cannot be undone.',
+    signInToDelete: 'Deleting a poll requires being signed in as its owner.',
 
     // Calendar
     closedClickDetails: 'Voting is closed. Click a date to see details',
@@ -344,6 +350,7 @@ export const translations = {
     // My polls list
     yourPolls: 'Twoje ankiety',
     yourPollsHint: 'Ankiety utworzone lub odwiedzone w tej przeglądarce',
+    yourPollsHintSynced: 'Ankiety utworzone lub odwiedzone, zsynchronizowane z Twoim kontem',
     lastOpened: 'Ostatnio otwarta {time}',
     yoursBadge: 'twoja',
     removeFromList: 'Usuń z listy',
@@ -418,6 +425,11 @@ export const translations = {
     noBound: 'brak',
     noCapacity: 'Bez limitu graczy.',
     actionFailed: 'Nie udało się. Spróbuj ponownie.',
+    deletePollButton: 'Usuń tę ankietę',
+    confirmDeletePoll: '⚠️ Kliknij ponownie, aby trwale usunąć',
+    deletingPoll: 'Usuwanie...',
+    deletePollWarning: 'Usuwa ankietę wszystkim, wraz z głosami i komentarzami. Nie można tego cofnąć.',
+    signInToDelete: 'Usunięcie ankiety wymaga zalogowania jako jej właściciel.',
 
     // Calendar
     closedClickDetails: 'Głosowanie zamknięte. Kliknij datę, aby zobaczyć szczegóły',

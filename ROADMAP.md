@@ -38,8 +38,8 @@ features were proposed, 11 accepted, 4 rejected (see bottom).
 | 10 | PWA install         | 4     | done        |
 | 11a | Auth foundation    | 5     | done        |
 | 11b | Identity merge     | 5     | done        |
-| 11c | My polls sync      | 5     | not started |
-| 11d | Poll deletion      | 5     | not started |
+| 11c | My polls sync      | 5     | done        |
+| 11d | Poll deletion      | 5     | done        |
 | 11e | Poll auto-expiry   | 5     | not started |
 | 11f | Rules + App Check  | 5     | not started |
 | 11g | Privacy note       | 5     | not started |
@@ -509,7 +509,24 @@ signed in, token as the legacy fallback.
 
 ### 11c. My polls synced to account
 
-Status: not started
+Status: done (26 Jul 2026, commit pending). Implemented: cloud copy
+of the my-polls list in users/{uid} (utils/userPolls.js), entries in
+a `polls` map keyed by poll ID so per-entry setDoc merges are safe
+across devices; createdByMe is only ever written as true so the
+flag stays sticky under merge semantics. Poll visits (throttled to
+real changes, not every vote snapshot) and creations upsert the
+account list; the homepage shows the union of local and cloud
+(newest lastSeen wins the title), shows a "synced to your account"
+hint, uploads local-only history once per account per mount
+(syncLocalPollsUp, also trims past the 50-entry cap oldest-first),
+and removal deletes from both lists. Signed-out behavior unchanged
+(local list only). firebase-rules.txt gained a users/{userId} block
+(owner-only read/create/update, polls map only, no delete), applied
+by Adam. Verified in the browser: anonymous REST read of a user doc
+gets PERMISSION_DENIED; with the local list cleared the homepage
+restored all entries from the cloud with correct YOURS badges;
+removing an entry stayed gone after reload (cloud deletion
+confirmed); local backup restored afterwards.
 
 Per-user poll list in Firestore (users/{uid} document), merged with
 the localStorage list; the homepage shows the union and syncs new
@@ -518,7 +535,23 @@ and writes their user document.
 
 ### 11d. Poll deletion by owner
 
-Status: not started
+Status: done (27 Jul 2026, commit pending). Implemented: deletePoll()
+(plain deleteDoc; authorization lives in the rules), a danger zone
+in the AdminBar with a two-step confirm delete button shown only to
+the signed-in owner (other creators see "requires signing in as its
+owner"), deletion navigates home and scrubs the poll from the local
+and cloud my-polls lists, and a poll page hitting errPollNotFound
+now drops the dead entry from both lists so dangling links self
+clean. Rules: allow delete only when request.auth.uid equals the
+poll's ownerUid (unclaimed anonymous polls stay undeletable);
+applied by Adam. CLAUDE.md's "polls cannot be deleted" gotcha
+updated. Verified in the browser: anonymous REST delete gets
+PERMISSION_DENIED; two-step UI delete removed the poll from
+Firestore (confirmed NOT_FOUND) and from the homepage list; a
+fabricated dead list entry self-cleaned on visit. Cleanup done with
+the new feature: test polls 8BJoLEAHEA, utY99RDlyn and the legacy
+jH4ll0Viah ("Deadline test", auto-claimed on visit thanks to 11b)
+all deleted; only the unclaimable RjwDCzmNa8 remains.
 
 Signed-in owners can delete their poll (two-step confirm in the
 AdminBar). Rules allow delete only when request.auth.uid matches
@@ -680,3 +713,14 @@ before the design system is delivered.
   ALREADY APPLIED by Adam in the console. Two labeled test polls
   added to the live database (utY99RDlyn, 8BJoLEAHEA); clean up
   after 11d.
+- 26 Jul 2026: feature 11c (my polls synced to account) implemented
+  and verified in the browser: users/{uid} cloud list, homepage
+  union of local and cloud lists, one-time upload of local history,
+  removal from both, owner-only access rules (applied by Adam,
+  anonymous read confirmed PERMISSION_DENIED). Signed-out behavior
+  unchanged.
+- 27 Jul 2026: feature 11d (poll deletion by owner) implemented and
+  verified: owner-only delete rule (applied by Adam), two-step
+  confirm in the AdminBar, list scrubbing and dangling-entry self
+  cleanup. All deletable test polls removed from the live database
+  using the new feature; RjwDCzmNa8 remains (unclaimable).

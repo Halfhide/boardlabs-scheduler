@@ -1,4 +1,4 @@
-import { doc, setDoc, runTransaction, deleteField } from 'firebase/firestore';
+import { doc, setDoc, runTransaction, deleteField, deleteDoc } from 'firebase/firestore';
 import { nanoid } from 'nanoid';
 import { db } from '../firebase';
 
@@ -548,6 +548,23 @@ export async function removeGame(pollId, auth, gameId) {
     });
   } catch (error) {
     console.error('Error removing game:', error);
+    throw error;
+  }
+}
+
+/**
+ * Permanently delete a poll. Only the signed-in owner may do this;
+ * the Firestore rules enforce it server-side (request.auth.uid must
+ * match the poll's ownerUid), so a browser token is never enough.
+ */
+export async function deletePoll(pollId, uid) {
+  if (!uid) {
+    throw appError('errNotCreator', 'Only the signed-in poll owner can delete a poll');
+  }
+  try {
+    await deleteDoc(doc(db, 'polls', pollId));
+  } catch (error) {
+    console.error('Error deleting poll:', error);
     throw error;
   }
 }
