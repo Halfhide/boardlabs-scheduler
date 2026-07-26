@@ -441,7 +441,7 @@ rules (status updates, browser verification, lint/build green).
 
 ### 11a. Auth foundation
 
-Status: done (26 Jul 2026, commit pending). Implemented: `auth`
+Status: done (26 Jul 2026, commit 7d575ad). Implemented: `auth`
 exported from firebase.js, AuthProvider (src/auth/) with
 onAuthStateChanged user state, Google popup sign-in, magic link
 send/complete including the cross-device email re-prompt and URL
