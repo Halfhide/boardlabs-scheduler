@@ -476,7 +476,7 @@ Auth's authorized domains.
 
 ### 11b. Identity merge and ownership claim
 
-Status: done (26 Jul 2026, commit pending). Implemented: votes,
+Status: done (26 Jul 2026, commit f655689). Implemented: votes,
 comments, game suggestions and game votes carry the signed-in
 user's `uid` (kept alongside voterId/voterName; a signed-out
 re-vote preserves a claimed uid). claimPollIdentity() runs on every
