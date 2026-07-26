@@ -509,7 +509,7 @@ signed in, token as the legacy fallback.
 
 ### 11c. My polls synced to account
 
-Status: done (26 Jul 2026, commit pending). Implemented: cloud copy
+Status: done (26 Jul 2026, commit ae56655). Implemented: cloud copy
 of the my-polls list in users/{uid} (utils/userPolls.js), entries in
 a `polls` map keyed by poll ID so per-entry setDoc merges are safe
 across devices; createdByMe is only ever written as true so the
@@ -535,7 +535,7 @@ and writes their user document.
 
 ### 11d. Poll deletion by owner
 
-Status: done (27 Jul 2026, commit pending). Implemented: deletePoll()
+Status: done (27 Jul 2026, commit ae56655). Implemented: deletePoll()
 (plain deleteDoc; authorization lives in the rules), a danger zone
 in the AdminBar with a two-step confirm delete button shown only to
 the signed-in owner (other creators see "requires signing in as its
