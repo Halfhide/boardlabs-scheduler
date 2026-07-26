@@ -36,7 +36,7 @@ features were proposed, 11 accepted, 4 rejected (see bottom).
 | 12 | BGG game search     | 3     | done        |
 | 9 | Polish + i18n        | 4     | done        |
 | 10 | PWA install         | 4     | done        |
-| 11a | Auth foundation    | 5     | not started |
+| 11a | Auth foundation    | 5     | done        |
 | 11b | Identity merge     | 5     | not started |
 | 11c | My polls sync      | 5     | not started |
 | 11d | Poll deletion      | 5     | not started |
@@ -441,7 +441,28 @@ rules (status updates, browser verification, lint/build green).
 
 ### 11a. Auth foundation
 
-Status: not started
+Status: done (26 Jul 2026, commit pending). Implemented: `auth`
+exported from firebase.js, AuthProvider (src/auth/) with
+onAuthStateChanged user state, Google popup sign-in, magic link
+send/complete including the cross-device email re-prompt and URL
+param cleanup, and an AccountMenu in the header (sign-in modal with
+Google + email link, avatar menu with name/email and sign-out),
+fully translated EN/PL. Signed-out app is byte-for-byte unchanged.
+Verified end to end in the browser with Adam: Google popup sign-in
+(avatar + account menu, session survives reload, sign-out works)
+and a real magic-link sign-in from the email (same Firebase account
+as the Google sign-in, auth state propagated across tabs). Error
+paths verified too: disabled-provider errors show a friendly
+banner, an invalid/spent link shows the link-invalid error, the
+cross-device confirm-email modal auto-opens on a link URL and
+dismissing it strips the link params.
+Known quirk, accepted: Firebase sign-in emails land in spam (the
+default noreply@<project>.firebaseapp.com sender). The link-sent
+confirmation warns about this in bold in both languages; the real
+deliverability fix is a post-launch follow-up (see note above the
+phase acceptance criteria).
+The Gmail MCP connector cannot see the spam folder, useful to know
+when debugging this in future sessions.
 
 Firebase Auth with Google and email-link providers. Header UI:
 sign-in button, account menu with avatar/name and sign-out. Magic
@@ -517,6 +538,15 @@ titles, dates, first names or nicks, votes, comments, optional
 account email), where (Google Firebase, EU visitors included), how
 long (auto-expiry window), and how to get data removed (contact
 Adam; owners can delete their polls). Footer link on both pages.
+
+Post-launch follow-up (agreed 26 Jul 2026, not part of the phase):
+Firebase's magic-link emails land in spam (confirmed with Adam's own
+mailbox; the sender is the default noreply@<project>.firebaseapp.com).
+Accepted for now; the UI warns users to check spam after sending a
+link. Some time after the public release, improve deliverability:
+customize the sender in Firebase Auth email templates to a domain
+Adam controls (requires DNS SPF/DKIM records) or route auth mail
+through a proper SMTP relay.
 
 Acceptance criteria for the phase: signed-out experience unchanged;
 sign-in works via Google and via magic link on desktop and phone;
@@ -605,3 +635,18 @@ before the design system is delivered.
   identity merge; synced my-polls; owner deletion; auto-expiry;
   rules + App Check hardening; privacy note) targeting a public
   launch.
+- 26 Jul 2026: feature 11a (auth foundation) implemented: Firebase
+  Auth wiring, AuthProvider with Google popup + email magic link
+  (cross-device re-prompt included), header sign-in modal and
+  account menu, EN/PL strings. UI and error paths verified in the
+  browser; real sign-in flows blocked until Adam enables the Google
+  and Email link providers in the Firebase console. No Firestore
+  rules changes in this sub-feature.
+- 26 Jul 2026 (later): Adam enabled both providers; 11a verified end
+  to end and marked done. Google popup sign-in, magic link sign-in
+  (email fetched from spam), account menu, sign-out, and reload
+  persistence all confirmed in the browser. Firebase auth emails
+  land in spam: bold check-your-spam warning added to the link-sent
+  confirmation (EN/PL), and a proper deliverability fix (custom
+  sender domain or SMTP relay) recorded as a post-launch follow-up
+  in phase 5.
