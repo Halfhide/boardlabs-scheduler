@@ -10,14 +10,15 @@ const MARK_STYLES = {
 
 const MARK_LABELS = { yes: '✓', maybe: '?', no: '✗' };
 
-function VoteMatrix({ dates, voterId, voterName, finalizedDateId, onDateClick }) {
+function VoteMatrix({ dates, voterId, voterName, voterUid, finalizedDateId, onDateClick }) {
   const { t, dateLocale } = useTranslation();
-  // Collect unique participants (by stable voter ID, name for legacy
-  // votes) and index their vote per date
+  // Collect unique participants (account ID first so one person's
+  // votes from two devices share a row, then stable voter ID, name
+  // for legacy votes) and index their vote per date
   const participantsByKey = new Map();
   dates.forEach((d) => {
     d.votes.forEach((v) => {
-      const key = v.voterId || v.voterName;
+      const key = v.uid || v.voterId || v.voterName;
       if (!participantsByKey.has(key)) {
         participantsByKey.set(key, { key, name: v.voterName, votes: {} });
       }
@@ -27,7 +28,8 @@ function VoteMatrix({ dates, voterId, voterName, finalizedDateId, onDateClick })
     });
   });
 
-  const isYou = (p) => p.key === voterId || p.key === voterName;
+  const isYou = (p) =>
+    (voterUid && p.key === voterUid) || p.key === voterId || p.key === voterName;
 
   // Current user pinned first, everyone else alphabetically
   const participants = [...participantsByKey.values()].sort((a, b) => {

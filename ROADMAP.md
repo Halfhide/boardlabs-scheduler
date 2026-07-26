@@ -37,7 +37,7 @@ features were proposed, 11 accepted, 4 rejected (see bottom).
 | 9 | Polish + i18n        | 4     | done        |
 | 10 | PWA install         | 4     | done        |
 | 11a | Auth foundation    | 5     | done        |
-| 11b | Identity merge     | 5     | not started |
+| 11b | Identity merge     | 5     | done        |
 | 11c | My polls sync      | 5     | not started |
 | 11d | Poll deletion      | 5     | not started |
 | 11e | Poll auto-expiry   | 5     | not started |
@@ -476,7 +476,29 @@ Auth's authorized domains.
 
 ### 11b. Identity merge and ownership claim
 
-Status: not started
+Status: done (26 Jul 2026, commit pending). Implemented: votes,
+comments, game suggestions and game votes carry the signed-in
+user's `uid` (kept alongside voterId/voterName; a signed-out
+re-vote preserves a claimed uid). claimPollIdentity() runs on every
+signed-in poll visit inside a transaction: it stamps the uid onto
+this browser's anonymous activity and attaches ownerUid when the
+browser holds the creator token and the poll is unowned; it writes
+nothing when there is nothing to claim and never breaks the page.
+Identity matching (isVoteByVoter/findUserVote) is uid-aware with
+uid comparison decisive when both sides have one; participant
+dedupe in the calendar and matrix keys by uid first so one person
+on two devices counts once. Creator access and all creator actions
+(runCreatorUpdate) authorize by ownerUid OR legacy token; polls
+created signed-in get ownerUid at creation. Firestore rules updated
+and applied by Adam: ownerUid allowed on create only as the
+requester's own uid, set-once on update, immutable afterwards.
+Verified in the browser end to end: anonymous vote claimed on
+signed-in visit (other voters untouched), signed-in creation owns
+immediately, REST-created anonymous poll claimed on visit, and with
+the browser token deleted the creator tools still appear and a
+rename persists (uid-only authorization through the new rules).
+Test polls created for this: utY99RDlyn and 8BJoLEAHEA (both
+labeled, safe to ignore, deletable once 11d ships).
 
 Signed-in users act under their UID: new votes/comments/games carry
 it. On visiting a poll while signed in, votes matching the local
@@ -650,3 +672,11 @@ before the design system is delivered.
   confirmation (EN/PL), and a proper deliverability fix (custom
   sender domain or SMTP relay) recorded as a post-launch follow-up
   in phase 5.
+- 26 Jul 2026: feature 11b (identity merge and ownership claim)
+  implemented and verified end to end in the browser (vote claiming,
+  signed-in creation, ownership claim from the browser token,
+  creator tools running on the account alone with the token
+  deleted). firebase-rules.txt extended for set-once ownerUid and
+  ALREADY APPLIED by Adam in the console. Two labeled test polls
+  added to the live database (utY99RDlyn, 8BJoLEAHEA); clean up
+  after 11d.

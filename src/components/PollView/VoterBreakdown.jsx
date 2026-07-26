@@ -7,7 +7,7 @@ const RESPONSE_META = [
   { key: 'no', labelKey: 'voteNo', badge: 'bg-red-100 text-red-800' }
 ];
 
-function VoterBreakdown({ votes, voterId, voterName }) {
+function VoterBreakdown({ votes, voterId, voterName, voterUid }) {
   const { t } = useTranslation();
   if (votes.length === 0) {
     return (
@@ -32,7 +32,7 @@ function VoterBreakdown({ votes, voterId, voterName }) {
             </span>
             <div className="flex flex-wrap gap-1 pt-0.5">
               {groupVotes.map((vote) => {
-                const isYou = isVoteByVoter(vote, voterId, voterName);
+                const isYou = isVoteByVoter(vote, voterId, voterName, voterUid);
                 return (
                   <span
                     key={vote.id}

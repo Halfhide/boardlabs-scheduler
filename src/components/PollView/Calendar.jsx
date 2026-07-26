@@ -15,7 +15,7 @@ const HEAT_BUCKETS = [
 
 const HEAT_ZERO = 'bg-red-100 border-red-300 text-red-900';
 
-function MonthCalendar({ monthDate, dates, voterId, voterName, finalizedDateId, mode, totalVoters, onDateClick }) {
+function MonthCalendar({ monthDate, dates, voterId, voterName, voterUid, finalizedDateId, mode, totalVoters, onDateClick }) {
   const { t, dateLocale } = useTranslation();
   const monthStart = startOfMonth(monthDate);
   const monthEnd = endOfMonth(monthDate);
@@ -46,7 +46,7 @@ function MonthCalendar({ monthDate, dates, voterId, voterName, finalizedDateId, 
   const getUserVote = (day) => {
     const dateData = dates.find(d => isSameDay(parseISO(d.date), day));
     if (!dateData || !voterName) return null;
-    const userVote = findUserVote(dateData.votes, voterId, voterName);
+    const userVote = findUserVote(dateData.votes, voterId, voterName, voterUid);
     return userVote?.response;
   };
 
@@ -162,7 +162,7 @@ function MonthCalendar({ monthDate, dates, voterId, voterName, finalizedDateId, 
   );
 }
 
-function Calendar({ dates, voterId, voterName, closed, finalizedDateId, onDateClick }) {
+function Calendar({ dates, voterId, voterName, voterUid, closed, finalizedDateId, onDateClick }) {
   const { t } = useTranslation();
   // 'mine' shows your own votes; 'group' shades dates by how many
   // people can attend
@@ -179,9 +179,10 @@ function Calendar({ dates, voterId, voterName, closed, finalizedDateId, onDateCl
     end: pollDates[pollDates.length - 1]
   });
 
-  // Unique voters across the poll (by stable ID, name for legacy votes)
+  // Unique voters across the poll (account ID first so one person's
+  // votes from two devices count once; voter ID or legacy name after)
   const allVoters = new Set();
-  dates.forEach(d => d.votes.forEach(v => allVoters.add(v.voterId || v.voterName)));
+  dates.forEach(d => d.votes.forEach(v => allVoters.add(v.uid || v.voterId || v.voterName)));
   const totalVoters = allVoters.size;
 
   const modeButton = (value) =>
@@ -278,6 +279,7 @@ function Calendar({ dates, voterId, voterName, closed, finalizedDateId, onDateCl
             dates={dates}
             voterId={voterId}
             voterName={voterName}
+            voterUid={voterUid}
             finalizedDateId={finalizedDateId}
             mode={mode}
             totalVoters={totalVoters}

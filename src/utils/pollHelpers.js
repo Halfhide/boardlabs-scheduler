@@ -16,11 +16,13 @@ function appError(code, message, params) {
  * Create a new poll
  * @param {string} title - Poll title
  * @param {string[]} dateStrings - Array of ISO date strings
- * @param {{deadline?: Date|null, minPlayers?: number|null, maxPlayers?: number|null}} options
+ * @param {{deadline?: Date|null, minPlayers?: number|null, maxPlayers?: number|null, ownerUid?: string|null}} options
+ *   ownerUid: the signed-in creator's account ID; polls created
+ *   while signed out get one later via claimPollIdentity
  * @returns {Promise<{pollId: string, creatorToken: string}>} Poll ID and creator token
  */
 export async function createPoll(title, dateStrings, options = {}) {
-  const { deadline = null, minPlayers = null, maxPlayers = null } = options;
+  const { deadline = null, minPlayers = null, maxPlayers = null, ownerUid = null } = options;
 
   try {
     const pollId = nanoid(10);
@@ -33,6 +35,7 @@ export async function createPoll(title, dateStrings, options = {}) {
       createdAt: new Date(),
       creatorToken,
       closed: false,
+      ...(ownerUid ? { ownerUid } : {}),
       ...(deadline ? { deadline } : {}),
       ...(minPlayers ? { minPlayers } : {}),
       ...(maxPlayers ? { maxPlayers } : {}),
@@ -55,10 +58,14 @@ export async function createPoll(title, dateStrings, options = {}) {
 /**
  * Run a creator-only poll update inside a transaction. The mutate
  * callback receives the current poll data and returns the fields to
- * update. Creator identity is checked against the stored token; this
- * is client-side gating until real auth (roadmap phase 5).
+ * update. Authorized either by the signed-in owner's account
+ * (poll.ownerUid) or by the legacy browser token; token gating stays
+ * client-side, uid gating is also enforced by the Firestore rules
+ * once the poll has an owner.
+ * @param {{creatorToken?: string|null, uid?: string|null}} auth
  */
-async function runCreatorUpdate(pollId, creatorToken, mutate) {
+async function runCreatorUpdate(pollId, auth, mutate) {
+  const { creatorToken = null, uid = null } = auth || {};
   const pollRef = doc(db, 'polls', pollId);
 
   await runTransaction(db, async (transaction) => {
@@ -70,7 +77,9 @@ async function runCreatorUpdate(pollId, creatorToken, mutate) {
 
     const poll = pollSnap.data();
 
-    if (!poll.creatorToken || poll.creatorToken !== creatorToken) {
+    const isOwner = !!poll.ownerUid && !!uid && poll.ownerUid === uid;
+    const hasToken = !!poll.creatorToken && creatorToken === poll.creatorToken;
+    if (!isOwner && !hasToken) {
       throw appError('errNotCreator', 'Only the poll creator can do this');
     }
 
@@ -81,14 +90,14 @@ async function runCreatorUpdate(pollId, creatorToken, mutate) {
 /**
  * Rename a poll (creator only)
  */
-export async function updatePollTitle(pollId, creatorToken, title) {
+export async function updatePollTitle(pollId, auth, title) {
   const trimmed = title.trim();
   if (!trimmed || trimmed.length > 100) {
     throw appError('errTitleLength', 'Title must be between 1 and 100 characters');
   }
 
   try {
-    await runCreatorUpdate(pollId, creatorToken, () => ({ title: trimmed }));
+    await runCreatorUpdate(pollId, auth, () => ({ title: trimmed }));
   } catch (error) {
     console.error('Error renaming poll:', error);
     throw error;
@@ -101,9 +110,9 @@ export async function updatePollTitle(pollId, creatorToken, title) {
  *   reopening a poll whose deadline has passed, which would otherwise
  *   keep it closed
  */
-export async function setPollClosed(pollId, creatorToken, closed, clearDeadline = false) {
+export async function setPollClosed(pollId, auth, closed, clearDeadline = false) {
   try {
-    await runCreatorUpdate(pollId, creatorToken, () => ({
+    await runCreatorUpdate(pollId, auth, () => ({
       closed,
       ...(clearDeadline ? { deadline: deleteField() } : {})
     }));
@@ -117,13 +126,13 @@ export async function setPollClosed(pollId, creatorToken, closed, clearDeadline 
  * Set or remove the voting deadline (creator only)
  * @param {Date|null} deadline - New deadline, or null to remove it
  */
-export async function setPollDeadline(pollId, creatorToken, deadline) {
+export async function setPollDeadline(pollId, auth, deadline) {
   if (deadline !== null && (!(deadline instanceof Date) || isNaN(deadline.getTime()))) {
     throw appError('errInvalidDeadline', 'Invalid deadline');
   }
 
   try {
-    await runCreatorUpdate(pollId, creatorToken, () => ({
+    await runCreatorUpdate(pollId, auth, () => ({
       deadline: deadline ?? deleteField()
     }));
   } catch (error) {
@@ -136,13 +145,13 @@ export async function setPollDeadline(pollId, creatorToken, deadline) {
  * Add a date to a poll (creator only)
  * @param {string} dateString - ISO date string (YYYY-MM-DD)
  */
-export async function addPollDate(pollId, creatorToken, dateString) {
+export async function addPollDate(pollId, auth, dateString) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
     throw appError('errInvalidDate', 'Invalid date');
   }
 
   try {
-    await runCreatorUpdate(pollId, creatorToken, (poll) => {
+    await runCreatorUpdate(pollId, auth, (poll) => {
       if (poll.dates.some(d => d.date === dateString)) {
         throw appError('errDateExists', 'That date is already in the poll');
       }
@@ -167,7 +176,7 @@ export async function addPollDate(pollId, creatorToken, dateString) {
  * Set or clear the player capacity (creator only). Pass null for a
  * bound to remove it.
  */
-export async function setPollCapacity(pollId, creatorToken, minPlayers, maxPlayers) {
+export async function setPollCapacity(pollId, auth, minPlayers, maxPlayers) {
   const validate = (value, label) => {
     if (value !== null && (!Number.isInteger(value) || value < 1 || value > 99)) {
       throw appError('errPlayersRange', `${label} must be a whole number between 1 and 99`);
@@ -180,7 +189,7 @@ export async function setPollCapacity(pollId, creatorToken, minPlayers, maxPlaye
   }
 
   try {
-    await runCreatorUpdate(pollId, creatorToken, () => ({
+    await runCreatorUpdate(pollId, auth, () => ({
       minPlayers: minPlayers ?? deleteField(),
       maxPlayers: maxPlayers ?? deleteField()
     }));
@@ -221,9 +230,9 @@ export function getCapacityStatus(votes, minPlayers, maxPlayers) {
  * @param {string|null} dateId - The winning date's ID, or null to
  *   un-finalize and reopen voting
  */
-export async function setFinalizedDate(pollId, creatorToken, dateId) {
+export async function setFinalizedDate(pollId, auth, dateId) {
   try {
-    await runCreatorUpdate(pollId, creatorToken, (poll) => {
+    await runCreatorUpdate(pollId, auth, (poll) => {
       if (dateId !== null && !poll.dates.some(d => d.id === dateId)) {
         throw appError('errDateNotFound', 'Date not found');
       }
@@ -239,9 +248,9 @@ export async function setFinalizedDate(pollId, creatorToken, dateId) {
  * Remove a date from a poll, including its votes and comments
  * (creator only)
  */
-export async function removePollDate(pollId, creatorToken, dateId) {
+export async function removePollDate(pollId, auth, dateId) {
   try {
-    await runCreatorUpdate(pollId, creatorToken, (poll) => {
+    await runCreatorUpdate(pollId, auth, (poll) => {
       if (poll.dates.length <= 1) {
         throw appError('errLastDate', 'A poll must keep at least one date');
       }
@@ -263,11 +272,17 @@ export async function removePollDate(pollId, creatorToken, dateId) {
 }
 
 /**
- * Check whether a vote belongs to a voter. Matches by stable voter ID,
- * falling back to name for votes recorded before voter IDs existed.
+ * Check whether a vote belongs to a voter. When both sides carry an
+ * account ID that comparison is decisive (a claimed vote on a shared
+ * computer stays with its account); otherwise match by the stable
+ * per-browser voter ID, falling back to name for votes recorded
+ * before voter IDs existed.
+ * @param {string|null} uid - Signed-in account ID, if any
  */
-export function isVoteByVoter(vote, voterId, voterName) {
-  return vote.voterId ? vote.voterId === voterId : vote.voterName === voterName;
+export function isVoteByVoter(vote, voterId, voterName, uid = null) {
+  if (uid && vote.uid) return vote.uid === uid;
+  if (vote.voterId) return vote.voterId === voterId;
+  return vote.voterName === voterName;
 }
 
 /**
@@ -275,17 +290,18 @@ export function isVoteByVoter(vote, voterId, voterName) {
  * @param {Array} votes - Array of vote objects
  * @param {string} voterId - Stable per-browser voter ID
  * @param {string} voterName - Voter's display name
+ * @param {string|null} uid - Signed-in account ID, if any
  * @returns {Object|undefined} The voter's vote, if any
  */
-export function findUserVote(votes, voterId, voterName) {
-  return votes.find(v => isVoteByVoter(v, voterId, voterName));
+export function findUserVote(votes, voterId, voterName, uid = null) {
+  return votes.find(v => isVoteByVoter(v, voterId, voterName, uid));
 }
 
 /**
  * Add a vote to a specific date
  * @param {string} pollId - Poll ID
  * @param {string} dateId - Date ID
- * @param {{id: string, name: string}} voter - Voter identity
+ * @param {{id: string, name: string, uid?: string|null}} voter - Voter identity
  * @param {string} response - Vote response ('yes', 'no', or 'maybe')
  */
 export async function addVote(pollId, dateId, voter, response) {
@@ -310,18 +326,21 @@ export async function addVote(pollId, dateId, voter, response) {
 
       // Check if voter already voted on this date
       const existingVoteIndex = poll.dates[dateIndex].votes.findIndex(
-        v => isVoteByVoter(v, voter.id, voter.name)
+        v => isVoteByVoter(v, voter.id, voter.name, voter.uid ?? null)
       );
 
       let updatedVotes;
       if (existingVoteIndex !== -1) {
         // Update existing vote (stamping the voter ID onto legacy
-        // name-only votes)
+        // name-only votes, and the account ID when signed in; a
+        // signed-out re-vote keeps the claimed account ID)
         updatedVotes = [...poll.dates[dateIndex].votes];
+        const existingUid = voter.uid ?? updatedVotes[existingVoteIndex].uid ?? null;
         updatedVotes[existingVoteIndex] = {
           id: updatedVotes[existingVoteIndex].id,
           voterId: voter.id,
           voterName: voter.name,
+          ...(existingUid ? { uid: existingUid } : {}),
           response,
           timestamp: new Date()
         };
@@ -333,6 +352,7 @@ export async function addVote(pollId, dateId, voter, response) {
             id: nanoid(8),
             voterId: voter.id,
             voterName: voter.name,
+            ...(voter.uid ? { uid: voter.uid } : {}),
             response,
             timestamp: new Date()
           }
@@ -360,7 +380,7 @@ export async function addVote(pollId, dateId, voter, response) {
  * Add a comment to a specific date
  * @param {string} pollId - Poll ID
  * @param {string} dateId - Date ID
- * @param {{id: string, name: string}} voter - Commenter identity
+ * @param {{id: string, name: string, uid?: string|null}} voter - Commenter identity
  * @param {string} text - Comment text
  */
 export async function addComment(pollId, dateId, voter, text) {
@@ -387,6 +407,7 @@ export async function addComment(pollId, dateId, voter, text) {
         id: nanoid(8),
         voterId: voter.id,
         voterName: voter.name,
+        ...(voter.uid ? { uid: voter.uid } : {}),
         text,
         timestamp: new Date()
       };
@@ -414,7 +435,7 @@ export const MAX_GAMES = 30;
 /**
  * Suggest a game to play. Any named participant can do this; the
  * suggester automatically votes for their own suggestion.
- * @param {{id: string, name: string}} voter
+ * @param {{id: string, name: string, uid?: string|null}} voter
  * @param {string} title - Game title
  * @param {string} url - Optional link (e.g. BoardGameGeek)
  */
@@ -454,7 +475,12 @@ export async function addGame(pollId, voter, title, url = '') {
         ...(cleanUrl ? { url: cleanUrl } : {}),
         suggestedById: voter.id,
         suggestedBy: voter.name,
-        votes: [{ voterId: voter.id, voterName: voter.name }]
+        ...(voter.uid ? { suggestedByUid: voter.uid } : {}),
+        votes: [{
+          voterId: voter.id,
+          voterName: voter.name,
+          ...(voter.uid ? { uid: voter.uid } : {})
+        }]
       };
 
       transaction.update(pollRef, { games: [...games, newGame] });
@@ -486,10 +512,16 @@ export async function toggleGameVote(pollId, gameId, voter) {
       }
 
       const game = games[index];
-      const hasVoted = game.votes.some(v => v.voterId === voter.id);
+      const uid = voter.uid ?? null;
+      const isMine = (v) => (uid && v.uid ? v.uid === uid : v.voterId === voter.id);
+      const hasVoted = game.votes.some(isMine);
       const votes = hasVoted
-        ? game.votes.filter(v => v.voterId !== voter.id)
-        : [...game.votes, { voterId: voter.id, voterName: voter.name }];
+        ? game.votes.filter(v => !isMine(v))
+        : [...game.votes, {
+            voterId: voter.id,
+            voterName: voter.name,
+            ...(uid ? { uid } : {})
+          }];
 
       const updated = [...games];
       updated[index] = { ...game, votes };
@@ -504,9 +536,9 @@ export async function toggleGameVote(pollId, gameId, voter) {
 /**
  * Remove a game suggestion (creator only)
  */
-export async function removeGame(pollId, creatorToken, gameId) {
+export async function removeGame(pollId, auth, gameId) {
   try {
-    await runCreatorUpdate(pollId, creatorToken, (poll) => {
+    await runCreatorUpdate(pollId, auth, (poll) => {
       const games = poll.games ?? [];
       const remaining = games.filter(g => g.id !== gameId);
       if (remaining.length === games.length) {
@@ -517,6 +549,74 @@ export async function removeGame(pollId, creatorToken, gameId) {
   } catch (error) {
     console.error('Error removing game:', error);
     throw error;
+  }
+}
+
+/**
+ * Attach the signed-in user's account ID to their earlier anonymous
+ * activity in a poll: votes, comments and game activity recorded
+ * under this browser's voterId get a `uid`, and if this browser
+ * holds the poll's creator token and the poll has no owner yet, the
+ * account becomes the owner (one-time claim). Safe to call on every
+ * visit: it writes nothing when there is nothing to claim.
+ * @param {string} pollId
+ * @param {{voterId: string, uid: string, creatorToken?: string|null}} identity
+ */
+export async function claimPollIdentity(pollId, { voterId, uid, creatorToken = null }) {
+  if (!uid) return;
+
+  try {
+    const pollRef = doc(db, 'polls', pollId);
+
+    await runTransaction(db, async (transaction) => {
+      const pollSnap = await transaction.get(pollRef);
+      if (!pollSnap.exists()) return;
+
+      const poll = pollSnap.data();
+      let changed = false;
+
+      // A record is claimable when it was made by this browser's
+      // anonymous ID and no account has claimed it yet
+      const claimable = (r) => r.voterId === voterId && !r.uid;
+
+      const dates = poll.dates.map((date) => {
+        if (!date.votes.some(claimable) && !(date.comments ?? []).some(claimable)) {
+          return date;
+        }
+        changed = true;
+        return {
+          ...date,
+          votes: date.votes.map(v => (claimable(v) ? { ...v, uid } : v)),
+          comments: (date.comments ?? []).map(c => (claimable(c) ? { ...c, uid } : c))
+        };
+      });
+
+      const games = (poll.games ?? []).map((game) => {
+        const claimSuggester = game.suggestedById === voterId && !game.suggestedByUid;
+        const claimVotes = game.votes.some(claimable);
+        if (!claimSuggester && !claimVotes) return game;
+        changed = true;
+        return {
+          ...game,
+          ...(claimSuggester ? { suggestedByUid: uid } : {}),
+          votes: game.votes.map(v => (claimable(v) ? { ...v, uid } : v))
+        };
+      });
+
+      const claimOwnership =
+        !poll.ownerUid && !!poll.creatorToken && creatorToken === poll.creatorToken;
+
+      if (!changed && !claimOwnership) return;
+
+      transaction.update(pollRef, {
+        ...(changed ? { dates } : {}),
+        ...(changed && poll.games ? { games } : {}),
+        ...(claimOwnership ? { ownerUid: uid } : {})
+      });
+    });
+  } catch (error) {
+    // Claiming is background housekeeping; never break the poll page
+    console.error('Error claiming poll identity:', error);
   }
 }
 

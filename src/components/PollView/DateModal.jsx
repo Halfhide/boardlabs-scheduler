@@ -13,7 +13,7 @@ const CAPACITY_STYLES = {
   full: 'bg-violet-100 text-violet-800'
 };
 
-function DateModal({ dateData, voterId, voterName, isCreator, closed, finalizedDateId, minPlayers, maxPlayers, onVote, onComment, onRemoveDate, onFinalize, onClose }) {
+function DateModal({ dateData, voterId, voterName, voterUid, isCreator, closed, finalizedDateId, minPlayers, maxPlayers, onVote, onComment, onRemoveDate, onFinalize, onClose }) {
   const { t, dateLocale } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [justVoted, setJustVoted] = useState(false);
@@ -41,7 +41,7 @@ function DateModal({ dateData, voterId, voterName, isCreator, closed, finalizedD
   if (!dateData) return null;
 
   // Find current user's vote
-  const currentUserVote = findUserVote(dateData.votes, voterId, voterName);
+  const currentUserVote = findUserVote(dateData.votes, voterId, voterName, voterUid);
 
   const voteSummary = getVoteSummary(dateData.votes);
   const capacity = getCapacityStatus(dateData.votes, minPlayers, maxPlayers);
@@ -249,6 +249,7 @@ function DateModal({ dateData, voterId, voterName, isCreator, closed, finalizedD
             <VoterBreakdown
               votes={dateData.votes}
               voterId={voterId}
+              voterUid={voterUid}
               voterName={voterName}
             />
           </div>

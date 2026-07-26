@@ -6,9 +6,11 @@ import { rememberPoll } from '../../utils/myPolls';
 import { diceRoll } from '../../utils/diceRoll';
 import MyPolls from './MyPolls';
 import { useTranslation } from '../../i18n/useTranslation';
+import { useAuth } from '../../auth/useAuth';
 
 function CreatePoll() {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const [title, setTitle] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -90,11 +92,13 @@ function CreatePoll() {
         return;
       }
 
-      // Create poll in Firebase
+      // Create poll in Firebase (a signed-in creator owns it from
+      // the start; anonymous creators can claim ownership later)
       const { pollId, creatorToken } = await createPoll(title, dates, {
         deadline: deadlineDate,
         minPlayers: min,
-        maxPlayers: max
+        maxPlayers: max,
+        ownerUid: user?.uid ?? null
       });
 
       // Remember that this browser created the poll, unlocking the

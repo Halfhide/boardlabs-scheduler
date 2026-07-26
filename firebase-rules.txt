@@ -5,9 +5,11 @@ service cloud.firestore {
       allow read: if true;
 
       // Anyone can create a poll, but only with the expected shape
-      // and within size limits
+      // and within size limits. A poll created while signed in may
+      // carry its owner's uid, which must be the requester's own.
       allow create: if
-        request.resource.data.keys().hasOnly(['id', 'title', 'createdAt', 'dates', 'creatorToken', 'closed', 'deadline', 'finalizedDateId', 'minPlayers', 'maxPlayers']) &&
+        request.resource.data.keys().hasOnly(['id', 'title', 'createdAt', 'dates', 'creatorToken', 'closed', 'deadline', 'finalizedDateId', 'minPlayers', 'maxPlayers', 'ownerUid']) &&
+        (!('ownerUid' in request.resource.data) || (request.auth != null && request.resource.data.ownerUid == request.auth.uid)) &&
         (!('deadline' in request.resource.data) || request.resource.data.deadline is timestamp) &&
         (!('finalizedDateId' in request.resource.data) || request.resource.data.finalizedDateId is string) &&
         (!('minPlayers' in request.resource.data) || (request.resource.data.minPlayers is int && request.resource.data.minPlayers >= 1 && request.resource.data.minPlayers <= 99)) &&
@@ -28,12 +30,18 @@ service cloud.firestore {
       // Updates cover votes/comments (dates array rewrites) and
       // creator actions (rename, add/remove dates, close/reopen).
       // The poll's id, creation time and creator token are immutable
-      // and every field stays within its bounds. Creator identity is
-      // enforced client-side until real auth (roadmap phase 5): the
-      // document is publicly readable, so the token cannot act as a
-      // server-side secret anyway.
+      // and every field stays within its bounds. The owner uid can be
+      // set exactly once, only by the signed-in account it names (the
+      // ownership claim); once set it never changes. Anonymous
+      // creator identity stays client-side until the full rules
+      // rewrite (11f): the document is publicly readable, so the
+      // token cannot act as a server-side secret anyway.
       allow update: if
-        request.resource.data.keys().hasOnly(['id', 'title', 'createdAt', 'dates', 'creatorToken', 'closed', 'deadline', 'finalizedDateId', 'minPlayers', 'maxPlayers', 'games']) &&
+        request.resource.data.keys().hasOnly(['id', 'title', 'createdAt', 'dates', 'creatorToken', 'closed', 'deadline', 'finalizedDateId', 'minPlayers', 'maxPlayers', 'games', 'ownerUid']) &&
+        (
+          request.resource.data.get('ownerUid', '') == resource.data.get('ownerUid', '') ||
+          (resource.data.get('ownerUid', '') == '' && request.auth != null && request.resource.data.ownerUid == request.auth.uid)
+        ) &&
         (!('games' in request.resource.data) || (request.resource.data.games is list && request.resource.data.games.size() <= 30)) &&
         (!('deadline' in request.resource.data) || request.resource.data.deadline is timestamp) &&
         (!('finalizedDateId' in request.resource.data) || request.resource.data.finalizedDateId is string) &&

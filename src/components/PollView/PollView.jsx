@@ -19,9 +19,11 @@ import {
   addGame,
   toggleGameVote,
   removeGame,
+  claimPollIdentity,
   getLeadingGame,
   groupVotesByResponse
 } from '../../utils/pollHelpers';
+import { useAuth } from '../../auth/useAuth';
 import { sortDates, formatDate } from '../../utils/dateHelpers';
 import Loading from '../shared/Loading';
 import AdminBar from './AdminBar';
@@ -37,10 +39,14 @@ function PollView() {
   const { t, dateLocale } = useTranslation();
   const { pollId } = useParams();
   const { poll, loading, error } = usePoll(pollId);
+  const { user } = useAuth();
   const [voterName, setVoterName] = useLocalStorage('voterName', '');
   // Stable per-browser voter ID so votes survive renames and two
   // voters with the same name don't overwrite each other
   const [voterId] = useLocalStorage('voterId', nanoid(8));
+  // Signed-in identity; votes and creator rights follow this across
+  // devices while everything keeps working without it
+  const voterUid = user?.uid ?? null;
   const [tempName, setTempName] = useState('');
   const [selectedDateId, setSelectedDateId] = useState(null);
   const [copied, setCopied] = useState(false);
@@ -56,21 +62,32 @@ function PollView() {
     rememberPoll({
       id: poll.id,
       title: poll.title,
-      createdByMe: !!poll.creatorToken && token === poll.creatorToken
+      createdByMe:
+        (!!poll.creatorToken && token === poll.creatorToken) ||
+        (!!voterUid && poll.ownerUid === voterUid)
     });
-  }, [poll]);
+  }, [poll, voterUid]);
+
+  // Signed-in visitors claim their earlier anonymous activity: votes
+  // made under this browser's voterId get the account ID, and a poll
+  // created in this browser gets its owner attached (one-time)
+  useEffect(() => {
+    if (!poll?.id || !voterUid) return;
+    const token = localStorage.getItem(`creatorToken:${poll.id}`);
+    claimPollIdentity(poll.id, { voterId, uid: voterUid, creatorToken: token });
+  }, [poll?.id, voterUid, voterId]);
 
   // Generate shareable link
   const pollUrl = `${window.location.origin}/poll/${pollId}`;
 
   const handleVote = async (dateId, response) => {
     if (!voterName) return;
-    await addVote(pollId, dateId, { id: voterId, name: voterName }, response);
+    await addVote(pollId, dateId, { id: voterId, name: voterName, uid: voterUid }, response);
   };
 
   const handleComment = async (dateId, text) => {
     if (!voterName) return;
-    await addComment(pollId, dateId, { id: voterId, name: voterName }, text);
+    await addComment(pollId, dateId, { id: voterId, name: voterName, uid: voterUid }, text);
   };
 
   const handleCopyLink = async () => {
@@ -121,10 +138,14 @@ function PollView() {
   const selectedDate =
     sortedDates.find((d) => d.id === selectedDateId) ?? null;
 
-  // Creator detection: the browser that created the poll holds the
-  // matching token in localStorage
+  // Creator detection: the signed-in owner account wins, with the
+  // legacy browser token as fallback for signed-out creators
   const creatorToken = localStorage.getItem(`creatorToken:${pollId}`);
-  const isCreator = !!poll.creatorToken && creatorToken === poll.creatorToken;
+  const isCreator =
+    (!!voterUid && poll.ownerUid === voterUid) ||
+    (!!poll.creatorToken && creatorToken === poll.creatorToken);
+  // Identity handed to creator actions; either credential authorizes
+  const creatorAuth = { creatorToken, uid: voterUid };
 
   // A poll is closed when the creator closed it, its deadline passed,
   // or a winning date has been finalized
@@ -204,15 +225,15 @@ function PollView() {
           deadlineDate={deadlineDate}
           deadlinePassed={deadlinePassed}
           finalizedDate={finalizedDate}
-          onRename={(title) => updatePollTitle(pollId, creatorToken, title)}
-          onAddDate={(dateString) => addPollDate(pollId, creatorToken, dateString)}
+          onRename={(title) => updatePollTitle(pollId, creatorAuth, title)}
+          onAddDate={(dateString) => addPollDate(pollId, creatorAuth, dateString)}
           onToggleClosed={() =>
-            setPollClosed(pollId, creatorToken, !poll.closed, poll.closed && deadlinePassed)
+            setPollClosed(pollId, creatorAuth, !poll.closed, poll.closed && deadlinePassed)
           }
-          onSetDeadline={(date) => setPollDeadline(pollId, creatorToken, date)}
-          onClearDeadline={() => setPollDeadline(pollId, creatorToken, null)}
-          onSetCapacity={(min, max) => setPollCapacity(pollId, creatorToken, min, max)}
-          onUnfinalize={() => setFinalizedDate(pollId, creatorToken, null)}
+          onSetDeadline={(date) => setPollDeadline(pollId, creatorAuth, date)}
+          onClearDeadline={() => setPollDeadline(pollId, creatorAuth, null)}
+          onSetCapacity={(min, max) => setPollCapacity(pollId, creatorAuth, min, max)}
+          onUnfinalize={() => setFinalizedDate(pollId, creatorAuth, null)}
         />
       )}
 
@@ -326,6 +347,7 @@ function PollView() {
           dates={sortedDates}
           voterId={voterId}
           voterName={voterName}
+          voterUid={voterUid}
           closed={isClosed}
           finalizedDateId={poll.finalizedDateId ?? null}
           onDateClick={handleDateClick}
@@ -337,6 +359,7 @@ function PollView() {
         dates={sortedDates}
         voterId={voterId}
         voterName={voterName}
+        voterUid={voterUid}
         finalizedDateId={poll.finalizedDateId ?? null}
         onDateClick={handleDateClick}
       />
@@ -346,15 +369,16 @@ function PollView() {
         games={games}
         voterId={voterId}
         voterName={voterName}
+        voterUid={voterUid}
         isCreator={isCreator}
         closed={isClosed}
         onAddGame={(title, url) =>
-          addGame(pollId, { id: voterId, name: voterName }, title, url)
+          addGame(pollId, { id: voterId, name: voterName, uid: voterUid }, title, url)
         }
         onToggleGameVote={(gameId) =>
-          toggleGameVote(pollId, gameId, { id: voterId, name: voterName })
+          toggleGameVote(pollId, gameId, { id: voterId, name: voterName, uid: voterUid })
         }
-        onRemoveGame={(gameId) => removeGame(pollId, creatorToken, gameId)}
+        onRemoveGame={(gameId) => removeGame(pollId, creatorAuth, gameId)}
       />
 
       {/* Results Summary - Below Calendar */}
@@ -372,6 +396,7 @@ function PollView() {
           dateData={selectedDate}
           voterId={voterId}
           voterName={voterName}
+          voterUid={voterUid}
           isCreator={isCreator}
           closed={isClosed}
           finalizedDateId={poll.finalizedDateId ?? null}
@@ -379,8 +404,8 @@ function PollView() {
           maxPlayers={poll.maxPlayers ?? null}
           onVote={handleVote}
           onComment={handleComment}
-          onRemoveDate={(dateId) => removePollDate(pollId, creatorToken, dateId)}
-          onFinalize={(dateId) => setFinalizedDate(pollId, creatorToken, dateId)}
+          onRemoveDate={(dateId) => removePollDate(pollId, creatorAuth, dateId)}
+          onFinalize={(dateId) => setFinalizedDate(pollId, creatorAuth, dateId)}
           onClose={() => setSelectedDateId(null)}
         />
       )}

@@ -4,7 +4,7 @@ import { bggGameUrl } from '../../utils/bggSearch';
 import GameSearchInput from './GameSearchInput';
 import { useTranslation, translateError } from '../../i18n/useTranslation';
 
-function GameVoting({ games, voterId, voterName, isCreator, closed, onAddGame, onToggleGameVote, onRemoveGame }) {
+function GameVoting({ games, voterId, voterName, voterUid, isCreator, closed, onAddGame, onToggleGameVote, onRemoveGame }) {
   const { t } = useTranslation();
   const [title, setTitle] = useState('');
   const [url, setUrl] = useState('');
@@ -88,7 +88,9 @@ function GameVoting({ games, voterId, voterName, isCreator, closed, onAddGame, o
       {sorted.length > 0 && (
         <ul className="space-y-2 mb-4">
           {sorted.map((game) => {
-            const youVoted = game.votes.some((v) => v.voterId === voterId);
+            const youVoted = game.votes.some((v) =>
+              voterUid && v.uid ? v.uid === voterUid : v.voterId === voterId
+            );
             const isLeading = game.id === leadingId;
 
             return (
