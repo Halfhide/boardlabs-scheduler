@@ -642,7 +642,7 @@ verified present and headings render uniformly in both languages.
 The Claude Design "Organic" project still names Caprasimo; if the
 design system gets reused elsewhere, update it there too.
 
-Brand addendum (27 Jul 2026, commit pending): Adam exported the
+Brand addendum (27 Jul 2026, commit 722b281): Adam exported the
 full brand doc to design-assets/MeppleTime Design System.html (the
 Claude Design UI renders brand assets on the fly; they are not
 files in the design project, hence the export). The product brand
