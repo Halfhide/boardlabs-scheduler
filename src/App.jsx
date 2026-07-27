@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import CreatePoll from './components/CreatePoll/CreatePoll';
 import PollView from './components/PollView/PollView';
 import LanguageProvider from './i18n/LanguageProvider';
@@ -43,7 +43,9 @@ function App() {
           <header className="bg-surface shadow-sm">
             <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between gap-3">
               <h1 className="leading-none">
-                <Logo />
+                <Link to="/" aria-label="MeppleTime home" className="inline-flex rounded-full">
+                  <Logo />
+                </Link>
               </h1>
               <div className="flex items-center gap-3 shrink-0">
                 <LanguageToggle />
