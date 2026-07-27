@@ -104,18 +104,18 @@ function GameSearchInput({ value, onChange, onSelect, disabled }) {
         role="combobox"
         aria-expanded={open}
         aria-autocomplete="list"
-        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        className="w-full px-4 py-2 border border-neutral-400 rounded-full text-sm focus:ring-2 focus:ring-terra focus:border-transparent"
         disabled={disabled}
       />
       {searching && (
-        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">
+        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-neutral-500">
           ...
         </span>
       )}
       {open && (
         <ul
           role="listbox"
-          className="absolute z-20 left-0 right-0 top-full mt-1 max-h-64 overflow-y-auto bg-white border border-gray-200 rounded-md shadow-lg py-1"
+          className="absolute z-20 left-0 right-0 top-full mt-1 max-h-64 overflow-y-auto bg-surface border border-neutral-300 rounded-2xl shadow-lg py-1"
         >
           {suggestions.map((game, index) => (
             <li key={game.id} role="option" aria-selected={index === activeIndex}>
@@ -128,19 +128,19 @@ function GameSearchInput({ value, onChange, onSelect, disabled }) {
                 }}
                 onMouseEnter={() => setActiveIndex(index)}
                 className={`w-full text-left px-3 py-1.5 text-sm ${
-                  index === activeIndex ? 'bg-blue-50' : ''
+                  index === activeIndex ? 'bg-terra-100' : ''
                 }`}
               >
-                <span className="text-gray-900">{game.name}</span>
+                <span className="text-ink">{game.name}</span>
                 {game.year && (
-                  <span className="ml-1.5 text-xs text-gray-400">
+                  <span className="ml-1.5 text-xs text-neutral-500">
                     ({game.year})
                   </span>
                 )}
               </button>
             </li>
           ))}
-          <li className="px-3 pt-1 mt-1 border-t border-gray-100 text-[10px] text-gray-400">
+          <li className="px-3 pt-1 mt-1 border-t border-neutral-200 text-[10px] text-neutral-500">
             {t('bggFooterHint')}
           </li>
         </ul>

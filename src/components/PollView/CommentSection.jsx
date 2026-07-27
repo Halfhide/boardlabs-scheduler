@@ -32,18 +32,18 @@ function CommentSection({ comments, dateId, voterName, onComment }) {
       {comments.length > 0 && (
         <div className="space-y-3">
           {comments.map((comment) => (
-            <div key={comment.id} className="bg-gray-50 rounded-md p-3">
+            <div key={comment.id} className="bg-ground rounded-md p-3">
               <div className="flex justify-between items-start mb-1">
-                <span className="font-medium text-sm text-gray-900">
+                <span className="font-medium text-sm text-ink">
                   {comment.voterName}
                 </span>
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-neutral-600">
                   {comment.timestamp?.toDate
                     ? format(comment.timestamp.toDate(), t('commentTimeFormat'), { locale: dateLocale })
                     : t('justNow')}
                 </span>
               </div>
-              <p className="text-sm text-gray-700">{comment.text}</p>
+              <p className="text-sm text-neutral-800">{comment.text}</p>
             </div>
           ))}
         </div>
@@ -56,26 +56,26 @@ function CommentSection({ comments, dateId, voterName, onComment }) {
           value={commentText}
           onChange={(e) => setCommentText(e.target.value)}
           placeholder={t('addCommentPlaceholder')}
-          className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="flex-1 px-4 py-2 border border-neutral-400 rounded-full text-sm focus:ring-2 focus:ring-terra focus:border-transparent"
           disabled={loading || !voterName}
         />
         <button
           type="submit"
           disabled={loading || !commentText.trim() || !voterName}
-          className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="px-4 py-2 bg-terra text-ground text-sm font-medium rounded-full hover:bg-terra-600 focus:outline-none focus:ring-2 focus:ring-terra focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {loading ? t('sending') : t('send')}
         </button>
       </form>
 
       {submitError && (
-        <p className="text-xs text-red-600">
+        <p className="text-xs text-danger-600">
           {t('commentFailed')}
         </p>
       )}
 
       {!voterName && (
-        <p className="text-xs text-gray-500 italic">
+        <p className="text-xs text-neutral-600 italic">
           {t('enterNameToComment')}
         </p>
       )}

@@ -137,9 +137,9 @@ function PollView() {
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-        <h2 className="text-xl font-semibold text-red-900 mb-2">{t('errorHeading')}</h2>
-        <p className="text-red-700">{t(error)}</p>
+      <div className="bg-danger-100 border border-danger-200 rounded-lg p-6 text-center">
+        <h2 className="text-xl font-semibold text-danger-800 mb-2">{t('errorHeading')}</h2>
+        <p className="text-danger-700">{t(error)}</p>
       </div>
     );
   }
@@ -193,14 +193,14 @@ function PollView() {
   return (
     <div className="space-y-6">
       {/* Poll Header */}
-      <div className="bg-white rounded-lg shadow-md p-6">
+      <div className="bg-surface rounded-lg shadow-md p-6">
         <div className="flex justify-between items-start mb-4">
-          <h2 className="text-3xl font-bold text-gray-900">{poll.title}</h2>
+          <h2 className="text-3xl font-bold text-ink">{poll.title}</h2>
 
           {/* Subtle Share Button */}
           <button
             onClick={handleCopyLink}
-            className="text-sm text-blue-600 hover:text-blue-700 font-medium px-3 py-1 rounded-md hover:bg-blue-50 transition-colors"
+            className="text-sm text-terra-700 hover:text-terra-800 font-medium px-3 py-1 rounded-full hover:bg-terra/10 transition-colors"
           >
             {copied ? t('copied') : t('sharePoll')}
           </button>
@@ -209,14 +209,14 @@ function PollView() {
 
       {/* Finalized banner - the decision everyone came for */}
       {finalizedDate && (
-        <div className="bg-green-50 border-2 border-green-400 rounded-lg p-5">
+        <div className="bg-sage-100 border-2 border-sage-500 rounded-lg p-5">
           <div className="flex items-start gap-3">
             <span className="text-3xl">🎉</span>
             <div className="flex-1">
-              <p className="text-xl font-bold text-green-900">
+              <p className="text-xl font-bold text-sage-900">
                 {t('playingOn', { date: formatDate(finalizedDate.date, { locale: dateLocale }, t('finalizedDateFormat')) })}
               </p>
-              <div className="mt-2 space-y-1 text-sm text-green-900">
+              <div className="mt-2 space-y-1 text-sm text-sage-900">
                 <p>
                   <span className="font-semibold">
                     {t('coming', { count: finalizedVotes.yes.length })}
@@ -268,11 +268,11 @@ function PollView() {
 
       {/* Closed banner (the finalized banner already covers closure) */}
       {isClosed && !finalizedDate && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-center gap-3">
+        <div className="bg-neutral-200 border border-neutral-400 rounded-lg p-4 flex items-center gap-3">
           <span className="text-2xl">🔒</span>
           <div>
-            <p className="font-semibold text-amber-900">{t('votingClosed')}</p>
-            <p className="text-sm text-amber-800">
+            <p className="font-semibold text-ink">{t('votingClosed')}</p>
+            <p className="text-sm text-neutral-800">
               {poll.closed
                 ? t('closedByCreator')
                 : t('closedByDeadline', {
@@ -286,9 +286,9 @@ function PollView() {
 
       {/* Deadline countdown */}
       {!isClosed && deadlineDate && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-center gap-2">
+        <div className="bg-terra-100 border border-terra-200 rounded-lg p-3 flex items-center gap-2">
           <span className="text-xl">⏳</span>
-          <p className="text-sm text-blue-900">
+          <p className="text-sm text-terra-900">
             {t('votingClosesIn', {
               relative: formatDistanceToNow(deadlineDate, { addSuffix: true, locale: dateLocale }),
               date: format(deadlineDate, t('deadlineAtFormat'), { locale: dateLocale })
@@ -299,16 +299,16 @@ function PollView() {
 
       {/* Name Input Section - Prominent and Clear */}
       {!voterName ? (
-        <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg shadow-lg p-4 sm:p-6 text-white">
+        <div className="bg-gradient-to-r from-terra-500 to-terra-600 rounded-lg shadow-lg p-4 sm:p-6 text-white">
           <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
-            <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-full flex items-center justify-center text-xl sm:text-2xl">
+            <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 bg-ground/25 rounded-full flex items-center justify-center text-xl sm:text-2xl">
               👤
             </div>
             <div className="flex-1 w-full">
               <h3 className="text-lg sm:text-xl font-bold mb-2">
                 {t('step1Heading')}
               </h3>
-              <p className="text-blue-100 text-sm sm:text-base mb-4">
+              <p className="text-terra-100 text-sm sm:text-base mb-4">
                 {t('step1Help')}
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
@@ -317,7 +317,7 @@ function PollView() {
                   value={tempName}
                   onChange={(e) => setTempName(e.target.value)}
                   placeholder={t('namePlaceholder')}
-                  className="flex-1 px-4 py-3 rounded-md bg-white text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-blue-600 w-full"
+                  className="flex-1 px-4 py-3 rounded-full bg-ground text-ink placeholder-neutral-500 focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-terra-600 w-full"
                   autoFocus
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') handleSaveName();
@@ -326,7 +326,7 @@ function PollView() {
                 <button
                   onClick={handleSaveName}
                   disabled={!tempName.trim()}
-                  className="w-full sm:w-auto px-6 py-3 bg-white text-blue-600 font-semibold rounded-md hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
+                  className="w-full sm:w-auto px-6 py-3 bg-ground text-terra-700 font-semibold rounded-full hover:bg-terra-100 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-terra-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
                 >
                   {t('continueButton')}
                 </button>
@@ -335,17 +335,17 @@ function PollView() {
           </div>
         </div>
       ) : (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4 animate-bounce-in">
+        <div className="bg-sage-100 border border-sage-300 rounded-lg p-4 animate-bounce-in">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-lg">
+              <div className="w-10 h-10 bg-sage-200 rounded-full flex items-center justify-center text-lg">
                 ✨
               </div>
               <div>
-                <p className="text-sm text-green-700 font-medium">
+                <p className="text-sm text-sage-800 font-medium">
                   {t('votingAs')}
                 </p>
-                <p className="text-lg font-bold text-green-900">
+                <p className="text-lg font-bold text-sage-900">
                   {voterName}
                 </p>
               </div>
@@ -355,7 +355,7 @@ function PollView() {
                 setTempName(voterName);
                 setVoterName('');
               }}
-              className="text-sm text-green-700 hover:text-green-900 font-medium underline"
+              className="text-sm text-sage-800 hover:text-sage-900 font-medium underline"
             >
               {t('changeName')}
             </button>
@@ -365,7 +365,7 @@ function PollView() {
 
       {/* Calendar View */}
       <div>
-        <h3 className="text-2xl font-bold text-gray-900 mb-4">
+        <h3 className="text-2xl font-bold text-ink mb-4">
           {isClosed
             ? t('datesAndResults')
             : voterName

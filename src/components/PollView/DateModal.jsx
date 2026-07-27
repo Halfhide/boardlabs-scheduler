@@ -8,9 +8,9 @@ import { diceRoll } from '../../utils/diceRoll';
 import { useTranslation, translateError } from '../../i18n/useTranslation';
 
 const CAPACITY_STYLES = {
-  needs: 'bg-amber-100 text-amber-800',
-  enough: 'bg-green-100 text-green-800',
-  full: 'bg-violet-100 text-violet-800'
+  needs: 'bg-gold-100 text-gold-900',
+  enough: 'bg-sage-200 text-sage-800',
+  full: 'bg-terra-100 text-terra-900'
 };
 
 function DateModal({ dateData, voterId, voterName, voterUid, isCreator, closed, finalizedDateId, minPlayers, maxPlayers, onVote, onComment, onRemoveDate, onFinalize, onClose }) {
@@ -119,28 +119,28 @@ function DateModal({ dateData, voterId, voterName, voterUid, isCreator, closed, 
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50" onClick={onClose}>
+    <div className="fixed inset-0 bg-ink/50 flex items-center justify-center p-4 z-50" onClick={onClose}>
       <div
-        className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+        className="bg-surface rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
         aria-label={formatDate(dateData.date, { locale: dateLocale }, t('finalizedDateFormat'))}
       >
         {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-start">
+        <div className="sticky top-0 bg-surface border-b border-neutral-300 px-6 py-4 flex justify-between items-start">
           <div>
-            <h3 className="text-2xl font-bold text-gray-900">
+            <h3 className="text-2xl font-bold text-ink">
               {formatDate(dateData.date, { locale: dateLocale }, t('finalizedDateFormat'))}
             </h3>
             <div className="flex gap-4 mt-2 text-sm">
-              <span className="text-green-600 font-medium">
+              <span className="text-sage-700 font-medium">
                 {t('yesCount', { count: voteSummary.yes })}
               </span>
-              <span className="text-yellow-600 font-medium">
+              <span className="text-gold-600 font-medium">
                 {t('maybeCount', { count: voteSummary.maybe })}
               </span>
-              <span className="text-red-600 font-medium">
+              <span className="text-danger-600 font-medium">
                 {t('noCount', { count: voteSummary.no })}
               </span>
               {capacity && (
@@ -152,7 +152,7 @@ function DateModal({ dateData, voterId, voterName, voterUid, isCreator, closed, 
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 text-3xl leading-none font-light"
+            className="text-neutral-500 hover:text-neutral-700 text-3xl leading-none font-light"
             aria-label={t('closeButton')}
           >
             ×
@@ -164,11 +164,11 @@ function DateModal({ dateData, voterId, voterName, voterUid, isCreator, closed, 
           {/* Vote Section */}
           <div>
             <div className="flex items-center justify-between mb-3">
-              <h4 className="text-lg font-semibold text-gray-900">
+              <h4 className="text-lg font-semibold text-ink">
                 {t('castYourVote')}
               </h4>
               {currentUserVote && !loading && (
-                <span className="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
+                <span className="text-sm text-neutral-700 bg-ink/5 px-3 py-1 rounded-full">
                   {currentUserVote.response === 'yes' && t('youVotedYes')}
                   {currentUserVote.response === 'maybe' && t('youVotedMaybe')}
                   {currentUserVote.response === 'no' && t('youVotedNo')}
@@ -178,8 +178,8 @@ function DateModal({ dateData, voterId, voterName, voterUid, isCreator, closed, 
 
             {/* Instruction Banner */}
             {voterName && !currentUserVote && !closed && (
-              <div className="bg-blue-50 border border-blue-200 rounded-md p-3 mb-3">
-                <p className="text-sm text-blue-800">
+              <div className="bg-terra-100 border border-terra-200 rounded-md p-3 mb-3">
+                <p className="text-sm text-terra-800">
                   💡 <strong>{t('clickButtonBelow')}</strong> {t('savedImmediately')}
                 </p>
               </div>
@@ -187,8 +187,8 @@ function DateModal({ dateData, voterId, voterName, voterUid, isCreator, closed, 
 
             {/* Error Message */}
             {voteError && (
-              <div className="bg-red-50 border border-red-200 rounded-md p-3 mb-3">
-                <p className="text-sm text-red-800 font-medium">
+              <div className="bg-danger-100 border border-danger-200 rounded-md p-3 mb-3">
+                <p className="text-sm text-danger-800 font-medium">
                   {t('voteFailed')}
                 </p>
               </div>
@@ -196,15 +196,15 @@ function DateModal({ dateData, voterId, voterName, voterUid, isCreator, closed, 
 
             {/* Success Message */}
             {justVoted && (
-              <div className="bg-green-50 border border-green-200 rounded-md p-3 mb-3 animate-bounce-in">
-                <p className="text-sm text-green-800 font-medium">
+              <div className="bg-sage-100 border border-sage-300 rounded-md p-3 mb-3 animate-bounce-in">
+                <p className="text-sm text-sage-800 font-medium">
                   {t('voteSaved')}
                 </p>
               </div>
             )}
 
             {closed ? (
-              <p className="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-md p-3">
+              <p className="text-sm text-neutral-800 bg-neutral-200 border border-neutral-400 rounded-md p-3">
                 {t('votingClosedForPoll')}
               </p>
             ) : voterName ? (
@@ -229,13 +229,13 @@ function DateModal({ dateData, voterId, voterName, voterUid, isCreator, closed, 
                 />
               </div>
             ) : (
-              <p className="text-sm text-gray-600 italic bg-yellow-50 border border-yellow-200 rounded-md p-3">
+              <p className="text-sm text-neutral-700 italic bg-gold-100 border border-gold-200 rounded-md p-3">
                 {t('enterNameToVote')}
               </p>
             )}
 
             {currentUserVote && !loading && !justVoted && (
-              <p className="text-xs text-gray-500 mt-2 text-center">
+              <p className="text-xs text-neutral-600 mt-2 text-center">
                 {t('changeVoteHint')}
               </p>
             )}
@@ -243,7 +243,7 @@ function DateModal({ dateData, voterId, voterName, voterUid, isCreator, closed, 
 
           {/* Voter Breakdown - who you'd be playing with */}
           <div>
-            <h4 className="text-lg font-semibold text-gray-900 mb-3">
+            <h4 className="text-lg font-semibold text-ink mb-3">
               {t('whosVoted', { count: dateData.votes.length })}
             </h4>
             <VoterBreakdown
@@ -256,7 +256,7 @@ function DateModal({ dateData, voterId, voterName, voterUid, isCreator, closed, 
 
           {/* Comments Section */}
           <div>
-            <h4 className="text-lg font-semibold text-gray-900 mb-3">
+            <h4 className="text-lg font-semibold text-ink mb-3">
               {t('commentsHeading', { count: dateData.comments.length })}
             </h4>
             <CommentSection
@@ -269,14 +269,14 @@ function DateModal({ dateData, voterId, voterName, voterUid, isCreator, closed, 
 
           {/* Creator actions */}
           {isCreator && (
-            <div className="border-t border-gray-200 pt-4 space-y-3">
+            <div className="border-t border-neutral-300 pt-4 space-y-3">
               <button
                 onClick={handleFinalize}
                 disabled={finalizing || removing}
-                className={`w-full py-2.5 px-4 rounded-md text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                className={`w-full py-2.5 px-4 rounded-full text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                   isFinalizedDate
-                    ? 'border border-green-400 text-green-800 hover:bg-green-50'
-                    : 'bg-green-600 text-white hover:bg-green-700'
+                    ? 'border border-sage-500 text-sage-800 hover:bg-sage-100'
+                    : 'bg-sage-600 text-ground hover:bg-sage-700'
                 }`}
               >
                 {finalizing
@@ -286,15 +286,15 @@ function DateModal({ dateData, voterId, voterName, voterUid, isCreator, closed, 
                     : t('finalizeButton')}
               </button>
               {finalizeError && (
-                <p className="text-xs text-red-600">{finalizeError}</p>
+                <p className="text-xs text-danger-600">{finalizeError}</p>
               )}
               <button
                 onClick={handleRemoveDate}
                 disabled={removing}
                 className={`text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed ${
                   confirmingRemove
-                    ? 'text-white bg-red-600 hover:bg-red-700 px-4 py-2 rounded-md'
-                    : 'text-red-600 hover:text-red-700'
+                    ? 'text-ground bg-danger-600 hover:bg-danger-700 px-4 py-2 rounded-full'
+                    : 'text-danger-600 hover:text-danger-700'
                 }`}
               >
                 {removing
@@ -304,12 +304,12 @@ function DateModal({ dateData, voterId, voterName, voterUid, isCreator, closed, 
                     : t('removeDateButton')}
               </button>
               {confirmingRemove && !removing && (
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-neutral-600 mt-1">
                   {t('removeDateWarning')}
                 </p>
               )}
               {removeError && (
-                <p className="text-xs text-red-600 mt-1">
+                <p className="text-xs text-danger-600 mt-1">
                   {t('removeDateFailed')}
                 </p>
               )}
@@ -318,10 +318,10 @@ function DateModal({ dateData, voterId, voterName, voterUid, isCreator, closed, 
         </div>
 
         {/* Footer */}
-        <div className="sticky bottom-0 bg-gray-50 border-t border-gray-200 px-6 py-4">
+        <div className="sticky bottom-0 bg-ground border-t border-neutral-300 px-6 py-4">
           <button
             onClick={onClose}
-            className="w-full bg-gray-600 text-white font-medium py-3 px-4 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
+            className="w-full bg-neutral-700 text-ground font-medium py-3 px-4 rounded-full hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-neutral-600 focus:ring-offset-2 transition-colors"
           >
             {t('closeButton')}
           </button>

@@ -43,7 +43,7 @@ features were proposed, 11 accepted, 4 rejected (see bottom).
 | 11e | Poll auto-expiry   | 5     | not started |
 | 11f | Rules + App Check  | 5     | not started |
 | 11g | Privacy note       | 5     | not started |
-| 13 | Design system align | 6     | blocked (awaiting design) |
+| 13 | Design system align | 6     | done        |
 
 ## Phase 1: Poll lifecycle (foundations)
 
@@ -616,15 +616,31 @@ breaking real users; privacy page reachable in both languages.
 
 Status: blocked, waiting on Adam's visual identity work
 
-Adam is developing a visual identity and design system in parallel
-(outside this repo). Once it exists, align the app to it as the
-last step before the public launch, after phase 5 is functionally
-complete. Implementation intent: express the design system as
-Tailwind v4 @theme tokens (semantic palette, type scale, radius and
-shadow values) so the swap is centralized, then do a component
-polish pass, and regenerate the PWA icons, favicon, and manifest
-theme color to match the new identity. Do not start restyling
-before the design system is delivered.
+Status update 27 Jul 2026: Adam delivered the design system as the
+Claude Design project "Organic" (read directly via DesignSync:
+theme.json + styles.css tokens). Pulled forward before 11e-11g on
+purpose: the remaining phase 5 features are backend-only except the
+privacy page, which should be born styled. Implemented: all Organic
+tokens as Tailwind v4 @theme in src/index.css (ground/surface/ink,
+neutral + terra + sage ramps, gold and danger semantic colors,
+Caprasimo/Figtree via self-hosted @fontsource imported in main.jsx
+because the Tailwind CSS pipeline does not rebase font URLs, radii
+16/28px, ink-tinted shadows), full component sweep across all 17
+JSX files (terra primary, sage creator tools and success, gold
+maybe/warning, brick danger, pill buttons and inputs), dice burst
+recolored, PWA icons regenerated (scripts/generate-icons.mjs,
+terracotta die with cream pips), manifest theme #c67139 on #f5ead8,
+fonts added to the SW precache (22 entries). Verified in the
+browser: home, poll page, calendar both modes, matrix, game voting,
+results, date modal, creator tools, EN and PL.
+RESOLVED (27 Jul 2026, done, commit pending): Caprasimo has NO
+Polish diacritics (confirmed against both the fontsource build and
+Google's hosted copy), so with Adam's approval the heading face was
+swapped to Baloo 2 at weight 700, the closest Polish-capable match
+to Caprasimo's chunky rounded personality. All Polish diacritics
+verified present and headings render uniformly in both languages.
+The Claude Design "Organic" project still names Caprasimo; if the
+design system gets reused elsewhere, update it there too.
 
 ## Rejected features (do not build unless Adam changes his mind)
 
@@ -724,3 +740,10 @@ before the design system is delivered.
   confirm in the AdminBar, list scrubbing and dangling-entry self
   cleanup. All deletable test polls removed from the live database
   using the new feature; RjwDCzmNa8 remains (unclaimable).
+- 27 Jul 2026: feature 13 (design system alignment) pulled forward
+  and completed: Adam's "Organic" design system read directly from
+  Claude Design, expressed as Tailwind @theme tokens, full component
+  sweep, recolored dice, regenerated PWA icons and manifest colors,
+  self-hosted fonts precached for offline. Heading font swapped
+  Caprasimo -> Baloo 2 (Caprasimo lacks Polish diacritics), approved
+  by Adam. Verified in the browser in both languages.

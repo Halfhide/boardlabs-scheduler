@@ -3,15 +3,15 @@ import { format, parseISO } from 'date-fns';
 import { useTranslation } from '../../i18n/useTranslation';
 
 const RESPONSE_META = [
-  { key: 'yes', icon: '✓', badge: 'bg-green-100 text-green-800' },
-  { key: 'maybe', icon: '?', badge: 'bg-yellow-100 text-yellow-800' },
-  { key: 'no', icon: '✗', badge: 'bg-red-100 text-red-800' }
+  { key: 'yes', icon: '✓', badge: 'bg-sage-200 text-sage-800' },
+  { key: 'maybe', icon: '?', badge: 'bg-gold-100 text-gold-900' },
+  { key: 'no', icon: '✗', badge: 'bg-danger-100 text-danger-800' }
 ];
 
 const CAPACITY_STYLES = {
-  needs: 'bg-amber-100 text-amber-800',
-  enough: 'bg-green-100 text-green-800',
-  full: 'bg-violet-100 text-violet-800'
+  needs: 'bg-gold-100 text-gold-900',
+  enough: 'bg-sage-200 text-sage-800',
+  full: 'bg-terra-100 text-terra-900'
 };
 
 function Results({ dates, finalizedDateId, minPlayers, maxPlayers, onDateClick }) {
@@ -34,14 +34,14 @@ function Results({ dates, finalizedDateId, minPlayers, maxPlayers, onDateClick }
   const totalVoters = allVoters.size;
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-4">
+    <div className="bg-surface rounded-lg shadow-sm p-4">
       <div className="flex items-center justify-between mb-1">
-        <h3 className="text-base font-bold text-gray-900">{t('resultsHeading')}</h3>
-        <p className="text-xs text-gray-600">
+        <h3 className="text-base font-bold text-ink">{t('resultsHeading')}</h3>
+        <p className="text-xs text-neutral-700">
           {t('voters', { count: totalVoters })}
         </p>
       </div>
-      <p className="text-xs text-gray-400 mb-3">
+      <p className="text-xs text-neutral-500 mb-3">
         {t('clickAnyDate')}
       </p>
 
@@ -61,32 +61,32 @@ function Results({ dates, finalizedDateId, minPlayers, maxPlayers, onDateClick }
               key={dateData.id}
               type="button"
               onClick={() => onDateClick(dateData)}
-              className={`border rounded-md p-2 relative text-left transition-all hover:shadow-md hover:border-blue-400 cursor-pointer ${
+              className={`border rounded-md p-2 relative text-left transition-all hover:shadow-md hover:border-terra-400 cursor-pointer ${
                 isChosen
-                  ? 'border-green-600 border-2 bg-green-50'
+                  ? 'border-sage-600 border-2 bg-sage-100'
                   : isBest
-                    ? 'border-green-400 bg-green-50'
-                    : 'border-gray-200 bg-white'
+                    ? 'border-sage-500 bg-sage-100'
+                    : 'border-neutral-300 bg-surface'
               }`}
             >
               {/* Chosen / Best Badge */}
               {isChosen && (
-                <div className="absolute -top-1.5 -right-1.5 bg-green-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                <div className="absolute -top-1.5 -right-1.5 bg-sage-600 text-ground text-[10px] font-bold px-1.5 py-0.5 rounded-full">
                   {t('chosenBadge')}
                 </div>
               )}
               {isBest && (
-                <div className="absolute -top-1.5 -right-1.5 bg-green-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                <div className="absolute -top-1.5 -right-1.5 bg-sage-600 text-ground text-[10px] font-bold px-1.5 py-0.5 rounded-full">
                   {t('bestBadge')}
                 </div>
               )}
 
               {/* Date */}
               <div className="mb-1.5">
-                <div className="text-xs font-semibold text-gray-900 leading-tight">
+                <div className="text-xs font-semibold text-ink leading-tight">
                   {format(parseISO(dateData.date), t('resultDateFormat'), { locale: dateLocale })}
                 </div>
-                <div className="text-[10px] text-gray-500">
+                <div className="text-[10px] text-neutral-600">
                   {format(parseISO(dateData.date), 'yyyy')}
                 </div>
               </div>
@@ -104,7 +104,7 @@ function Results({ dates, finalizedDateId, minPlayers, maxPlayers, onDateClick }
                           <span>{icon}</span>
                           <span>{votes.length}</span>
                         </span>
-                        <span className="text-[11px] text-gray-600 truncate">
+                        <span className="text-[11px] text-neutral-700 truncate">
                           {votes.map(v => v.voterName).join(', ')}
                         </span>
                       </div>
@@ -112,7 +112,7 @@ function Results({ dates, finalizedDateId, minPlayers, maxPlayers, onDateClick }
                   })}
                 </div>
               ) : (
-                <div className="text-[10px] text-gray-400 italic">{t('noVotes')}</div>
+                <div className="text-[10px] text-neutral-500 italic">{t('noVotes')}</div>
               )}
 
               {/* Player capacity state */}
@@ -126,7 +126,7 @@ function Results({ dates, finalizedDateId, minPlayers, maxPlayers, onDateClick }
 
               {/* Total votes indicator */}
               {hasVotes && (
-                <div className="mt-1 text-[10px] text-gray-500">
+                <div className="mt-1 text-[10px] text-neutral-600">
                   {t('votes', { count: totalVotes })}
                 </div>
               )}

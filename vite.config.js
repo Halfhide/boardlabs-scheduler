@@ -23,8 +23,8 @@ const pwaPlugin = VitePWA({
     short_name: 'Game Nights',
     description:
       'Create a poll, share the link, and find the best date for your next board game night.',
-    theme_color: '#2563eb',
-    background_color: '#f9fafb',
+    theme_color: '#c67139',
+    background_color: '#f5ead8',
     display: 'standalone',
     start_url: '/',
     icons: [
@@ -42,6 +42,9 @@ const pwaPlugin = VitePWA({
     // Offline app shell: precached build assets plus an SPA fallback.
     // Poll data stays live-only (Firestore); /api/ is never routed to
     // the shell so BGG search fails cleanly instead of getting HTML.
+    // woff2 is included so the identity fonts work offline (woff
+    // fallbacks for ancient browsers are not worth caching).
+    globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
     navigateFallback: '/index.html',
     navigateFallbackDenylist: [/^\/api\//],
   },

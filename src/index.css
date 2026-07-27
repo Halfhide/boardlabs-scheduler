@@ -1,13 +1,115 @@
+/* Organic design system (from Adam's Claude Design project "Organic"):
+   warm cream ground, terracotta + sage accents, Caprasimo display
+   headings over Figtree, over-rounded shapes. All values live here as
+   Tailwind v4 theme tokens; components consume them as utilities
+   (bg-terra-600, text-ink, rounded-lg, ...). Swap the look by editing
+   this file only. */
+
+/* Fonts are imported in src/main.jsx (Vite copies the woff2 assets
+   there; the Tailwind CSS pipeline would not rebase their URLs) */
 @import "tailwindcss";
+
+@theme {
+  /* Core roles */
+  --color-ground: #f5ead8;
+  --color-surface: #ebddc5;
+  --color-ink: #201e1d;
+
+  /* Neutral ramp (replaces Tailwind's cool greys with warm ones) */
+  --color-neutral-100: #f9f4ed;
+  --color-neutral-200: #eee7db;
+  --color-neutral-300: #dcd3c4;
+  --color-neutral-400: #c0b6a5;
+  --color-neutral-500: #a19786;
+  --color-neutral-600: #82796a;
+  --color-neutral-700: #645c50;
+  --color-neutral-800: #474238;
+  --color-neutral-900: #2e2b25;
+
+  /* Terracotta: the primary accent */
+  --color-terra: #c67139;
+  --color-terra-100: #fff2eb;
+  --color-terra-200: #ffe1d0;
+  --color-terra-300: #ffc6a5;
+  --color-terra-400: #f6a06b;
+  --color-terra-500: #d67f48;
+  --color-terra-600: #b2622d;
+  --color-terra-700: #8c491a;
+  --color-terra-800: #643312;
+  --color-terra-900: #402310;
+
+  /* Sage: the second accent; also the app's "yes"/success voice */
+  --color-sage: #7a8a5e;
+  --color-sage-100: #f0fae1;
+  --color-sage-200: #e1eecc;
+  --color-sage-300: #ccdbb2;
+  --color-sage-400: #aebf92;
+  --color-sage-500: #8fa073;
+  --color-sage-600: #728157;
+  --color-sage-700: #56633f;
+  --color-sage-800: #3d472b;
+  --color-sage-900: #272e1b;
+
+  /* Warm gold for "maybe" and caution states (kept in the palette's
+     warmth; the design system has no cold yellow) */
+  --color-gold: #d9a13f;
+  --color-gold-100: #faeed3;
+  --color-gold-200: #f3ddab;
+  --color-gold-300: #e8c274;
+  --color-gold-500: #d9a13f;
+  --color-gold-600: #b98426;
+  --color-gold-900: #5c3e0e;
+
+  /* Warm brick red for "no", errors and destructive actions
+     (distinct from terracotta: redder, darker) */
+  --color-danger: #b3402e;
+  --color-danger-100: #f9e2dc;
+  --color-danger-200: #f0c4b9;
+  --color-danger-300: #de9484;
+  --color-danger-500: #c05540;
+  --color-danger-600: #a84331;
+  --color-danger-700: #8a3325;
+  --color-danger-800: #622419;
+
+  /* Type. The Organic system specifies Caprasimo for headings, but
+     Caprasimo has no Polish diacritics (verified: ł ś ą ę ć ń ó ż ź
+     all missing, also in Google's hosted build), so the closest
+     Polish-capable personality match is used instead: Baloo 2 at 700. */
+  --font-heading: "Baloo 2", system-ui, sans-serif;
+  --font-body: "Figtree", system-ui, sans-serif;
+
+  /* Radii: over-rounded (Organic frame is "rounded") */
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 28px;
+  --radius-xl: 32px;
+
+  /* Elevation: soft ink-tinted shadows tuned to the warm ground */
+  --shadow-sm: 0 1px 2px rgb(46 43 37 / 0.14);
+  --shadow-md: 0 3px 10px rgb(46 43 37 / 0.16);
+  --shadow-lg: 0 12px 32px rgb(46 43 37 / 0.22);
+  --shadow-xl: 0 12px 32px rgb(46 43 37 / 0.22);
+}
 
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  background: var(--color-ground);
+  color: var(--color-ink);
+  font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+}
+
+:focus { outline: none; }
+:focus-visible { outline: 2px solid var(--color-terra); outline-offset: 2px; }
+::selection { background: rgb(198 113 57 / 0.3); }
 
 /* ✨ Sparkle animation for interactive elements */
 @keyframes sparkle {
@@ -23,10 +125,10 @@ body {
 
 @keyframes pulse-glow {
   0%, 100% {
-    box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
+    box-shadow: 0 0 5px rgb(198 113 57 / 0.5);
   }
   50% {
-    box-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
+    box-shadow: 0 0 20px rgb(198 113 57 / 0.8);
   }
 }
 
@@ -55,7 +157,8 @@ body {
   animation: sparkle 1s ease-in-out infinite;
 }
 
-/* 🎲 3D dice bursts (see src/utils/diceRoll.js) */
+/* 🎲 3D dice bursts (see src/utils/diceRoll.js) — cream dice with
+   terracotta pips to match the identity */
 .dice-overlay {
   position: fixed;
   inset: 0;
@@ -89,9 +192,9 @@ body {
   grid-template-rows: repeat(3, 1fr);
   grid-template-columns: repeat(3, 1fr);
   padding: 14%;
-  background: linear-gradient(135deg, #ffffff, #d1d5db);
-  border: 1px solid #9ca3af;
-  border-radius: 15%;
+  background: linear-gradient(135deg, #fdf7ec, #e5d5b9);
+  border: 1px solid #c0b6a5;
+  border-radius: 22%;
   backface-visibility: hidden;
 }
 
@@ -100,7 +203,7 @@ body {
   aspect-ratio: 1 / 1;
   margin: auto;
   border-radius: 50%;
-  background: #111827;
+  background: #c67139;
 }
 
 @keyframes die-drift {

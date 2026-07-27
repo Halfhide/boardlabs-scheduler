@@ -71,16 +71,16 @@ function GameVoting({ games, voterId, voterName, voterUid, isCreator, closed, on
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
+    <div className="bg-surface rounded-lg shadow-md p-4 sm:p-6">
       <div className="flex items-center justify-between mb-1">
-        <h3 className="text-base font-bold text-gray-900">
+        <h3 className="text-base font-bold text-ink">
           {t('whatShallWePlay')}
         </h3>
-        <p className="text-xs text-gray-600">
+        <p className="text-xs text-neutral-700">
           {t('suggestions', { count: games.length })}
         </p>
       </div>
-      <p className="text-xs text-gray-400 mb-3">
+      <p className="text-xs text-neutral-500 mb-3">
         {t('suggestHint')}
       </p>
 
@@ -97,17 +97,17 @@ function GameVoting({ games, voterId, voterName, voterUid, isCreator, closed, on
               <li
                 key={game.id}
                 className={`flex items-center gap-3 rounded-md border p-2.5 ${
-                  isLeading ? 'border-green-400 bg-green-50' : 'border-gray-200'
+                  isLeading ? 'border-sage-500 bg-sage-100' : 'border-neutral-300'
                 }`}
               >
                 <button
                   onClick={() => run(() => onToggleGameVote(game.id))}
                   disabled={busy || closed || !voterName}
                   title={youVoted ? t('removeGameVote') : t('voteForGame')}
-                  className={`flex-shrink-0 inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                  className={`flex-shrink-0 inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                     youVoted
-                      ? 'bg-blue-600 text-white hover:bg-blue-700'
-                      : 'bg-gray-100 text-gray-700 hover:bg-blue-100'
+                      ? 'bg-terra text-ground hover:bg-terra-600'
+                      : 'bg-ink/5 text-neutral-800 hover:bg-terra-100'
                   }`}
                 >
                   👍 {game.votes.length}
@@ -120,22 +120,22 @@ function GameVoting({ games, voterId, voterName, voterUid, isCreator, closed, on
                         href={game.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm font-medium text-blue-700 hover:underline truncate"
+                        className="text-sm font-medium text-terra-700 hover:underline truncate"
                       >
                         {game.title}
                       </a>
                     ) : (
-                      <span className="text-sm font-medium text-gray-900 truncate">
+                      <span className="text-sm font-medium text-ink truncate">
                         {game.title}
                       </span>
                     )}
                     {isLeading && (
-                      <span className="flex-shrink-0 text-[10px] font-bold uppercase bg-green-600 text-white px-1.5 py-0.5 rounded-full">
+                      <span className="flex-shrink-0 text-[10px] font-bold uppercase bg-sage-600 text-ground px-1.5 py-0.5 rounded-full">
                         {t('leadingBadge')}
                       </span>
                     )}
                   </div>
-                  <p className="text-xs text-gray-500 truncate">
+                  <p className="text-xs text-neutral-600 truncate">
                     {t('suggestedBy', { name: game.suggestedBy })}
                     {game.votes.length > 0 &&
                       ` · ${game.votes.map((v) => v.voterName).join(', ')}`}
@@ -148,8 +148,8 @@ function GameVoting({ games, voterId, voterName, voterUid, isCreator, closed, on
                     disabled={busy}
                     className={`flex-shrink-0 text-xs font-medium disabled:opacity-50 ${
                       confirmingRemoveId === game.id
-                        ? 'text-white bg-red-600 hover:bg-red-700 px-2 py-1 rounded'
-                        : 'text-gray-400 hover:text-red-600'
+                        ? 'text-ground bg-danger-600 hover:bg-danger-700 px-2 py-1 rounded-full'
+                        : 'text-neutral-500 hover:text-danger-600'
                     }`}
                   >
                     {confirmingRemoveId === game.id ? t('confirmRemove') : '×'}
@@ -163,7 +163,7 @@ function GameVoting({ games, voterId, voterName, voterUid, isCreator, closed, on
 
       {/* Suggest form */}
       {closed ? (
-        <p className="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-md p-3">
+        <p className="text-sm text-neutral-800 bg-neutral-200 border border-neutral-400 rounded-md p-3">
           {t('gamesLocked')}
         </p>
       ) : voterName ? (
@@ -179,24 +179,24 @@ function GameVoting({ games, voterId, voterName, voterUid, isCreator, closed, on
             value={url}
             onChange={(e) => setUrl(e.target.value)}
             placeholder={t('linkPlaceholder')}
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="flex-1 px-4 py-2 border border-neutral-400 rounded-full text-sm focus:ring-2 focus:ring-terra focus:border-transparent"
             disabled={busy}
           />
           <button
             type="submit"
             disabled={busy || !title.trim()}
-            className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="px-4 py-2 bg-terra text-ground text-sm font-medium rounded-full hover:bg-terra-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {t('suggestButton')}
           </button>
         </form>
       ) : (
-        <p className="text-xs text-gray-500 italic">
+        <p className="text-xs text-neutral-600 italic">
           {t('enterNameForGames')}
         </p>
       )}
 
-      {error && <p className="mt-2 text-xs text-red-600 font-medium">{error}</p>}
+      {error && <p className="mt-2 text-xs text-danger-600 font-medium">{error}</p>}
 
       {/* Required by BGG's API terms for public-facing apps */}
       <div className="mt-4 flex justify-end">

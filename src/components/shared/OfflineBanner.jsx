@@ -22,7 +22,7 @@ function OfflineBanner() {
   if (online) return null;
 
   return (
-    <div className="bg-amber-500 text-white text-sm font-medium text-center px-4 py-2">
+    <div className="bg-gold-500 text-ink text-sm font-medium text-center px-4 py-2">
       📡 {t('offlineNotice')}
     </div>
   );

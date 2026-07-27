@@ -6,14 +6,14 @@ import { useTranslation } from '../../i18n/useTranslation';
 // Heatmap shading for group mode, from "few can attend" to "most can
 // attend" (static class strings so Tailwind generates them)
 const HEAT_BUCKETS = [
-  'bg-green-100 border-green-300 text-green-900',
-  'bg-green-200 border-green-400 text-green-900',
-  'bg-green-300 border-green-500 text-green-900',
-  'bg-green-400 border-green-600 text-white',
-  'bg-green-600 border-green-700 text-white'
+  'bg-sage-100 border-sage-300 text-sage-900',
+  'bg-sage-200 border-sage-400 text-sage-900',
+  'bg-sage-300 border-sage-500 text-sage-900',
+  'bg-sage-400 border-sage-600 text-ground',
+  'bg-sage-600 border-sage-700 text-ground'
 ];
 
-const HEAT_ZERO = 'bg-red-100 border-red-300 text-red-900';
+const HEAT_ZERO = 'bg-danger-100 border-danger-300 text-danger-800';
 
 function MonthCalendar({ monthDate, dates, voterId, voterName, voterUid, finalizedDateId, mode, totalVoters, onDateClick }) {
   const { t, dateLocale } = useTranslation();
@@ -53,14 +53,14 @@ function MonthCalendar({ monthDate, dates, voterId, voterName, voterUid, finaliz
   return (
     <div className="flex-1">
       {/* Month Header */}
-      <h4 className="text-center font-bold text-gray-900 mb-2 text-sm">
+      <h4 className="text-center font-bold text-ink mb-2 text-sm">
         {format(monthDate, t('monthHeaderFormat'), { locale: dateLocale })}
       </h4>
 
       {/* Week day headers */}
       <div className="grid grid-cols-7 mb-1">
         {weekDays.map((day, index) => (
-          <div key={index} className="text-center text-xs font-semibold text-gray-500 py-1">
+          <div key={index} className="text-center text-xs font-semibold text-neutral-600 py-1">
             {day}
           </div>
         ))}
@@ -80,9 +80,9 @@ function MonthCalendar({ monthDate, dates, voterId, voterName, voterUid, finaliz
           const votes = pollDateData ? getDateVotes(day) : null;
           const userVote = getUserVote(day);
 
-          let bgColor = 'bg-white';
-          let borderColor = 'border-gray-200';
-          let textColor = isInCurrentMonth ? 'text-gray-900' : 'text-gray-300';
+          let bgColor = 'bg-surface';
+          let borderColor = 'border-neutral-300';
+          let textColor = isInCurrentMonth ? 'text-ink' : 'text-neutral-400';
           let hoverEffect = '';
 
           const totalDateVotes = votes ? votes.yes + votes.maybe + votes.no : 0;
@@ -92,15 +92,15 @@ function MonthCalendar({ monthDate, dates, voterId, voterName, voterUid, finaliz
 
             // The chosen date outshines everything else
             if (pollDateData.id === finalizedDateId) {
-              bgColor = 'bg-green-600 ring-2 ring-green-400 ring-offset-1';
-              textColor = 'text-white';
-              borderColor = 'border-green-700';
+              bgColor = 'bg-sage-600 ring-2 ring-sage-400 ring-offset-1';
+              textColor = 'text-ground';
+              borderColor = 'border-sage-700';
             } else if (mode === 'group') {
               // Heatmap: shade by attendance score (yes 1, maybe 0.5)
               if (totalDateVotes === 0 || totalVoters === 0) {
-                bgColor = 'bg-blue-100';
-                borderColor = 'border-blue-400 border-2';
-                textColor = 'text-blue-900';
+                bgColor = 'bg-terra-100';
+                borderColor = 'border-terra-400 border-2';
+                textColor = 'text-terra-900';
               } else {
                 const score = votes.yes + votes.maybe * 0.5;
                 if (score === 0) {
@@ -114,21 +114,21 @@ function MonthCalendar({ monthDate, dates, voterId, voterName, voterUid, finaliz
                 }
               }
             } else if (userVote === 'yes') {
-              bgColor = 'bg-green-500';
-              textColor = 'text-white';
-              borderColor = 'border-green-600';
+              bgColor = 'bg-sage-500';
+              textColor = 'text-ground';
+              borderColor = 'border-sage-600';
             } else if (userVote === 'maybe') {
-              bgColor = 'bg-yellow-400';
-              textColor = 'text-white';
-              borderColor = 'border-yellow-500';
+              bgColor = 'bg-gold-500';
+              textColor = 'text-ink';
+              borderColor = 'border-gold-600';
             } else if (userVote === 'no') {
-              bgColor = 'bg-red-500';
-              textColor = 'text-white';
-              borderColor = 'border-red-600';
+              bgColor = 'bg-danger';
+              textColor = 'text-ground';
+              borderColor = 'border-danger-600';
             } else {
-              bgColor = 'bg-blue-100';
-              borderColor = 'border-blue-400 border-2';
-              textColor = 'text-blue-900';
+              bgColor = 'bg-terra-100';
+              borderColor = 'border-terra-400 border-2';
+              textColor = 'text-terra-900';
             }
           }
 
@@ -151,7 +151,7 @@ function MonthCalendar({ monthDate, dates, voterId, voterName, voterUid, finaliz
                 )}
 
                 {mode === 'mine' && pollDateData && totalDateVotes > 0 && !userVote && (
-                  <div className="absolute bottom-0 right-0 w-1.5 h-1.5 bg-blue-600 rounded-full"></div>
+                  <div className="absolute bottom-0 right-0 w-1.5 h-1.5 bg-terra rounded-full"></div>
                 )}
               </div>
             </button>
@@ -187,12 +187,12 @@ function Calendar({ dates, voterId, voterName, voterUid, closed, finalizedDateId
 
   const modeButton = (value) =>
     mode === value
-      ? 'bg-blue-600 text-white'
-      : 'bg-white text-gray-600 hover:bg-gray-100';
+      ? 'bg-terra text-ground'
+      : 'bg-surface text-neutral-700 hover:bg-ink/5';
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <h3 className="text-lg font-bold text-gray-900 mb-4 text-center">
+    <div className="bg-surface rounded-lg shadow-md p-6">
+      <h3 className="text-lg font-bold text-ink mb-4 text-center">
         {closed
           ? t('closedClickDetails')
           : t('clickToVote')}
@@ -200,7 +200,7 @@ function Calendar({ dates, voterId, voterName, voterUid, closed, finalizedDateId
 
       {/* View mode toggle */}
       <div className="flex justify-center mb-4">
-        <div className="inline-flex rounded-md border border-gray-300 overflow-hidden text-sm font-medium">
+        <div className="inline-flex rounded-full border border-neutral-400 overflow-hidden text-sm font-medium">
           <button
             onClick={() => setMode('mine')}
             className={`px-4 py-1.5 transition-colors ${modeButton('mine')}`}
@@ -209,7 +209,7 @@ function Calendar({ dates, voterId, voterName, voterUid, closed, finalizedDateId
           </button>
           <button
             onClick={() => setMode('group')}
-            className={`px-4 py-1.5 border-l border-gray-300 transition-colors ${modeButton('group')}`}
+            className={`px-4 py-1.5 border-l border-neutral-400 transition-colors ${modeButton('group')}`}
           >
             {t('groupAvailability')}
           </button>
@@ -218,53 +218,53 @@ function Calendar({ dates, voterId, voterName, voterUid, closed, finalizedDateId
 
       {/* Legend */}
       {mode === 'group' ? (
-        <div className="flex gap-3 mb-6 text-xs text-gray-600 flex-wrap justify-center items-center">
+        <div className="flex gap-3 mb-6 text-xs text-neutral-700 flex-wrap justify-center items-center">
           {finalizedDateId && (
             <div className="flex items-center gap-1">
-              <div className="w-5 h-5 bg-green-600 border border-green-700 ring-2 ring-green-400 rounded-sm"></div>
+              <div className="w-5 h-5 bg-sage-600 border border-sage-700 ring-2 ring-sage-400 rounded-sm"></div>
               <span className="font-semibold">{t('chosenDate')}</span>
             </div>
           )}
           <div className="flex items-center gap-1">
             <span>{t('fewer')}</span>
-            <div className="w-4 h-4 bg-green-100 border border-green-300 rounded-sm"></div>
-            <div className="w-4 h-4 bg-green-200 border border-green-400 rounded-sm"></div>
-            <div className="w-4 h-4 bg-green-300 border border-green-500 rounded-sm"></div>
-            <div className="w-4 h-4 bg-green-400 border border-green-600 rounded-sm"></div>
-            <div className="w-4 h-4 bg-green-600 border border-green-700 rounded-sm"></div>
+            <div className="w-4 h-4 bg-sage-100 border border-sage-300 rounded-sm"></div>
+            <div className="w-4 h-4 bg-sage-200 border border-sage-400 rounded-sm"></div>
+            <div className="w-4 h-4 bg-sage-300 border border-sage-500 rounded-sm"></div>
+            <div className="w-4 h-4 bg-sage-400 border border-sage-600 rounded-sm"></div>
+            <div className="w-4 h-4 bg-sage-600 border border-sage-700 rounded-sm"></div>
             <span>{t('moreCanAttend')}</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-5 h-5 bg-red-100 border border-red-300 rounded-sm"></div>
+            <div className="w-5 h-5 bg-danger-100 border border-danger-300 rounded-sm"></div>
             <span>{t('nobodyCan')}</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-5 h-5 bg-blue-100 border-2 border-blue-400 rounded-sm"></div>
+            <div className="w-5 h-5 bg-terra-100 border-2 border-terra-400 rounded-sm"></div>
             <span>{t('noVotesYet')}</span>
           </div>
         </div>
       ) : (
-        <div className="flex gap-3 mb-6 text-xs text-gray-600 flex-wrap justify-center">
+        <div className="flex gap-3 mb-6 text-xs text-neutral-700 flex-wrap justify-center">
           {finalizedDateId && (
             <div className="flex items-center gap-1">
-              <div className="w-5 h-5 bg-green-600 border border-green-700 ring-2 ring-green-400 rounded-sm"></div>
+              <div className="w-5 h-5 bg-sage-600 border border-sage-700 ring-2 ring-sage-400 rounded-sm"></div>
               <span className="font-semibold">{t('chosenDate')}</span>
             </div>
           )}
           <div className="flex items-center gap-1">
-            <div className="w-5 h-5 bg-blue-100 border-2 border-blue-400 rounded-sm"></div>
+            <div className="w-5 h-5 bg-terra-100 border-2 border-terra-400 rounded-sm"></div>
             <span>{t('availableLegend')}</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-5 h-5 bg-green-500 border border-green-600 rounded-sm"></div>
+            <div className="w-5 h-5 bg-sage-500 border border-sage-600 rounded-sm"></div>
             <span>{t('yes')}</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-5 h-5 bg-yellow-400 border border-yellow-500 rounded-sm"></div>
+            <div className="w-5 h-5 bg-gold-500 border border-gold-600 rounded-sm"></div>
             <span>{t('maybe')}</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-5 h-5 bg-red-500 border border-red-600 rounded-sm"></div>
+            <div className="w-5 h-5 bg-danger border border-danger-600 rounded-sm"></div>
             <span>{t('no')}</span>
           </div>
         </div>

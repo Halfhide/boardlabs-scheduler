@@ -154,15 +154,15 @@ function CreatePoll() {
 
   return (
     <>
-    <div className="bg-white rounded-lg shadow-md p-6 max-w-2xl mx-auto">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">
+    <div className="bg-surface rounded-lg shadow-md p-6 max-w-2xl mx-auto">
+      <h2 className="text-2xl font-bold text-ink mb-6">
         {t('createTitle')}
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Title Input */}
         <div>
-          <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="title" className="block text-sm font-medium text-neutral-800 mb-2">
             {t('pollTitleLabel')}
           </label>
           <input
@@ -172,7 +172,7 @@ function CreatePoll() {
             onChange={(e) => setTitle(e.target.value)}
             placeholder={t('pollTitlePlaceholder')}
             maxLength={100}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 border border-neutral-400 rounded-full focus:ring-2 focus:ring-terra focus:border-transparent"
             disabled={loading}
           />
         </div>
@@ -180,7 +180,7 @@ function CreatePoll() {
         {/* Date Range */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="startDate" className="block text-sm font-medium text-neutral-800 mb-2">
               {t('startDate')}
             </label>
             <input
@@ -188,13 +188,13 @@ function CreatePoll() {
               id="startDate"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-neutral-400 rounded-full focus:ring-2 focus:ring-terra focus:border-transparent"
               disabled={loading}
             />
           </div>
 
           <div>
-            <label htmlFor="endDate" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="endDate" className="block text-sm font-medium text-neutral-800 mb-2">
               {t('endDate')}
             </label>
             <input
@@ -203,7 +203,7 @@ function CreatePoll() {
               value={endDate}
               min={startDate || undefined}
               onChange={(e) => setEndDate(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-neutral-400 rounded-full focus:ring-2 focus:ring-terra focus:border-transparent"
               disabled={loading}
             />
           </div>
@@ -211,18 +211,18 @@ function CreatePoll() {
 
         {/* Optional Voting Deadline */}
         <div>
-          <label htmlFor="deadline" className="block text-sm font-medium text-gray-700 mb-2">
-            {t('votingDeadlineLabel')} <span className="text-gray-400 font-normal">{t('optional')}</span>
+          <label htmlFor="deadline" className="block text-sm font-medium text-neutral-800 mb-2">
+            {t('votingDeadlineLabel')} <span className="text-neutral-500 font-normal">{t('optional')}</span>
           </label>
           <input
             type="datetime-local"
             id="deadline"
             value={deadline}
             onChange={(e) => setDeadline(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 border border-neutral-400 rounded-full focus:ring-2 focus:ring-terra focus:border-transparent"
             disabled={loading}
           />
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="mt-1 text-xs text-neutral-600">
             {t('deadlineHelp')}
           </p>
         </div>
@@ -230,8 +230,8 @@ function CreatePoll() {
         {/* Optional Player Capacity */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label htmlFor="minPlayers" className="block text-sm font-medium text-gray-700 mb-2">
-              {t('minPlayersLabel')} <span className="text-gray-400 font-normal">{t('optional')}</span>
+            <label htmlFor="minPlayers" className="block text-sm font-medium text-neutral-800 mb-2">
+              {t('minPlayersLabel')} <span className="text-neutral-500 font-normal">{t('optional')}</span>
             </label>
             <input
               type="number"
@@ -241,13 +241,13 @@ function CreatePoll() {
               value={minPlayers}
               onChange={(e) => setMinPlayers(e.target.value)}
               placeholder={t('minPlayersPlaceholder')}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-neutral-400 rounded-full focus:ring-2 focus:ring-terra focus:border-transparent"
               disabled={loading}
             />
           </div>
           <div>
-            <label htmlFor="maxPlayers" className="block text-sm font-medium text-gray-700 mb-2">
-              {t('maxPlayersLabel')} <span className="text-gray-400 font-normal">{t('optional')}</span>
+            <label htmlFor="maxPlayers" className="block text-sm font-medium text-neutral-800 mb-2">
+              {t('maxPlayersLabel')} <span className="text-neutral-500 font-normal">{t('optional')}</span>
             </label>
             <input
               type="number"
@@ -257,18 +257,18 @@ function CreatePoll() {
               value={maxPlayers}
               onChange={(e) => setMaxPlayers(e.target.value)}
               placeholder={t('maxPlayersPlaceholder')}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-neutral-400 rounded-full focus:ring-2 focus:ring-terra focus:border-transparent"
               disabled={loading}
             />
           </div>
         </div>
-        <p className="-mt-4 text-xs text-gray-500">
+        <p className="-mt-4 text-xs text-neutral-600">
           {t('capacityHelp')}
         </p>
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
+          <div className="bg-danger-100 border border-danger-200 text-danger-700 px-4 py-3 rounded-md">
             {error}
           </div>
         )}
@@ -277,16 +277,16 @@ function CreatePoll() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-blue-600 text-white font-medium py-3 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="w-full bg-terra text-ground font-medium py-3 px-4 rounded-full hover:bg-terra-600 focus:outline-none focus:ring-2 focus:ring-terra focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {loading ? t('creatingPoll') : t('createPoll')}
         </button>
       </form>
 
       {/* Instructions */}
-      <div className="mt-6 p-4 bg-blue-50 rounded-md">
-        <h3 className="text-sm font-medium text-blue-900 mb-2">{t('howItWorks')}</h3>
-        <ul className="text-sm text-blue-700 space-y-1 list-disc list-inside">
+      <div className="mt-6 p-4 bg-terra-100 rounded-md">
+        <h3 className="text-sm font-medium text-terra-900 mb-2">{t('howItWorks')}</h3>
+        <ul className="text-sm text-terra-700 space-y-1 list-disc list-inside">
           <li>{t('howItWorks1')}</li>
           <li>{t('howItWorks2')}</li>
           <li>{t('howItWorks3')}</li>

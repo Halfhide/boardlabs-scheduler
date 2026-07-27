@@ -2,16 +2,16 @@ import { groupVotesByResponse, isVoteByVoter } from '../../utils/pollHelpers';
 import { useTranslation } from '../../i18n/useTranslation';
 
 const RESPONSE_META = [
-  { key: 'yes', labelKey: 'voteYes', badge: 'bg-green-100 text-green-800' },
-  { key: 'maybe', labelKey: 'voteMaybe', badge: 'bg-yellow-100 text-yellow-800' },
-  { key: 'no', labelKey: 'voteNo', badge: 'bg-red-100 text-red-800' }
+  { key: 'yes', labelKey: 'voteYes', badge: 'bg-sage-200 text-sage-800' },
+  { key: 'maybe', labelKey: 'voteMaybe', badge: 'bg-gold-100 text-gold-900' },
+  { key: 'no', labelKey: 'voteNo', badge: 'bg-danger-100 text-danger-800' }
 ];
 
 function VoterBreakdown({ votes, voterId, voterName, voterUid }) {
   const { t } = useTranslation();
   if (votes.length === 0) {
     return (
-      <p className="text-sm text-gray-500 italic">
+      <p className="text-sm text-neutral-600 italic">
         {t('noVotesBeFirst')}
       </p>
     );
@@ -38,8 +38,8 @@ function VoterBreakdown({ votes, voterId, voterName, voterUid }) {
                     key={vote.id}
                     className={`text-xs px-2 py-0.5 rounded-full ${
                       isYou
-                        ? 'bg-blue-100 text-blue-900 font-semibold ring-1 ring-blue-300'
-                        : 'bg-gray-100 text-gray-700'
+                        ? 'bg-terra-100 text-terra-900 font-semibold ring-1 ring-terra-300'
+                        : 'bg-neutral-200 text-neutral-800'
                     }`}
                   >
                     {vote.voterName}

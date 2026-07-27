@@ -81,9 +81,9 @@ function AdminBar({
   const hasCapacity = poll.minPlayers != null || poll.maxPlayers != null;
 
   return (
-    <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4 space-y-3">
+    <div className="bg-sage-100 border border-sage-300 rounded-lg p-4 space-y-3">
       <div className="flex items-center justify-between gap-3">
-        <h3 className="text-sm font-bold text-indigo-900">
+        <h3 className="text-sm font-bold text-sage-900">
           {t('creatorTools')}
         </h3>
         {!finalizedDate && (
@@ -92,10 +92,10 @@ function AdminBar({
               run(onToggleClosed, poll.closed ? t('votingReopenedNotice') : t('votingClosedNotice'))
             }
             disabled={busy}
-            className={`text-sm font-medium px-3 py-1.5 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+            className={`text-sm font-medium px-3 py-1.5 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
               poll.closed
-                ? 'bg-green-600 text-white hover:bg-green-700'
-                : 'bg-amber-500 text-white hover:bg-amber-600'
+                ? 'bg-sage-600 text-ground hover:bg-sage-700'
+                : 'bg-gold-500 text-ink hover:bg-gold-600'
             }`}
           >
             {poll.closed ? t('reopenVoting') : t('closeVoting')}
@@ -105,8 +105,8 @@ function AdminBar({
 
       {/* Finalized status */}
       {finalizedDate && (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-green-100 border border-green-300 rounded-md px-3 py-2">
-          <p className="text-xs text-green-900 font-medium">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-sage-200 border border-sage-400 rounded-md px-3 py-2">
+          <p className="text-xs text-sage-900 font-medium">
             {t('finalizedStatus', {
               date: format(parseISO(finalizedDate.date), t('finalizedDateFormat'), { locale: dateLocale })
             })}
@@ -114,7 +114,7 @@ function AdminBar({
           <button
             onClick={() => run(onUnfinalize, t('pollReopenedNotice'))}
             disabled={busy}
-            className="text-xs font-medium px-3 py-1.5 rounded-md border border-green-400 text-green-800 hover:bg-green-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
+            className="text-xs font-medium px-3 py-1.5 rounded-full border border-sage-500 text-sage-800 hover:bg-sage-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
           >
             {t('unfinalizeReopen')}
           </button>
@@ -123,7 +123,7 @@ function AdminBar({
 
       {/* Rename */}
       <div>
-        <label htmlFor="admin-title" className="block text-xs font-medium text-indigo-900 mb-1">
+        <label htmlFor="admin-title" className="block text-xs font-medium text-sage-900 mb-1">
           {t('pollTitleLabel')}
         </label>
         <div className="flex flex-col sm:flex-row gap-2">
@@ -133,13 +133,13 @@ function AdminBar({
             value={titleDraft}
             onChange={(e) => setTitleDraft(e.target.value)}
             maxLength={100}
-            className="flex-1 px-3 py-2 border border-indigo-200 rounded-md text-sm bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            className="flex-1 px-4 py-2 border border-sage-300 rounded-full text-sm bg-surface focus:ring-2 focus:ring-terra focus:border-transparent"
             disabled={busy}
           />
           <button
             onClick={() => run(() => onRename(trimmedDraft), t('titleUpdatedNotice'))}
             disabled={busy || !trimmedDraft || trimmedDraft === poll.title}
-            className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="px-4 py-2 bg-sage-600 text-ground text-sm font-medium rounded-full hover:bg-sage-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {t('renameButton')}
           </button>
@@ -148,7 +148,7 @@ function AdminBar({
 
       {/* Add a date option */}
       <div>
-        <label htmlFor="admin-new-date" className="block text-xs font-medium text-indigo-900 mb-1">
+        <label htmlFor="admin-new-date" className="block text-xs font-medium text-sage-900 mb-1">
           {t('addDateLabel')}
         </label>
         <div className="flex flex-col sm:flex-row gap-2">
@@ -157,7 +157,7 @@ function AdminBar({
             id="admin-new-date"
             value={newDate}
             onChange={(e) => setNewDate(e.target.value)}
-            className="flex-1 px-3 py-2 border border-indigo-200 rounded-md text-sm bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            className="flex-1 px-4 py-2 border border-sage-300 rounded-full text-sm bg-surface focus:ring-2 focus:ring-terra focus:border-transparent"
             disabled={busy}
           />
           <button
@@ -168,19 +168,19 @@ function AdminBar({
               }, t('dateAddedNotice'))
             }
             disabled={busy || !newDate}
-            className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="px-4 py-2 bg-sage-600 text-ground text-sm font-medium rounded-full hover:bg-sage-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {t('addDateButton')}
           </button>
         </div>
-        <p className="mt-1 text-xs text-indigo-700">
+        <p className="mt-1 text-xs text-sage-800">
           {t('removeDateHint', { button: t('removeDateButton') })}
         </p>
       </div>
 
       {/* Voting deadline */}
       <div>
-        <label htmlFor="admin-deadline" className="block text-xs font-medium text-indigo-900 mb-1">
+        <label htmlFor="admin-deadline" className="block text-xs font-medium text-sage-900 mb-1">
           {t('deadlineLabel')}
         </label>
         <div className="flex flex-col sm:flex-row gap-2">
@@ -189,13 +189,13 @@ function AdminBar({
             id="admin-deadline"
             value={deadlineDraft}
             onChange={(e) => setDeadlineDraft(e.target.value)}
-            className="flex-1 px-3 py-2 border border-indigo-200 rounded-md text-sm bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            className="flex-1 px-4 py-2 border border-sage-300 rounded-full text-sm bg-surface focus:ring-2 focus:ring-terra focus:border-transparent"
             disabled={busy}
           />
           <button
             onClick={handleSetDeadline}
             disabled={busy || !deadlineDraft}
-            className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="px-4 py-2 bg-sage-600 text-ground text-sm font-medium rounded-full hover:bg-sage-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {t('setDeadline')}
           </button>
@@ -203,13 +203,13 @@ function AdminBar({
             <button
               onClick={handleClearDeadline}
               disabled={busy}
-              className="px-4 py-2 border border-indigo-300 text-indigo-700 text-sm font-medium rounded-md hover:bg-indigo-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-4 py-2 border border-sage-400 text-sage-800 text-sm font-medium rounded-full hover:bg-sage-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {t('removeDeadline')}
             </button>
           )}
         </div>
-        <p className="mt-1 text-xs text-indigo-700">
+        <p className="mt-1 text-xs text-sage-800">
           {deadlineDate
             ? deadlinePassed
               ? t('deadlinePassedHint', {
@@ -224,7 +224,7 @@ function AdminBar({
 
       {/* Player capacity */}
       <div>
-        <label htmlFor="admin-min-players" className="block text-xs font-medium text-indigo-900 mb-1">
+        <label htmlFor="admin-min-players" className="block text-xs font-medium text-sage-900 mb-1">
           {t('capacityLabel')}
         </label>
         <div className="flex flex-col sm:flex-row gap-2">
@@ -237,7 +237,7 @@ function AdminBar({
             onChange={(e) => setMinDraft(e.target.value)}
             placeholder={t('minPlaceholder')}
             aria-label={t('minPlayersAria')}
-            className="w-full sm:w-24 px-3 py-2 border border-indigo-200 rounded-md text-sm bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            className="w-full sm:w-24 px-4 py-2 border border-sage-300 rounded-full text-sm bg-surface focus:ring-2 focus:ring-terra focus:border-transparent"
             disabled={busy}
           />
           <input
@@ -249,13 +249,13 @@ function AdminBar({
             onChange={(e) => setMaxDraft(e.target.value)}
             placeholder={t('maxPlaceholder')}
             aria-label={t('maxPlayersAria')}
-            className="w-full sm:w-24 px-3 py-2 border border-indigo-200 rounded-md text-sm bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            className="w-full sm:w-24 px-4 py-2 border border-sage-300 rounded-full text-sm bg-surface focus:ring-2 focus:ring-terra focus:border-transparent"
             disabled={busy}
           />
           <button
             onClick={handleSaveCapacity}
             disabled={busy || (minDraft === '' && maxDraft === '')}
-            className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="px-4 py-2 bg-sage-600 text-ground text-sm font-medium rounded-full hover:bg-sage-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {t('saveCapacity')}
           </button>
@@ -263,13 +263,13 @@ function AdminBar({
             <button
               onClick={handleClearCapacity}
               disabled={busy}
-              className="px-4 py-2 border border-indigo-300 text-indigo-700 text-sm font-medium rounded-md hover:bg-indigo-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-4 py-2 border border-sage-400 text-sage-800 text-sm font-medium rounded-full hover:bg-sage-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {t('removeCapacity')}
             </button>
           )}
         </div>
-        <p className="mt-1 text-xs text-indigo-700">
+        <p className="mt-1 text-xs text-sage-800">
           {hasCapacity
             ? t('capacityCurrent', {
                 min: poll.minPlayers ?? t('noBound'),
@@ -280,7 +280,7 @@ function AdminBar({
       </div>
 
       {/* Danger zone: permanent deletion (signed-in owner only) */}
-      <div className="pt-3 border-t border-indigo-200">
+      <div className="pt-3 border-t border-sage-300">
         {canDelete ? (
           <div className="flex flex-col sm:flex-row sm:items-center gap-2">
             <button
@@ -292,10 +292,10 @@ function AdminBar({
                 run(onDelete);
               }}
               disabled={busy}
-              className={`text-sm font-medium px-4 py-2 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap ${
+              className={`text-sm font-medium px-4 py-2 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap ${
                 confirmDelete
-                  ? 'bg-red-600 text-white hover:bg-red-700'
-                  : 'border border-red-300 text-red-700 hover:bg-red-50'
+                  ? 'bg-danger-600 text-ground hover:bg-danger-700'
+                  : 'border border-danger-300 text-danger-700 hover:bg-danger-100'
               }`}
             >
               {busy && confirmDelete
@@ -304,15 +304,15 @@ function AdminBar({
                   ? t('confirmDeletePoll')
                   : t('deletePollButton')}
             </button>
-            <p className="text-xs text-indigo-700">{t('deletePollWarning')}</p>
+            <p className="text-xs text-sage-800">{t('deletePollWarning')}</p>
           </div>
         ) : (
-          <p className="text-xs text-indigo-700">{t('signInToDelete')}</p>
+          <p className="text-xs text-sage-800">{t('signInToDelete')}</p>
         )}
       </div>
 
-      {error && <p className="text-xs text-red-600 font-medium">{error}</p>}
-      {notice && <p className="text-xs text-green-700 font-medium">{notice}</p>}
+      {error && <p className="text-xs text-danger-600 font-medium">{error}</p>}
+      {notice && <p className="text-xs text-sage-800 font-medium">{notice}</p>}
     </div>
   );
 }

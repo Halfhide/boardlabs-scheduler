@@ -4,18 +4,18 @@ function VoteButton({ response, currentVote, onClick, loading }) {
   const { t } = useTranslation();
   const isSelected = currentVote === response;
 
-  const baseClasses = "flex-1 py-3 px-6 rounded-md font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 text-lg";
+  const baseClasses = "flex-1 py-3 px-6 rounded-full font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 text-lg";
 
   const variantClasses = {
     yes: isSelected
-      ? "bg-green-600 text-white hover:bg-green-700 focus:ring-green-500 shadow-lg scale-105"
-      : "bg-white text-green-700 border-2 border-green-300 hover:bg-green-50 hover:border-green-400 focus:ring-green-500",
+      ? "bg-sage-600 text-ground hover:bg-sage-700 focus:ring-sage-500 shadow-lg scale-105"
+      : "bg-surface text-sage-800 border-2 border-sage-400 hover:bg-sage-100 hover:border-sage-500 focus:ring-sage-500",
     maybe: isSelected
-      ? "bg-yellow-500 text-white hover:bg-yellow-600 focus:ring-yellow-500 shadow-lg scale-105"
-      : "bg-white text-yellow-700 border-2 border-yellow-300 hover:bg-yellow-50 hover:border-yellow-400 focus:ring-yellow-500",
+      ? "bg-gold-500 text-ink hover:bg-gold-600 focus:ring-gold-500 shadow-lg scale-105"
+      : "bg-surface text-gold-900 border-2 border-gold-300 hover:bg-gold-100 hover:border-gold-500 focus:ring-gold-500",
     no: isSelected
-      ? "bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 shadow-lg scale-105"
-      : "bg-white text-red-700 border-2 border-red-300 hover:bg-red-50 hover:border-red-400 focus:ring-red-500"
+      ? "bg-danger-600 text-ground hover:bg-danger-700 focus:ring-danger-500 shadow-lg scale-105"
+      : "bg-surface text-danger-700 border-2 border-danger-300 hover:bg-danger-100 hover:border-danger-500 focus:ring-danger-500"
   };
 
   const labels = {

@@ -16,8 +16,8 @@ function LanguageToggle() {
       aria-pressed={lang === value}
       className={`px-2.5 py-1 text-xs font-semibold transition-colors ${
         lang === value
-          ? 'bg-blue-600 text-white'
-          : 'bg-white text-gray-600 hover:bg-gray-100'
+          ? 'bg-terra text-ground'
+          : 'bg-surface text-neutral-700 hover:bg-ink/5'
       }`}
     >
       {label}
@@ -25,7 +25,7 @@ function LanguageToggle() {
   );
 
   return (
-    <div className="inline-flex rounded-md border border-gray-300 overflow-hidden">
+    <div className="inline-flex rounded-full border border-neutral-400 overflow-hidden">
       {button('en', 'EN')}
       {button('pl', 'PL')}
     </div>
@@ -37,11 +37,11 @@ function App() {
     <LanguageProvider>
       <AuthProvider>
       <Router>
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-ground">
           <OfflineBanner />
-          <header className="bg-white shadow-sm">
+          <header className="bg-surface shadow-sm">
             <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between gap-3">
-              <h1 className="text-2xl font-bold text-gray-900">
+              <h1 className="text-2xl font-bold text-ink">
                 Board Game Scheduler
               </h1>
               <div className="flex items-center gap-3 shrink-0">
