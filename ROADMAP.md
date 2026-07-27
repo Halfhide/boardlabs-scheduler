@@ -633,7 +633,7 @@ terracotta die with cream pips), manifest theme #c67139 on #f5ead8,
 fonts added to the SW precache (22 entries). Verified in the
 browser: home, poll page, calendar both modes, matrix, game voting,
 results, date modal, creator tools, EN and PL.
-RESOLVED (27 Jul 2026, done, commit pending): Caprasimo has NO
+RESOLVED (27 Jul 2026, done, commit 780c29d): Caprasimo has NO
 Polish diacritics (confirmed against both the fontsource build and
 Google's hosted copy), so with Adam's approval the heading face was
 swapped to Baloo 2 at weight 700, the closest Polish-capable match
