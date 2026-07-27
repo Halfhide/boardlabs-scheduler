@@ -642,6 +642,27 @@ verified present and headings render uniformly in both languages.
 The Claude Design "Organic" project still names Caprasimo; if the
 design system gets reused elsewhere, update it there too.
 
+Brand addendum (27 Jul 2026, commit pending): Adam exported the
+full brand doc to design-assets/MeppleTime Design System.html (the
+Claude Design UI renders brand assets on the fly; they are not
+files in the design project, hence the export). The product brand
+is MeppleTime: a split calendar tile (sage left = the calendar,
+terracotta right = the commitment, binder rings on top) with a
+cream meeple straddling the seam, wordmark always Caprasimo with
+Mepple in sage-700 and Time in terracotta-600. Implemented: the
+mark as a faithful SVG port (src/components/shared/Logo.jsx, rings
+auto-drop below 32px per the rules), header lockup replacing the
+text title, Caprasimo reinstated for the wordmark only (pure ASCII,
+so the Polish issue does not apply; UI headings stay Baloo 2),
+ringless-SVG favicon, PWA icons regenerated from the real mark, app
+renamed MeppleTime in index.html title/meta and the manifest.
+NOTE: the brand doc also contains component specs and two full
+product screens (sections 07-10) that diverge from the current app,
+including features rejected on 15 Jul 2026 (time slots) and
+unplanned ones (groups, nudges, auto-lock, batched voting). Not
+implemented; awaiting Adam's decision on whether deeper alignment
+becomes a new roadmap item.
+
 ## Rejected features (do not build unless Adam changes his mind)
 
 - Time slots (time-of-day options): rejected 15 Jul 2026.

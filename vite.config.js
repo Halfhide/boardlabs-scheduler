@@ -19,8 +19,8 @@ const pwaPlugin = VitePWA({
   registerType: 'autoUpdate',
   includeAssets: ['apple-touch-icon.png'],
   manifest: {
-    name: 'Board Game Scheduler',
-    short_name: 'Game Nights',
+    name: 'MeppleTime',
+    short_name: 'MeppleTime',
     description:
       'Create a poll, share the link, and find the best date for your next board game night.',
     theme_color: '#c67139',

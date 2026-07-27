@@ -6,6 +6,7 @@ import AuthProvider from './auth/AuthProvider';
 import { useTranslation } from './i18n/useTranslation';
 import OfflineBanner from './components/shared/OfflineBanner';
 import AccountMenu from './components/shared/AccountMenu';
+import Logo from './components/shared/Logo';
 
 function LanguageToggle() {
   const { lang, setLang } = useTranslation();
@@ -41,8 +42,8 @@ function App() {
           <OfflineBanner />
           <header className="bg-surface shadow-sm">
             <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between gap-3">
-              <h1 className="text-2xl font-bold text-ink">
-                Board Game Scheduler
+              <h1 className="leading-none">
+                <Logo />
               </h1>
               <div className="flex items-center gap-3 shrink-0">
                 <LanguageToggle />
