@@ -4,5 +4,11 @@
       "path": "/api/expire-polls",
       "schedule": "14 3 * * *"
     }
+  ],
+  "rewrites": [
+    {
+      "source": "/((?!api/).*)",
+      "destination": "/index.html"
+    }
   ]
 }
