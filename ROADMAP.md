@@ -40,7 +40,7 @@ features were proposed, 11 accepted, 4 rejected (see bottom).
 | 11b | Identity merge     | 5     | done        |
 | 11c | My polls sync      | 5     | done        |
 | 11d | Poll deletion      | 5     | done        |
-| 11e | Poll auto-expiry   | 5     | in progress |
+| 11e | Poll auto-expiry   | 5     | done        |
 | 11f | Rules + App Check  | 5     | not started |
 | 11g | Privacy note       | 5     | not started |
 | 13 | Design system align | 6     | done        |
@@ -562,7 +562,21 @@ gracefully.
 
 ### 11e. Poll auto-expiry
 
-Status: not started
+Status: done (28 Jul 2026, commit pending). api/expire-polls.js
+(Firebase Admin SDK, FIREBASE_SERVICE_ACCOUNT + CRON_SECRET Vercel
+env vars set by Adam) deletes polls whose latest offered date is
+older than EXPIRY_MONTHS (default 12, env-overridable); polls with
+unreadable dates are skipped, batches capped at Firestore's 500.
+vercel.json runs it daily at 03:14 UTC; Vercel sends the bearer
+secret automatically, everything else gets 401 (verified). Verified
+live end to end: a planted expired bait poll was deleted by a
+manually triggered run (scanned 41, deleted exactly 1), real polls
+untouched. Debugging note for posterity: a regenerated CRON_SECRET
+was saved with trailing whitespace, which makes every Vercel BUILD
+fail ("environment variable contains leading or trailing
+whitespace"), silently pinning production to the old deploy; the
+fix is a clean value plus redeploy. Deleted-poll list entries
+self-clean via the 11d dangling-entry cleanup.
 
 A Vercel cron (vercel.json) hits a serverless function using the
 Firebase Admin SDK to delete polls whose latest date is more than
@@ -813,3 +827,9 @@ account, then provide both links.
   feature 15 (donation links: Ko-fi on the English UI, buycoffee.to
   on the Polish UI). Launch order fixed as 11e -> 14 -> 11f -> 11g
   -> 15 -> public launch.
+- 28 Jul 2026: feature 11e (poll auto-expiry) implemented and
+  verified live (bait poll deleted by a manual cron-secret run,
+  real polls intact, unauthorized calls 401). Domain hooked up
+  early: app.meppletime.today and the apex both serve the app
+  (Adam added both to Firebase authorized domains); the apex
+  repoints to the landing in feature 14.

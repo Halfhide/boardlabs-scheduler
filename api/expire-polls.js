@@ -55,19 +55,7 @@ export default async function handler(req, res) {
     return;
   }
   if (req.headers.authorization !== `Bearer ${process.env.CRON_SECRET}`) {
-    // TEMPORARY diagnostic while debugging the secret mismatch:
-    // discloses lengths only, never values. Remove once 11e verifies.
-    const header = req.headers.authorization || '';
-    const received = header.startsWith('Bearer ') ? header.slice(7) : null;
-    send(401, {
-      error: 'Unauthorized',
-      debug: {
-        headerPresent: !!header,
-        bearerPrefix: header.startsWith('Bearer '),
-        receivedLength: received === null ? 0 : received.length,
-        expectedLength: process.env.CRON_SECRET.length
-      }
-    });
+    send(401, { error: 'Unauthorized' });
     return;
   }
 
