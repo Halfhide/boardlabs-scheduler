@@ -81,9 +81,9 @@ function AdminBar({
   const hasCapacity = poll.minPlayers != null || poll.maxPlayers != null;
 
   return (
-    <div className="bg-sage-100 border border-sage-300 rounded-lg p-4 space-y-3">
+    <div className="bg-surface border border-neutral-300 rounded-lg p-4 space-y-3">
       <div className="flex items-center justify-between gap-3">
-        <h3 className="text-sm font-bold text-sage-900">
+        <h3 className="text-sm font-bold text-ink">
           {t('creatorTools')}
         </h3>
         {!finalizedDate && (
@@ -105,7 +105,7 @@ function AdminBar({
 
       {/* Finalized status */}
       {finalizedDate && (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-sage-200 border border-sage-400 rounded-md px-3 py-2">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-sage-100 border border-sage-300 rounded-md px-3 py-2">
           <p className="text-xs text-sage-900 font-medium">
             {t('finalizedStatus', {
               date: format(parseISO(finalizedDate.date), t('finalizedDateFormat'), { locale: dateLocale })
@@ -123,7 +123,7 @@ function AdminBar({
 
       {/* Rename */}
       <div>
-        <label htmlFor="admin-title" className="block text-xs font-medium text-sage-900 mb-1">
+        <label htmlFor="admin-title" className="block text-xs font-medium text-neutral-800 mb-1">
           {t('pollTitleLabel')}
         </label>
         <div className="flex flex-col sm:flex-row gap-2">
@@ -133,7 +133,7 @@ function AdminBar({
             value={titleDraft}
             onChange={(e) => setTitleDraft(e.target.value)}
             maxLength={100}
-            className="flex-1 px-4 py-2 border border-sage-300 rounded-full text-sm bg-surface focus:ring-2 focus:ring-terra focus:border-transparent"
+            className="flex-1 px-4 py-2 border border-neutral-400 rounded-full text-sm bg-ground focus:ring-2 focus:ring-terra focus:border-transparent"
             disabled={busy}
           />
           <button
@@ -148,7 +148,7 @@ function AdminBar({
 
       {/* Add a date option */}
       <div>
-        <label htmlFor="admin-new-date" className="block text-xs font-medium text-sage-900 mb-1">
+        <label htmlFor="admin-new-date" className="block text-xs font-medium text-neutral-800 mb-1">
           {t('addDateLabel')}
         </label>
         <div className="flex flex-col sm:flex-row gap-2">
@@ -157,7 +157,7 @@ function AdminBar({
             id="admin-new-date"
             value={newDate}
             onChange={(e) => setNewDate(e.target.value)}
-            className="flex-1 px-4 py-2 border border-sage-300 rounded-full text-sm bg-surface focus:ring-2 focus:ring-terra focus:border-transparent"
+            className="flex-1 px-4 py-2 border border-neutral-400 rounded-full text-sm bg-ground focus:ring-2 focus:ring-terra focus:border-transparent"
             disabled={busy}
           />
           <button
@@ -173,14 +173,14 @@ function AdminBar({
             {t('addDateButton')}
           </button>
         </div>
-        <p className="mt-1 text-xs text-sage-800">
+        <p className="mt-1 text-xs text-neutral-700">
           {t('removeDateHint', { button: t('removeDateButton') })}
         </p>
       </div>
 
       {/* Voting deadline */}
       <div>
-        <label htmlFor="admin-deadline" className="block text-xs font-medium text-sage-900 mb-1">
+        <label htmlFor="admin-deadline" className="block text-xs font-medium text-neutral-800 mb-1">
           {t('deadlineLabel')}
         </label>
         <div className="flex flex-col sm:flex-row gap-2">
@@ -189,7 +189,7 @@ function AdminBar({
             id="admin-deadline"
             value={deadlineDraft}
             onChange={(e) => setDeadlineDraft(e.target.value)}
-            className="flex-1 px-4 py-2 border border-sage-300 rounded-full text-sm bg-surface focus:ring-2 focus:ring-terra focus:border-transparent"
+            className="flex-1 px-4 py-2 border border-neutral-400 rounded-full text-sm bg-ground focus:ring-2 focus:ring-terra focus:border-transparent"
             disabled={busy}
           />
           <button
@@ -203,13 +203,13 @@ function AdminBar({
             <button
               onClick={handleClearDeadline}
               disabled={busy}
-              className="px-4 py-2 border border-sage-400 text-sage-800 text-sm font-medium rounded-full hover:bg-sage-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-4 py-2 border border-neutral-400 text-neutral-800 text-sm font-medium rounded-full hover:bg-ink/5 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {t('removeDeadline')}
             </button>
           )}
         </div>
-        <p className="mt-1 text-xs text-sage-800">
+        <p className="mt-1 text-xs text-neutral-700">
           {deadlineDate
             ? deadlinePassed
               ? t('deadlinePassedHint', {
@@ -224,7 +224,7 @@ function AdminBar({
 
       {/* Player capacity */}
       <div>
-        <label htmlFor="admin-min-players" className="block text-xs font-medium text-sage-900 mb-1">
+        <label htmlFor="admin-min-players" className="block text-xs font-medium text-neutral-800 mb-1">
           {t('capacityLabel')}
         </label>
         <div className="flex flex-col sm:flex-row gap-2">
@@ -237,7 +237,7 @@ function AdminBar({
             onChange={(e) => setMinDraft(e.target.value)}
             placeholder={t('minPlaceholder')}
             aria-label={t('minPlayersAria')}
-            className="w-full sm:w-24 px-4 py-2 border border-sage-300 rounded-full text-sm bg-surface focus:ring-2 focus:ring-terra focus:border-transparent"
+            className="w-full sm:w-24 px-4 py-2 border border-neutral-400 rounded-full text-sm bg-ground focus:ring-2 focus:ring-terra focus:border-transparent"
             disabled={busy}
           />
           <input
@@ -249,7 +249,7 @@ function AdminBar({
             onChange={(e) => setMaxDraft(e.target.value)}
             placeholder={t('maxPlaceholder')}
             aria-label={t('maxPlayersAria')}
-            className="w-full sm:w-24 px-4 py-2 border border-sage-300 rounded-full text-sm bg-surface focus:ring-2 focus:ring-terra focus:border-transparent"
+            className="w-full sm:w-24 px-4 py-2 border border-neutral-400 rounded-full text-sm bg-ground focus:ring-2 focus:ring-terra focus:border-transparent"
             disabled={busy}
           />
           <button
@@ -263,13 +263,13 @@ function AdminBar({
             <button
               onClick={handleClearCapacity}
               disabled={busy}
-              className="px-4 py-2 border border-sage-400 text-sage-800 text-sm font-medium rounded-full hover:bg-sage-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-4 py-2 border border-neutral-400 text-neutral-800 text-sm font-medium rounded-full hover:bg-ink/5 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {t('removeCapacity')}
             </button>
           )}
         </div>
-        <p className="mt-1 text-xs text-sage-800">
+        <p className="mt-1 text-xs text-neutral-700">
           {hasCapacity
             ? t('capacityCurrent', {
                 min: poll.minPlayers ?? t('noBound'),
@@ -280,7 +280,7 @@ function AdminBar({
       </div>
 
       {/* Danger zone: permanent deletion (signed-in owner only) */}
-      <div className="pt-3 border-t border-sage-300">
+      <div className="pt-3 border-t border-neutral-300">
         {canDelete ? (
           <div className="flex flex-col sm:flex-row sm:items-center gap-2">
             <button
@@ -304,10 +304,10 @@ function AdminBar({
                   ? t('confirmDeletePoll')
                   : t('deletePollButton')}
             </button>
-            <p className="text-xs text-sage-800">{t('deletePollWarning')}</p>
+            <p className="text-xs text-neutral-700">{t('deletePollWarning')}</p>
           </div>
         ) : (
-          <p className="text-xs text-sage-800">{t('signInToDelete')}</p>
+          <p className="text-xs text-neutral-700">{t('signInToDelete')}</p>
         )}
       </div>
 
