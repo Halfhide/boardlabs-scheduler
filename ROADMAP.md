@@ -44,7 +44,7 @@ features were proposed, 11 accepted, 4 rejected (see bottom).
 | 11f | Rules + App Check  | 5     | not started |
 | 11g | Privacy note       | 5     | not started |
 | 13 | Design system align | 6     | done        |
-| 14 | Domain + landing    | 6     | not started |
+| 14 | Domain + landing    | 6     | in progress |
 | 15 | Donations           | 6     | not started |
 
 ## Phase 1: Poll lifecycle (foundations)
