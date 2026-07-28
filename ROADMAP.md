@@ -44,6 +44,8 @@ features were proposed, 11 accepted, 4 rejected (see bottom).
 | 11f | Rules + App Check  | 5     | not started |
 | 11g | Privacy note       | 5     | not started |
 | 13 | Design system align | 6     | done        |
+| 14 | Domain + landing    | 6     | not started |
+| 15 | Donations           | 6     | not started |
 
 ## Phase 1: Poll lifecycle (foundations)
 
@@ -663,6 +665,44 @@ unplanned ones (groups, nudges, auto-lock, batched voting). Not
 implemented; awaiting Adam's decision on whether deeper alignment
 becomes a new roadmap item.
 
+### 14. Domain move + landing page (added 28 Jul 2026)
+
+Status: not started (waiting for Adam to buy meppletime.today)
+
+Adam is buying meppletime.today. Target architecture: the apex (and
+www) serve a small static landing page presenting MeppleTime as a
+product; the app itself moves to app.meppletime.today as-is (own
+Vercel project, poll links become app.meppletime.today/poll/...).
+The landing is a separate tiny Vercel project built from the brand
+doc (design-assets/) and the Organic landing template: product
+pitch, screenshots, a big CTA into the app, marketing lockup rules
+per the brand doc (sage-only lockup on marketing bands).
+Sequencing: do this BEFORE 11f (App Check registers domains with
+reCAPTCHA) and before 11g (the privacy page should name the real
+domain). Recommended order: 11e -> 14 -> 11f -> 11g -> 15.
+MANUAL (Adam): buy the domain (Vercel Domains is the zero-config
+option; Porkbun or Cloudflare are the cheap ones, DNS-only mode on
+Cloudflare); then in Vercel assign meppletime.today + www to the
+landing project and app.meppletime.today to the app project; add
+app.meppletime.today to Firebase Auth authorized domains. The old
+boardlabs-scheduler.vercel.app URL keeps working for old links.
+
+### 15. Optional donations (added 28 Jul 2026)
+
+Status: not started
+
+Monetization stays donation-only and fully optional: no payments in
+the app itself, just links out to donation platforms, so no payment
+processing or consumer-law burden lands on the app. Pragmatic combo
+agreed with Adam: Ko-fi for the English UI, buycoffee.to for the
+Polish UI (BLIK matters for Polish donors); the i18n dictionary
+carries the per-language URL. Placement: a small "Support
+MeppleTime" link in the app footer (the footer arrives with 11g's
+privacy link; this rides along) and a support section on the
+landing page (feature 14). Ships last, right before launch.
+MANUAL (Adam): create the Ko-fi account and the buycoffee.to
+account, then provide both links.
+
 ## Rejected features (do not build unless Adam changes his mind)
 
 - Time slots (time-of-day options): rejected 15 Jul 2026.
@@ -768,3 +808,8 @@ becomes a new roadmap item.
   self-hosted fonts precached for offline. Heading font swapped
   Caprasimo -> Baloo 2 (Caprasimo lacks Polish diacritics), approved
   by Adam. Verified in the browser in both languages.
+- 28 Jul 2026: planned with Adam: feature 14 (meppletime.today
+  domain + landing page, app moves to app.meppletime.today) and
+  feature 15 (donation links: Ko-fi on the English UI, buycoffee.to
+  on the Polish UI). Launch order fixed as 11e -> 14 -> 11f -> 11g
+  -> 15 -> public launch.

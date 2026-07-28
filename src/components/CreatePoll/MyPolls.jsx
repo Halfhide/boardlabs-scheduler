@@ -54,11 +54,25 @@ function MyPolls() {
     return [...byId.values()].sort((a, b) => b.lastSeen - a.lastSeen);
   }, [localPolls, cloudById]);
 
+  // Removal is two-step so a stray click cannot silently lose the
+  // only pointer to a poll; the armed state disarms itself
+  const [confirmingId, setConfirmingId] = useState(null);
+  useEffect(() => {
+    if (!confirmingId) return;
+    const timer = setTimeout(() => setConfirmingId(null), 4000);
+    return () => clearTimeout(timer);
+  }, [confirmingId]);
+
   if (polls.length === 0) {
     return null;
   }
 
   const handleRemove = (id) => {
+    if (confirmingId !== id) {
+      setConfirmingId(id);
+      return;
+    }
+    setConfirmingId(null);
     forgetPoll(id);
     setLocalPolls(getMyPolls());
     if (uid) forgetPollForUser(uid, id);
@@ -91,14 +105,24 @@ function MyPolls() {
                 {t('yoursBadge')}
               </span>
             )}
-            <button
-              onClick={() => handleRemove(p.id)}
-              aria-label={t('removeFromListAria', { title: p.title })}
-              title={t('removeFromList')}
-              className="flex-shrink-0 text-neutral-500 hover:text-danger-600 text-xl leading-none px-1"
-            >
-              ×
-            </button>
+            {confirmingId === p.id ? (
+              <button
+                onClick={() => handleRemove(p.id)}
+                aria-label={t('removeFromListAria', { title: p.title })}
+                className="flex-shrink-0 text-xs font-semibold bg-danger-600 text-ground px-2.5 py-1 rounded-full hover:bg-danger-700 transition-colors whitespace-nowrap"
+              >
+                {t('confirmRemove')}
+              </button>
+            ) : (
+              <button
+                onClick={() => handleRemove(p.id)}
+                aria-label={t('removeFromListAria', { title: p.title })}
+                title={t('removeFromList')}
+                className="flex-shrink-0 text-neutral-500 hover:text-danger-600 text-xl leading-none px-1"
+              >
+                ×
+              </button>
+            )}
           </li>
         ))}
       </ul>
