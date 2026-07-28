@@ -44,7 +44,7 @@ features were proposed, 11 accepted, 4 rejected (see bottom).
 | 11f | Rules + App Check  | 5     | not started |
 | 11g | Privacy note       | 5     | not started |
 | 13 | Design system align | 6     | done        |
-| 14 | Domain + landing    | 6     | in progress |
+| 14 | Domain + landing    | 6     | done        |
 | 15 | Donations           | 6     | not started |
 
 ## Phase 1: Poll lifecycle (foundations)
@@ -681,7 +681,19 @@ becomes a new roadmap item.
 
 ### 14. Domain move + landing page (added 28 Jul 2026)
 
-Status: not started (waiting for Adam to buy meppletime.today)
+Status: done (29 Jul 2026, commit a21baf8; SPA-routing hotfix
+c393387 discovered and shipped during this feature). Live layout:
+www.meppletime.today serves the bilingual landing (its own Vercel
+project, root directory landing/, framework Other, no build);
+meppletime.today 308-redirects to www (www ended up primary, fine);
+app.meppletime.today serves the app, deep links verified 200. The
+landing is a self-contained landing/index.html on the Organic
+tokens: EN/PL auto-detect plus toggle, brand hero, three steps,
+washed real screenshots (scripts/capture-landing-shots.mjs staged
+a demo poll, captured cards headlessly via puppeteer-core and the
+demo poll was deleted), chips, sage brand band, footer with TODO
+slots for 11g privacy and 15 donations. Verified live on desktop
+and mobile in both languages.
 
 Adam is buying meppletime.today. Target architecture: the apex (and
 www) serve a small static landing page presenting MeppleTime as a
