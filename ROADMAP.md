@@ -40,7 +40,7 @@ features were proposed, 11 accepted, 4 rejected (see bottom).
 | 11b | Identity merge     | 5     | done        |
 | 11c | My polls sync      | 5     | done        |
 | 11d | Poll deletion      | 5     | done        |
-| 11e | Poll auto-expiry   | 5     | not started |
+| 11e | Poll auto-expiry   | 5     | in progress |
 | 11f | Rules + App Check  | 5     | not started |
 | 11g | Privacy note       | 5     | not started |
 | 13 | Design system align | 6     | done        |

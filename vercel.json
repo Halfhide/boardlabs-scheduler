@@ -1,8 +1,8 @@
 {
-  "rewrites": [
+  "crons": [
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "path": "/api/expire-polls",
+      "schedule": "14 3 * * *"
     }
   ]
 }
