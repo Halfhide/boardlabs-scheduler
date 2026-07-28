@@ -562,7 +562,7 @@ gracefully.
 
 ### 11e. Poll auto-expiry
 
-Status: done (28 Jul 2026, commit pending). api/expire-polls.js
+Status: done (28 Jul 2026, commits d091138 + 9f2e533). api/expire-polls.js
 (Firebase Admin SDK, FIREBASE_SERVICE_ACCOUNT + CRON_SECRET Vercel
 env vars set by Adam) deletes polls whose latest offered date is
 older than EXPIRY_MONTHS (default 12, env-overridable); polls with
