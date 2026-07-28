@@ -77,8 +77,11 @@ async function runCreatorUpdate(pollId, auth, mutate) {
 
     const poll = pollSnap.data();
 
+    // Mirrors the Firestore rules: an owned poll is managed only by
+    // the owner account; the token authorizes only unowned polls
     const isOwner = !!poll.ownerUid && !!uid && poll.ownerUid === uid;
-    const hasToken = !!poll.creatorToken && creatorToken === poll.creatorToken;
+    const hasToken =
+      !poll.ownerUid && !!poll.creatorToken && creatorToken === poll.creatorToken;
     if (!isOwner && !hasToken) {
       throw appError('errNotCreator', 'Only the poll creator can do this');
     }

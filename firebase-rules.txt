@@ -1,89 +1,136 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    // ══════════════════════════════════════════════════════════════
+    // Phase 5 hardening (11f). The model, honestly stated:
+    // - Polls are public: anyone with the link reads and votes, no
+    //   account required. Rules cannot iterate arrays, so per-vote
+    //   validation inside the dates/games arrays is impossible; the
+    //   caps below plus Firebase App Check are the anti-abuse layer
+    //   for anonymous traffic.
+    // - A poll WITHOUT ownerUid (anonymous creator) keeps client-side
+    //   token gating for management: the token sits in the public
+    //   document, so rules could never treat it as a secret anyway.
+    // - A poll WITH ownerUid is rules-protected: management fields
+    //   (title, closed, deadline, finalized date, capacity), resizing
+    //   the dates list and shrinking games require the owner account.
+    //   Everyone else can only vote/comment (dates keep their count),
+    //   suggest at most one game per write, or claim their own votes.
+    // - Deletion always requires the signed-in owner.
+    // ══════════════════════════════════════════════════════════════
+
+    function signedIn() { return request.auth != null; }
+
     match /polls/{pollId} {
       allow read: if true;
 
-      // Anyone can create a poll, but only with the expected shape
-      // and within size limits. A poll created while signed in may
-      // carry its owner's uid, which must be the requester's own.
+      // Shape + bounds. Optional-field checks are presence-guarded so
+      // an existing poll that predates a field (e.g. the very first
+      // test polls, created before `closed`/`creatorToken` existed)
+      // can still be voted on. The create rule below additionally
+      // REQUIRES creatorToken and closed for new polls.
+      function validShape(d) {
+        return d.keys().hasOnly(['id', 'title', 'createdAt', 'dates', 'creatorToken', 'closed', 'deadline', 'finalizedDateId', 'minPlayers', 'maxPlayers', 'games', 'ownerUid']) &&
+          d.id == pollId &&
+          d.title is string && d.title.size() > 0 && d.title.size() <= 100 &&
+          d.createdAt is timestamp &&
+          (!('creatorToken' in d) || (d.creatorToken is string && d.creatorToken.size() >= 8 && d.creatorToken.size() <= 64)) &&
+          (!('closed' in d) || d.closed is bool) &&
+          d.dates is list && d.dates.size() > 0 && d.dates.size() <= 92 &&
+          (!('games' in d) || (d.games is list && d.games.size() <= 30)) &&
+          (!('deadline' in d) || d.deadline is timestamp) &&
+          (!('finalizedDateId' in d) || (d.finalizedDateId is string && d.finalizedDateId.size() <= 40)) &&
+          (!('minPlayers' in d) || (d.minPlayers is int && d.minPlayers >= 1 && d.minPlayers <= 99)) &&
+          (!('maxPlayers' in d) || (d.maxPlayers is int && d.maxPlayers >= 1 && d.maxPlayers <= 99)) &&
+          (!('ownerUid' in d) || (d.ownerUid is string && d.ownerUid.size() > 0 && d.ownerUid.size() <= 128));
+      }
+
       allow create: if
-        request.resource.data.keys().hasOnly(['id', 'title', 'createdAt', 'dates', 'creatorToken', 'closed', 'deadline', 'finalizedDateId', 'minPlayers', 'maxPlayers', 'ownerUid']) &&
-        (!('ownerUid' in request.resource.data) || (request.auth != null && request.resource.data.ownerUid == request.auth.uid)) &&
-        (!('deadline' in request.resource.data) || request.resource.data.deadline is timestamp) &&
-        (!('finalizedDateId' in request.resource.data) || request.resource.data.finalizedDateId is string) &&
-        (!('minPlayers' in request.resource.data) || (request.resource.data.minPlayers is int && request.resource.data.minPlayers >= 1 && request.resource.data.minPlayers <= 99)) &&
-        (!('maxPlayers' in request.resource.data) || (request.resource.data.maxPlayers is int && request.resource.data.maxPlayers >= 1 && request.resource.data.maxPlayers <= 99)) &&
-        request.resource.data.id == pollId &&
-        request.resource.data.title is string &&
-        request.resource.data.title.size() > 0 &&
-        request.resource.data.title.size() <= 100 &&
-        request.resource.data.createdAt is timestamp &&
-        request.resource.data.creatorToken is string &&
-        request.resource.data.creatorToken.size() >= 8 &&
-        request.resource.data.creatorToken.size() <= 64 &&
+        validShape(request.resource.data) &&
+        'creatorToken' in request.resource.data &&
+        'closed' in request.resource.data &&
         request.resource.data.closed == false &&
-        request.resource.data.dates is list &&
-        request.resource.data.dates.size() > 0 &&
-        request.resource.data.dates.size() <= 92;
+        !('games' in request.resource.data) &&
+        !('finalizedDateId' in request.resource.data) &&
+        (!('ownerUid' in request.resource.data) ||
+          (signedIn() && request.resource.data.ownerUid == request.auth.uid));
 
-      // Updates cover votes/comments (dates array rewrites) and
-      // creator actions (rename, add/remove dates, close/reopen).
-      // The poll's id, creation time and creator token are immutable
-      // and every field stays within its bounds. The owner uid can be
-      // set exactly once, only by the signed-in account it names (the
-      // ownership claim); once set it never changes. Anonymous
-      // creator identity stays client-side until the full rules
-      // rewrite (11f): the document is publicly readable, so the
-      // token cannot act as a server-side secret anyway.
+      // Identity fields never change; ownerUid can be set exactly
+      // once, only by the signed-in account it names (the claim)
+      function identityKept() {
+        return request.resource.data.id == resource.data.id &&
+          request.resource.data.createdAt == resource.data.createdAt &&
+          request.resource.data.get('creatorToken', '') == resource.data.get('creatorToken', '') &&
+          (
+            (('ownerUid' in request.resource.data) == ('ownerUid' in resource.data) &&
+              (!('ownerUid' in resource.data) || request.resource.data.ownerUid == resource.data.ownerUid)) ||
+            (!('ownerUid' in resource.data) && signedIn() &&
+              request.resource.data.ownerUid == request.auth.uid)
+          );
+      }
+
+      function isOwner() {
+        return ('ownerUid' in resource.data) && signedIn() &&
+          request.auth.uid == resource.data.ownerUid;
+      }
+
+      // What a non-owner may do to an owned poll: change nothing at
+      // the management level. Same optional-field presence and value,
+      // same number of dates; games may grow by at most one entry
+      // (a suggestion) and never shrink.
+      function managementUntouched() {
+        return request.resource.data.title == resource.data.title &&
+          request.resource.data.closed == resource.data.closed &&
+          (('deadline' in request.resource.data) == ('deadline' in resource.data) &&
+            (!('deadline' in resource.data) || request.resource.data.deadline == resource.data.deadline)) &&
+          (('finalizedDateId' in request.resource.data) == ('finalizedDateId' in resource.data) &&
+            (!('finalizedDateId' in resource.data) || request.resource.data.finalizedDateId == resource.data.finalizedDateId)) &&
+          (('minPlayers' in request.resource.data) == ('minPlayers' in resource.data) &&
+            (!('minPlayers' in resource.data) || request.resource.data.minPlayers == resource.data.minPlayers)) &&
+          (('maxPlayers' in request.resource.data) == ('maxPlayers' in resource.data) &&
+            (!('maxPlayers' in resource.data) || request.resource.data.maxPlayers == resource.data.maxPlayers)) &&
+          request.resource.data.dates.size() == resource.data.dates.size() &&
+          request.resource.data.get('games', []).size() >= resource.data.get('games', []).size() &&
+          request.resource.data.get('games', []).size() <= resource.data.get('games', []).size() + 1;
+      }
+
       allow update: if
-        request.resource.data.keys().hasOnly(['id', 'title', 'createdAt', 'dates', 'creatorToken', 'closed', 'deadline', 'finalizedDateId', 'minPlayers', 'maxPlayers', 'games', 'ownerUid']) &&
+        validShape(request.resource.data) &&
+        identityKept() &&
         (
-          request.resource.data.get('ownerUid', '') == resource.data.get('ownerUid', '') ||
-          (resource.data.get('ownerUid', '') == '' && request.auth != null && request.resource.data.ownerUid == request.auth.uid)
-        ) &&
-        (!('games' in request.resource.data) || (request.resource.data.games is list && request.resource.data.games.size() <= 30)) &&
-        (!('deadline' in request.resource.data) || request.resource.data.deadline is timestamp) &&
-        (!('finalizedDateId' in request.resource.data) || request.resource.data.finalizedDateId is string) &&
-        (!('minPlayers' in request.resource.data) || (request.resource.data.minPlayers is int && request.resource.data.minPlayers >= 1 && request.resource.data.minPlayers <= 99)) &&
-        (!('maxPlayers' in request.resource.data) || (request.resource.data.maxPlayers is int && request.resource.data.maxPlayers >= 1 && request.resource.data.maxPlayers <= 99)) &&
-        request.resource.data.id == resource.data.id &&
-        request.resource.data.createdAt == resource.data.createdAt &&
-        request.resource.data.get('creatorToken', '') == resource.data.get('creatorToken', '') &&
-        request.resource.data.title is string &&
-        request.resource.data.title.size() > 0 &&
-        request.resource.data.title.size() <= 100 &&
-        request.resource.data.get('closed', false) is bool &&
-        request.resource.data.dates is list &&
-        request.resource.data.dates.size() > 0 &&
-        request.resource.data.dates.size() <= 92;
+          isOwner() ||
+          !('ownerUid' in resource.data) ||
+          managementUntouched()
+        );
 
-      // Only the signed-in owner can delete a poll. Polls without an
-      // ownerUid (anonymous, never claimed) cannot be deleted; their
-      // creator signs in first and ownership is claimed on visit.
-      allow delete: if
-        request.auth != null &&
-        resource.data.get('ownerUid', '') == request.auth.uid;
+      // Only the signed-in owner can delete; unclaimed anonymous
+      // polls are undeletable (their creator signs in and ownership
+      // is claimed on visit)
+      allow delete: if isOwner();
     }
 
     // Per-account document holding the user's synced poll list.
-    // Only the signed-in owner can read or write it; the shape is a
-    // single `polls` map (entries validated in the 11f rules pass).
+    // Only the signed-in owner touches it; a single `polls` map,
+    // capped comfortably above the client's 50-entry limit.
     match /users/{userId} {
-      allow read: if request.auth != null && request.auth.uid == userId;
+      allow read: if signedIn() && request.auth.uid == userId;
       allow create, update: if
-        request.auth != null &&
+        signedIn() &&
         request.auth.uid == userId &&
         request.resource.data.keys().hasOnly(['polls']) &&
-        request.resource.data.polls is map;
+        request.resource.data.polls is map &&
+        request.resource.data.polls.size() <= 60;
       allow delete: if false;
     }
   }
 }
 
-// Note: without authentication these rules cannot stop a determined
-// visitor from rewriting votes or poll settings of a poll whose link
-// they have. They do prevent deletion by anyone but the signed-in
-// owner, malformed or oversized documents, forging a poll's identity
-// fields, and touching any other collection. This app is intended
-// for friendly groups, not adversarial environments.
+// Notes:
+// - Per-element validation of votes/comments/games entries is not
+//   expressible in rules (no array iteration); document size is
+//   bounded by Firestore's 1 MB limit and the caps above. App Check
+//   (enforced after 11f's rollout completes) is the abuse gate for
+//   anonymous writes.
+// - The Vercel expiry cron uses the Admin SDK and bypasses these
+//   rules and App Check by design; it authenticates with CRON_SECRET.

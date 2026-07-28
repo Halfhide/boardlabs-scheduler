@@ -155,12 +155,13 @@ function PollView() {
   const selectedDate =
     sortedDates.find((d) => d.id === selectedDateId) ?? null;
 
-  // Creator detection: the signed-in owner account wins, with the
-  // legacy browser token as fallback for signed-out creators
+  // Creator detection mirrors the Firestore rules: an owned poll is
+  // managed only by the signed-in owner account; the browser token
+  // grants management only while the poll has no owner yet
   const creatorToken = localStorage.getItem(`creatorToken:${pollId}`);
-  const isCreator =
-    (!!voterUid && poll.ownerUid === voterUid) ||
-    (!!poll.creatorToken && creatorToken === poll.creatorToken);
+  const isCreator = poll.ownerUid
+    ? !!voterUid && poll.ownerUid === voterUid
+    : !!poll.creatorToken && creatorToken === poll.creatorToken;
   // Identity handed to creator actions; either credential authorizes
   const creatorAuth = { creatorToken, uid: voterUid };
   // Deletion is stricter than the other creator tools: rules only
