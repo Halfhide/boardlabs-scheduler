@@ -588,17 +588,42 @@ plus CRON_SECRET in Vercel env vars.
 
 ### 11f. Hardening: rules + App Check
 
-Status: not started
+Status: in progress (29 Jul 2026). PAUSED mid-feature. Done so far,
+committed and pushed, working tree clean:
+- Part 1 (commit 1c7a514): Firestore rules rewritten and APPLIED by
+  Adam in the console. Owned polls (ownerUid present) are protected
+  server-side (management, dates-list resize, game removal need the
+  owner account); non-owners may only vote/comment (date count
+  preserved), add <=1 game per write, or claim votes; deletion
+  owner-only; identity immutable; ownerUid set-once; shapes/caps
+  validated; create tightened; users/{uid} owner-only + map cap.
+  Optional-field checks are presence-guarded so the pre-closed/
+  pre-creatorToken legacy poll (RjwDCzmNa8) stays votable. Client
+  (PollView, pollHelpers) mirrors the rules. VERIFIED: 16/16
+  forged-vs-legit write cases pass against the live rules; owner
+  rename works through the app.
+- Part 2 (commit 1ba6134): App Check client wired in src/firebase.js
+  (reCAPTCHA v3), DORMANT until VITE_RECAPTCHA_SITE_KEY is set, so
+  current prod is unchanged. Debug token enabled in dev.
 
-Firestore rules rewritten: strict shape validation and size caps
-everywhere, ownership checks wherever auth is present (poll
-management by ownerUid, user docs, vote claims). Firebase App Check
-with reCAPTCHA v3 enforced on Firestore so only the real app can
-talk to the database.
-MANUAL (Adam): register the app for App Check in the Firebase
-console (reCAPTCHA v3 site key), then enable enforcement AFTER the
-App Check client code is deployed and confirmed working (enforcing
-too early locks everyone out).
+REMAINING when resuming (this is the resume point):
+1. Adam finishes reCAPTCHA v3 key creation at
+   google.com/recaptcha/admin (label MeppleTime, v3 score-based,
+   domains: meppletime.today, www.meppletime.today,
+   app.meppletime.today, boardlabs-scheduler.vercel.app, localhost).
+   Yields a public SITE KEY and a private SECRET.
+2. Register that provider in Firebase console -> App Check -> the web
+   app -> reCAPTCHA v3, paste the SECRET there.
+3. Set VITE_RECAPTCHA_SITE_KEY (the public site key) in Vercel env
+   (Production) for the APP project AND in local .env; redeploy.
+4. Verify tokens flow: Firebase App Check console shows verified
+   requests climbing, and (before enforcing) that "unverified"
+   requests are only from non-app sources. Drive the app to confirm
+   voting/creating still works with a token attached.
+5. ONLY THEN: enable App Check ENFORCEMENT on Firestore in the
+   console. Enforcing before step 4 confirms tokens locks everyone
+   out. Also add app.meppletime.today etc. as needed.
+6. Immediately re-verify the live app end to end after enforcing.
 
 ### 11g. Privacy note
 
