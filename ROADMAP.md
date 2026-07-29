@@ -46,6 +46,7 @@ features were proposed, 11 accepted, 4 rejected (see bottom).
 | 13 | Design system align | 6     | done        |
 | 14 | Domain + landing    | 6     | done        |
 | 15 | Donations           | 6     | not started |
+| 16 | Enriched my-polls   | 7     | not started |
 
 ## Phase 1: Poll lifecycle (foundations)
 
@@ -754,6 +755,43 @@ landing page (feature 14). Ships last, right before launch.
 MANUAL (Adam): create the Ko-fi account and the buycoffee.to
 account, then provide both links.
 
+## Phase 7: Post-launch
+
+### 16. Enriched my-polls list (added 29 Jul 2026)
+
+Status: not started (post-launch; prioritize against real usage data
+once the app is public)
+
+Origin: a "dashboard as the main view" idea from Adam, evaluated
+critically on 29 Jul 2026 and rejected in that form (see rejected
+list). MeppleTime is link-first (most users arrive via a shared poll
+link and never see the homepage), a typical user has one or two
+active polls, and the homepage already carries the create form plus
+the "Your polls" list. But the underlying need is real: "which of my
+polls need something from me, and when am I playing next?" This
+feature captures most of the dashboard's value inside the existing
+list instead of a new main view.
+
+Scope:
+- Enrich the existing "Your polls" homepage list entries with poll
+  status: voting open and you have not voted yet; voting closes soon
+  (deadline approaching); voting closed; and, most valuable, an
+  upcoming finalized game night line ("You're playing Wingspan on
+  Friday"), with the leading/chosen game when one exists.
+- No live per-poll reads on homepage load: store a small status
+  snapshot on the list entry (localStorage and the users/{uid} cloud
+  map) whenever a poll is visited, refreshed opportunistically on
+  later visits. Staleness between visits is the accepted tradeoff.
+- Same screen and mental model as today; no new route, no dashboard
+  view. If groups or recurring nights ever become features, revisit
+  a true dashboard then, seeded by this list.
+
+Acceptance criteria:
+- Entries show correct status after visiting a poll, survive reload,
+  and sync across devices for signed-in users; entries without a
+  snapshot render exactly as today; homepage load performs no poll
+  document reads; works in EN and PL.
+
 ## Rejected features (do not build unless Adam changes his mind)
 
 - Time slots (time-of-day options): rejected 15 Jul 2026.
@@ -761,6 +799,9 @@ account, then provide both links.
 - Richer share options (QR, WhatsApp buttons, OG tags): rejected
   15 Jul 2026.
 - Dark mode: rejected 15 Jul 2026.
+- Dashboard as the main view: rejected 29 Jul 2026. Link-first app,
+  few active polls per user, homepage list already covers the need;
+  the useful core was scoped down into feature 16 instead.
 
 ## Changelog
 
@@ -870,3 +911,8 @@ account, then provide both links.
   early: app.meppletime.today and the apex both serve the app
   (Adam added both to Firebase authorized domains); the apex
   repoints to the landing in feature 14.
+- 29 Jul 2026: Adam's "dashboard as the main view" idea discussed
+  and rejected in its full form; the useful core (poll status and
+  next game night surfaced on the existing "Your polls" list) added
+  as feature 16 in a new post-launch phase 7. Launch order and the
+  remaining pre-launch work (11f, 11g, 15) unchanged.
