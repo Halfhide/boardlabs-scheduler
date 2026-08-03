@@ -929,6 +929,19 @@ Acceptance criteria:
   early: app.meppletime.today and the apex both serve the app
   (Adam added both to Firebase authorized domains); the apex
   repoints to the landing in feature 14.
+- 3 Aug 2026: landing page expanded and visually reworked on Adam's
+  request (feature 14 follow-up): kicker labels, hero stickers,
+  tilted screenshot cards with blob backdrops, a six-cell "Everything
+  for game night" grid replacing the chips row, and a six-question
+  FAQ, all bilingual; landing favicon switched to the new mark. The
+  heatmap screenshot was recaptured at a narrow viewport so the
+  calendar fills its card (the old wide capture needed a hacky CSS
+  crop, now removed). New reusable script scripts/stage-demo-poll.mjs
+  stages the labeled demo poll for captures and afterwards rewrites
+  its dates to Jan 2024 so the nightly expiry cron deletes it (poll
+  nMmOKtqi69 staged and expired this way; gone after the next 03:14
+  UTC run). Verified headlessly: desktop and 390px, EN and PL, no
+  horizontal overflow.
 - 3 Aug 2026: Adam's new illustrated logotype implemented across the
   app header, favicon, PWA icons and the landing page (recorded as a
   feature 13 addendum). generate-icons.mjs now derives all brand

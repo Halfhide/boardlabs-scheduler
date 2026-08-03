@@ -20,7 +20,9 @@ const browser = await puppeteer.launch({
 });
 
 const page = await browser.newPage();
-await page.setViewport({ width: 1100, height: 1600, deviceScaleFactor: 2 });
+// The heatmap card is captured at a narrow viewport so the calendar
+// fills its card instead of hugging the left edge of a wide one
+await page.setViewport({ width: 660, height: 1600, deviceScaleFactor: 2 });
 // English UI regardless of machine locale
 await page.evaluateOnNewDocument(() => {
   window.localStorage.setItem('language', JSON.stringify('en'));
@@ -64,6 +66,9 @@ async function shootCard(markerText, file) {
 }
 
 await shootCard('Group availability', 'landing/assets/shot-heatmap.png');
+
+await page.setViewport({ width: 1100, height: 1600, deviceScaleFactor: 2 });
+await new Promise((r) => setTimeout(r, 800));
 await shootCard('Availability table', 'landing/assets/shot-matrix.png');
 await shootCard('What shall we play?', 'landing/assets/shot-games.png');
 
