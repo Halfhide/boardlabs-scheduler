@@ -705,6 +705,24 @@ unplanned ones (groups, nudges, auto-lock, batched voting). Not
 implemented; awaiting Adam's decision on whether deeper alignment
 becomes a new roadmap item.
 
+Logotype refresh (3 Aug 2026): Adam delivered a new illustrated
+logotype (design-assets/good-logotype.svg and .png): a shaded,
+textured version of the split-calendar mark with the meeple, and
+the wordmark set in Bogart Extrabold. scripts/generate-icons.mjs
+was rewritten to derive every brand asset from that file via
+headless Chrome: mark-only SVGs (the wordmark is live Bogart text
+inside the SVG, which browsers cannot render, so it is stripped)
+for the app header (src/assets/mepple-mark.svg via Logo.jsx), the
+favicon (public/favicon.svg) and the landing page
+(landing/assets/mepple-mark.svg, used in nav, hero and footer),
+plus regenerated PWA icons (192/512 transparent, maskable 512 and
+apple-touch 180 on cream). Wordmarks in the app and landing remain
+Caprasimo live text: Bogart is a commercial font and is not
+licensed for embedding; adopting it is an open decision for Adam.
+The old flat-geometry mark is fully retired. Verified in headless
+Chrome (app header at desktop and 390px, landing hero/nav/footer,
+favicon served); lint and build green.
+
 ### 14. Domain move + landing page (added 28 Jul 2026)
 
 Status: done (29 Jul 2026, commit a21baf8; SPA-routing hotfix
@@ -911,6 +929,12 @@ Acceptance criteria:
   early: app.meppletime.today and the apex both serve the app
   (Adam added both to Firebase authorized domains); the apex
   repoints to the landing in feature 14.
+- 3 Aug 2026: Adam's new illustrated logotype implemented across the
+  app header, favicon, PWA icons and the landing page (recorded as a
+  feature 13 addendum). generate-icons.mjs now derives all brand
+  assets from design-assets/good-logotype.svg. Wordmarks stay
+  Caprasimo text; the logotype's Bogart Extrabold face is
+  commercial and unlicensed, flagged to Adam as an open decision.
 - 29 Jul 2026: Adam's "dashboard as the main view" idea discussed
   and rejected in its full form; the useful core (poll status and
   next game night surfaced on the existing "Your polls" list) added
