@@ -956,6 +956,19 @@ Acceptance criteria:
   early: app.meppletime.today and the apex both serve the app
   (Adam added both to Firebase authorized domains); the apex
   repoints to the landing in feature 14.
+- 10 Aug 2026: investigated Adam's "cross-month polls only show one
+  month" report. NOT a display bug: calendar, matrix and results all
+  handle multi-month polls correctly (verified with a staged Aug-Sep
+  poll and a form-created one, both months rendered with all dates).
+  Root cause: Adam's real poll (5IuA3W_jpB) was created with end
+  date 31 Aug, so September dates never existed; the segmented
+  native date input makes such mis-entry easy and the form gave no
+  feedback. Hotfix shipped: a live bilingual range preview under the
+  date inputs ("Voters will see 14 dates: Mon, Aug 24, 2026 to Sun,
+  Sep 6, 2026", proper Polish plurals, too-long warning inline).
+  Repairing the live poll is owner-only (it has ownerUid): Adam adds
+  the missing September dates via the AdminBar. Test polls expired
+  via the cron path.
 - 10 Aug 2026: feature 17 (bring a friend) implemented and verified
   in the browser: optional per-vote guest count feeding all player
   counts (heatmap, matrix, results, capacity, finalize banner) via

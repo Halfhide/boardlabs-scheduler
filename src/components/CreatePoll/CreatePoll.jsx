@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { format, parseISO } from 'date-fns';
 import { createPoll, MAX_POLL_DATES } from '../../utils/pollHelpers';
 import { generateDateRange } from '../../utils/dateHelpers';
 import { rememberPoll } from '../../utils/myPolls';
@@ -10,7 +11,7 @@ import { useTranslation } from '../../i18n/useTranslation';
 import { useAuth } from '../../auth/useAuth';
 
 function CreatePoll() {
-  const { t } = useTranslation();
+  const { t, dateLocale } = useTranslation();
   const { user } = useAuth();
   const [title, setTitle] = useState('');
   const [startDate, setStartDate] = useState('');
@@ -208,6 +209,33 @@ function CreatePoll() {
             />
           </div>
         </div>
+
+        {/* Live range preview: shows exactly which dates the poll
+            will offer, so a mistyped end date (e.g. a cross-month
+            range silently collapsing) is caught before creation */}
+        {startDate && endDate && (() => {
+          const preview = generateDateRange(startDate, endDate);
+          if (preview.length === 0) {
+            return (
+              <p className="text-xs text-danger-600 font-medium">
+                {t('errDateOrder')}
+              </p>
+            );
+          }
+          const fmt = (d) => format(parseISO(d), t('rangePreviewFormat'), { locale: dateLocale });
+          const tooMany = preview.length > MAX_POLL_DATES;
+          return (
+            <p className={`text-xs ${tooMany ? 'text-danger-600 font-medium' : 'text-sage-800 bg-sage-100 rounded-full px-3 py-1.5 inline-block'}`}>
+              {tooMany
+                ? t('errTooManyDatesRange', { count: preview.length, max: MAX_POLL_DATES })
+                : `📅 ${t('rangePreview', {
+                    count: preview.length,
+                    from: fmt(preview[0]),
+                    to: fmt(preview[preview.length - 1])
+                  })}`}
+            </p>
+          );
+        })()}
 
         {/* Optional Voting Deadline */}
         <div>

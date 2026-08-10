@@ -78,6 +78,11 @@ export const translations = {
     errMaxBelowMin: 'Maximum players cannot be lower than minimum players',
     errNoDates: 'No dates generated. Please check your date range.',
     errTooManyDatesRange: 'Date range is too long ({count} days). Please choose a range of {max} days or less.',
+    rangePreview: [
+      'Voters will see {count} date: {from}',
+      'Voters will see {count} dates: {from} to {to}'
+    ],
+    rangePreviewFormat: 'EEE, MMM d, yyyy',
     errCreateFailed: 'Failed to create poll. Please try again.',
 
     // My polls list
@@ -348,6 +353,12 @@ export const translations = {
     errMaxBelowMin: 'Maksimum graczy nie może być mniejsze niż minimum',
     errNoDates: 'Nie powstała żadna data. Sprawdź zakres dat.',
     errTooManyDatesRange: 'Zakres dat jest za długi ({count} dni). Wybierz najwyżej {max} dni.',
+    rangePreview: [
+      'Głosujący zobaczą {count} termin: {from}',
+      'Głosujący zobaczą {count} terminy: od {from} do {to}',
+      'Głosujący zobaczą {count} terminów: od {from} do {to}'
+    ],
+    rangePreviewFormat: 'EEE, d MMM yyyy',
     errCreateFailed: 'Nie udało się utworzyć ankiety. Spróbuj ponownie.',
 
     // My polls list
