@@ -3,7 +3,7 @@ import VoteButton from './VoteButton';
 import VoterBreakdown from './VoterBreakdown';
 import CommentSection from './CommentSection';
 import { formatDate } from '../../utils/dateHelpers';
-import { getVoteSummary, findUserVote, getCapacityStatus } from '../../utils/pollHelpers';
+import { getVoteSummary, findUserVote, getCapacityStatus, MAX_GUESTS } from '../../utils/pollHelpers';
 import { diceRoll } from '../../utils/diceRoll';
 import { useTranslation, translateError } from '../../i18n/useTranslation';
 
@@ -24,6 +24,7 @@ function DateModal({ dateData, voterId, voterName, voterUid, isCreator, closed, 
   const [removeError, setRemoveError] = useState(false);
   const [finalizing, setFinalizing] = useState(false);
   const [finalizeError, setFinalizeError] = useState('');
+  const [guestsSaving, setGuestsSaving] = useState(false);
 
   // Close on Escape and lock background scroll while the modal is open
   useEffect(() => {
@@ -78,6 +79,24 @@ function DateModal({ dateData, voterId, voterName, voterUid, isCreator, closed, 
 
   // Show the vote that's being processed, or the actual vote
   const displayedVote = votingFor || currentUserVote?.response;
+
+  // Guests: re-submit the same response with a new guest count.
+  // Quiet on purpose (no dice, no banner); the counts update live.
+  const currentGuests = currentUserVote?.guests ?? 0;
+  const handleGuests = async (delta) => {
+    const next = Math.min(Math.max(currentGuests + delta, 0), MAX_GUESTS);
+    if (next === currentGuests || !currentUserVote) return;
+    setGuestsSaving(true);
+    setVoteError(false);
+    try {
+      await onVote(dateData.id, currentUserVote.response, next);
+    } catch (error) {
+      console.error('Error updating guests:', error);
+      setVoteError(true);
+    } finally {
+      setGuestsSaving(false);
+    }
+  };
 
   const isFinalizedDate = finalizedDateId === dateData.id;
 
@@ -172,6 +191,7 @@ function DateModal({ dateData, voterId, voterName, voterUid, isCreator, closed, 
                   {currentUserVote.response === 'yes' && t('youVotedYes')}
                   {currentUserVote.response === 'maybe' && t('youVotedMaybe')}
                   {currentUserVote.response === 'no' && t('youVotedNo')}
+                  {currentGuests > 0 && currentUserVote.response !== 'no' && ` (+${currentGuests})`}
                 </span>
               )}
             </div>
@@ -232,6 +252,36 @@ function DateModal({ dateData, voterId, voterName, voterUid, isCreator, closed, 
               <p className="text-sm text-neutral-700 italic bg-gold-100 border border-gold-200 rounded-md p-3">
                 {t('enterNameToVote')}
               </p>
+            )}
+
+            {/* Bring-a-friend stepper: only when you're coming (or maybe) */}
+            {!closed && currentUserVote && currentUserVote.response !== 'no' && !votingFor && (
+              <div className="flex items-center justify-between gap-3 mt-3 bg-ink/5 rounded-full px-4 py-2">
+                <span className="text-sm text-neutral-700">
+                  {t('guestsLabel')}
+                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handleGuests(-1)}
+                    disabled={guestsSaving || currentGuests === 0}
+                    aria-label={t('guestsRemove')}
+                    className="w-7 h-7 rounded-full bg-surface border border-neutral-400 text-ink font-bold leading-none disabled:opacity-40 disabled:cursor-not-allowed hover:bg-neutral-200 transition-colors"
+                  >
+                    −
+                  </button>
+                  <span className={`text-sm font-semibold min-w-8 text-center ${currentGuests > 0 ? 'text-terra-700' : 'text-neutral-600'}`}>
+                    {currentGuests > 0 ? `+${currentGuests}` : '0'}
+                  </span>
+                  <button
+                    onClick={() => handleGuests(1)}
+                    disabled={guestsSaving || currentGuests >= MAX_GUESTS}
+                    aria-label={t('guestsAdd')}
+                    className="w-7 h-7 rounded-full bg-surface border border-neutral-400 text-ink font-bold leading-none disabled:opacity-40 disabled:cursor-not-allowed hover:bg-neutral-200 transition-colors"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
             )}
 
             {currentUserVote && !loading && !justVoted && (

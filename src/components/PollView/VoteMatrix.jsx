@@ -24,7 +24,7 @@ function VoteMatrix({ dates, voterId, voterName, voterUid, finalizedDateId, onDa
       }
       const p = participantsByKey.get(key);
       p.name = v.voterName;
-      p.votes[d.id] = v.response;
+      p.votes[d.id] = { response: v.response, guests: v.guests || 0 };
     });
   });
 
@@ -121,19 +121,22 @@ function VoteMatrix({ dates, voterId, voterName, voterUid, finalizedDateId, onDa
                     {you && <span className="font-normal text-terra-700"> {t('you')}</span>}
                   </th>
                   {dates.map((d) => {
-                    const response = p.votes[d.id];
+                    const cell = p.votes[d.id];
                     return (
                       <td key={d.id} className="p-0">
                         <div
-                          className={`w-12 h-8 flex items-center justify-center rounded text-xs font-bold ${
-                            response
-                              ? MARK_STYLES[response]
+                          className={`w-12 h-8 flex items-center justify-center gap-0.5 rounded text-xs font-bold ${
+                            cell
+                              ? MARK_STYLES[cell.response]
                               : you
                                 ? 'bg-terra-100 text-terra-300'
                                 : 'bg-ink/5 text-neutral-400'
                           }`}
                         >
-                          {response ? MARK_LABELS[response] : '·'}
+                          {cell ? MARK_LABELS[cell.response] : '·'}
+                          {cell && cell.guests > 0 && cell.response !== 'no' && (
+                            <span className="text-[9px] font-semibold">+{cell.guests}</span>
+                          )}
                         </div>
                       </td>
                     );

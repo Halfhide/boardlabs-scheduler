@@ -1,4 +1,4 @@
-import { groupVotesByResponse, isVoteByVoter } from '../../utils/pollHelpers';
+import { groupVotesByResponse, isVoteByVoter, voteWeight } from '../../utils/pollHelpers';
 import { useTranslation } from '../../i18n/useTranslation';
 
 const RESPONSE_META = [
@@ -28,7 +28,7 @@ function VoterBreakdown({ votes, voterId, voterName, voterUid }) {
         return (
           <div key={key} className="flex items-start gap-2">
             <span className={`flex-shrink-0 text-xs font-semibold px-2 py-1 rounded ${badge}`}>
-              {t(labelKey)} ({groupVotes.length})
+              {t(labelKey)} ({groupVotes.reduce((n, v) => n + voteWeight(v), 0)})
             </span>
             <div className="flex flex-wrap gap-1 pt-0.5">
               {groupVotes.map((vote) => {
@@ -43,6 +43,7 @@ function VoterBreakdown({ votes, voterId, voterName, voterUid }) {
                     }`}
                   >
                     {vote.voterName}
+                    {vote.guests > 0 && ` +${vote.guests}`}
                     {isYou && ` ${t('you')}`}
                   </span>
                 );

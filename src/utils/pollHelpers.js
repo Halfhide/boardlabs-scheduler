@@ -6,6 +6,9 @@ import { db } from '../firebase';
 // under it and matches the create-form range limit
 export const MAX_POLL_DATES = 92;
 
+// A voter may bring along up to this many extra players (feature 17)
+export const MAX_GUESTS = 9;
+
 // Errors shown to users carry a `code` matching a translation key
 // (plus optional params); the message stays English for the console
 function appError(code, message, params) {
@@ -306,8 +309,11 @@ export function findUserVote(votes, voterId, voterName, uid = null) {
  * @param {string} dateId - Date ID
  * @param {{id: string, name: string, uid?: string|null}} voter - Voter identity
  * @param {string} response - Vote response ('yes', 'no', or 'maybe')
+ * @param {number|undefined} guests - Extra players this voter brings
+ *   (0..MAX_GUESTS). undefined keeps the existing vote's guests when
+ *   re-voting; a 'no' response always clears them.
  */
-export async function addVote(pollId, dateId, voter, response) {
+export async function addVote(pollId, dateId, voter, response, guests = undefined) {
   try {
     const pollRef = doc(db, 'polls', pollId);
 
@@ -332,6 +338,12 @@ export async function addVote(pollId, dateId, voter, response) {
         v => isVoteByVoter(v, voter.id, voter.name, voter.uid ?? null)
       );
 
+      // Guests: explicit value wins, re-votes keep the existing
+      // count, and a 'no' clears it (you bring nobody if you're
+      // not coming yourself)
+      const sanitizeGuests = (value) =>
+        Number.isInteger(value) ? Math.min(Math.max(value, 0), MAX_GUESTS) : 0;
+
       let updatedVotes;
       if (existingVoteIndex !== -1) {
         // Update existing vote (stamping the voter ID onto legacy
@@ -339,16 +351,22 @@ export async function addVote(pollId, dateId, voter, response) {
         // signed-out re-vote keeps the claimed account ID)
         updatedVotes = [...poll.dates[dateIndex].votes];
         const existingUid = voter.uid ?? updatedVotes[existingVoteIndex].uid ?? null;
+        const keptGuests =
+          response === 'no'
+            ? 0
+            : sanitizeGuests(guests ?? updatedVotes[existingVoteIndex].guests);
         updatedVotes[existingVoteIndex] = {
           id: updatedVotes[existingVoteIndex].id,
           voterId: voter.id,
           voterName: voter.name,
           ...(existingUid ? { uid: existingUid } : {}),
+          ...(keptGuests > 0 ? { guests: keptGuests } : {}),
           response,
           timestamp: new Date()
         };
       } else {
         // Add new vote
+        const newGuests = response === 'no' ? 0 : sanitizeGuests(guests);
         updatedVotes = [
           ...poll.dates[dateIndex].votes,
           {
@@ -356,6 +374,7 @@ export async function addVote(pollId, dateId, voter, response) {
             voterId: voter.id,
             voterName: voter.name,
             ...(voter.uid ? { uid: voter.uid } : {}),
+            ...(newGuests > 0 ? { guests: newGuests } : {}),
             response,
             timestamp: new Date()
           }
@@ -667,14 +686,26 @@ export function groupVotesByResponse(votes) {
 }
 
 /**
- * Calculate vote summary for a date
+ * How many players a vote stands for: the voter plus any guests
+ * they bring along (optional `guests` field, feature 17)
+ * @param {Object} vote - Vote object
+ * @returns {number} Player count represented by this vote
+ */
+export function voteWeight(vote) {
+  const guests = Number.isInteger(vote.guests) ? vote.guests : 0;
+  return 1 + Math.min(Math.max(guests, 0), MAX_GUESTS);
+}
+
+/**
+ * Calculate vote summary for a date. Counts are player counts, not
+ * voter counts: a yes with 2 guests contributes 3 to `yes`.
  * @param {Array} votes - Array of vote objects
  * @returns {Object} Vote counts
  */
 export function getVoteSummary(votes) {
   return votes.reduce(
     (acc, vote) => {
-      acc[vote.response] = (acc[vote.response] || 0) + 1;
+      acc[vote.response] = (acc[vote.response] || 0) + voteWeight(vote);
       return acc;
     },
     { yes: 0, no: 0, maybe: 0 }
@@ -689,9 +720,11 @@ export function getVoteSummary(votes) {
  * @returns {Array} Sorted dates (best first)
  */
 export function getBestDates(dates, minPlayers = null) {
+  const count = (votes, response) =>
+    votes.reduce((n, v) => (v.response === response ? n + voteWeight(v) : n), 0);
   return [...dates].sort((a, b) => {
-    const aYes = a.votes.filter(v => v.response === 'yes').length;
-    const bYes = b.votes.filter(v => v.response === 'yes').length;
+    const aYes = count(a.votes, 'yes');
+    const bYes = count(b.votes, 'yes');
 
     if (minPlayers) {
       const aViable = aYes >= minPlayers;
@@ -702,15 +735,12 @@ export function getBestDates(dates, minPlayers = null) {
     if (aYes !== bYes) return bYes - aYes;
 
     // If same number of yes votes, prefer fewer no votes
-    const aNo = a.votes.filter(v => v.response === 'no').length;
-    const bNo = b.votes.filter(v => v.response === 'no').length;
+    const aNo = count(a.votes, 'no');
+    const bNo = count(b.votes, 'no');
 
     if (aNo !== bNo) return aNo - bNo;
 
     // Finally, prefer more maybe votes
-    const aMaybe = a.votes.filter(v => v.response === 'maybe').length;
-    const bMaybe = b.votes.filter(v => v.response === 'maybe').length;
-
-    return bMaybe - aMaybe;
+    return count(b.votes, 'maybe') - count(a.votes, 'maybe');
   });
 }

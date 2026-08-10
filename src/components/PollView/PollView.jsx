@@ -23,7 +23,8 @@ import {
   claimPollIdentity,
   deletePoll,
   getLeadingGame,
-  groupVotesByResponse
+  groupVotesByResponse,
+  voteWeight
 } from '../../utils/pollHelpers';
 import { useAuth } from '../../auth/useAuth';
 import { sortDates, formatDate } from '../../utils/dateHelpers';
@@ -36,6 +37,10 @@ import DateModal from './DateModal';
 import Results from '../Results/Results';
 import { diceRoll } from '../../utils/diceRoll';
 import { useTranslation } from '../../i18n/useTranslation';
+
+// Guests ride along in attendee lists and counts (feature 17)
+const playerCount = (votes) => votes.reduce((n, v) => n + voteWeight(v), 0);
+const nameWithGuests = (v) => (v.guests ? `${v.voterName} +${v.guests}` : v.voterName);
 
 function PollView() {
   const { t, dateLocale } = useTranslation();
@@ -97,9 +102,9 @@ function PollView() {
   // Generate shareable link
   const pollUrl = `${window.location.origin}/poll/${pollId}`;
 
-  const handleVote = async (dateId, response) => {
+  const handleVote = async (dateId, response, guests = undefined) => {
     if (!voterName) return;
-    await addVote(pollId, dateId, { id: voterId, name: voterName, uid: voterUid }, response);
+    await addVote(pollId, dateId, { id: voterId, name: voterName, uid: voterUid }, response, guests);
   };
 
   const handleComment = async (dateId, text) => {
@@ -220,18 +225,18 @@ function PollView() {
               <div className="mt-2 space-y-1 text-sm text-sage-900">
                 <p>
                   <span className="font-semibold">
-                    {t('coming', { count: finalizedVotes.yes.length })}
+                    {t('coming', { count: playerCount(finalizedVotes.yes) })}
                   </span>{' '}
                   {finalizedVotes.yes.length > 0
-                    ? finalizedVotes.yes.map((v) => v.voterName).join(', ')
+                    ? finalizedVotes.yes.map(nameWithGuests).join(', ')
                     : t('nobodyYesYet')}
                 </p>
                 {finalizedVotes.maybe.length > 0 && (
                   <p>
                     <span className="font-semibold">
-                      {t('maybeComing', { count: finalizedVotes.maybe.length })}
+                      {t('maybeComing', { count: playerCount(finalizedVotes.maybe) })}
                     </span>{' '}
-                    {finalizedVotes.maybe.map((v) => v.voterName).join(', ')}
+                    {finalizedVotes.maybe.map(nameWithGuests).join(', ')}
                   </p>
                 )}
                 {leadingGame && leadingGame.votes.length > 0 && (

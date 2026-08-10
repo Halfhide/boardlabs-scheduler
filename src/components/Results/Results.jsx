@@ -1,4 +1,4 @@
-import { getBestDates, groupVotesByResponse, getCapacityStatus } from '../../utils/pollHelpers';
+import { getBestDates, groupVotesByResponse, getCapacityStatus, voteWeight } from '../../utils/pollHelpers';
 import { format, parseISO } from 'date-fns';
 import { useTranslation } from '../../i18n/useTranslation';
 
@@ -102,10 +102,10 @@ function Results({ dates, finalizedDateId, minPlayers, maxPlayers, onDateClick }
                       <div key={key} className="flex items-center gap-1 min-w-0">
                         <span className={`flex-shrink-0 inline-flex items-center gap-0.5 ${badge} px-1.5 py-0.5 rounded text-[11px] font-medium`}>
                           <span>{icon}</span>
-                          <span>{votes.length}</span>
+                          <span>{votes.reduce((n, v) => n + voteWeight(v), 0)}</span>
                         </span>
                         <span className="text-[11px] text-neutral-700 truncate">
-                          {votes.map(v => v.voterName).join(', ')}
+                          {votes.map(v => (v.guests ? `${v.voterName} +${v.guests}` : v.voterName)).join(', ')}
                         </span>
                       </div>
                     );

@@ -46,6 +46,7 @@ features were proposed, 11 accepted, 4 rejected (see bottom).
 | 13 | Design system align | 6     | done        |
 | 14 | Domain + landing    | 6     | done        |
 | 15 | Donations           | 6     | not started |
+| 17 | Bring a friend      | 6     | done        |
 | 16 | Enriched my-polls   | 7     | not started |
 
 ## Phase 1: Poll lifecycle (foundations)
@@ -773,6 +774,32 @@ landing page (feature 14). Ships last, right before launch.
 MANUAL (Adam): create the Ko-fi account and the buycoffee.to
 account, then provide both links.
 
+### 17. Bring a friend (added 10 Aug 2026 on Adam's request)
+
+Status: done (10 Aug 2026). Votes carry an optional `guests` int
+(0..MAX_GUESTS, capped at 9): a voter can bring along extra players
+who count toward the player count without being named. Implemented:
+addVote accepts a guests param (re-votes keep the count, a 'no'
+clears it, omitted when 0 so legacy votes are untouched);
+voteWeight() (1 + guests) drives getVoteSummary, getBestDates and
+getCapacityStatus, so heatmap shading and counts, matrix totals,
+results ranking and capacity badges all speak player counts now. UI:
+a quiet "Bringing extra players?" minus/plus stepper in the date
+modal (visible only for your own yes/maybe vote while voting is
+open; no dice, no banner), "+N" suffixes on names in the voter
+breakdown, matrix cells (✓+2), results cards and the finalize
+banner, and "(+N)" on the you-voted chip. EN/PL strings added. NO
+Firestore rules change needed: rules cannot inspect per-vote fields
+(documented ceiling), so the existing shape validation already
+admits the new field. Verified in the browser end to end on a
+staged poll: voting yes then stepping to +2 showed 3 Yes in the
+modal, 3(checkmark) in the heatmap cell and matrix totals, "Adam T
++2" in breakdown/matrix/results, and "Coming (3): Adam T +2" on the
+finalize banner; test poll expired via the cron path afterwards.
+
+Goal: reflect that people sometimes bring a spouse or friend; only
+the player count matters, not who the guest is.
+
 ## Phase 7: Post-launch
 
 ### 16. Enriched my-polls list (added 29 Jul 2026)
@@ -929,6 +956,11 @@ Acceptance criteria:
   early: app.meppletime.today and the apex both serve the app
   (Adam added both to Firebase authorized domains); the apex
   repoints to the landing in feature 14.
+- 10 Aug 2026: feature 17 (bring a friend) implemented and verified
+  in the browser: optional per-vote guest count feeding all player
+  counts (heatmap, matrix, results, capacity, finalize banner) via
+  voteWeight(), with a small stepper in the date modal. No rules
+  change needed. Test poll routed through the cron cleanup.
 - 3 Aug 2026: landing page expanded and visually reworked on Adam's
   request (feature 14 follow-up): kicker labels, hero stickers,
   tilted screenshot cards with blob backdrops, a six-cell "Everything
