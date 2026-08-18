@@ -609,6 +609,18 @@ committed and pushed, working tree clean:
   (reCAPTCHA v3), DORMANT until VITE_RECAPTCHA_SITE_KEY is set, so
   current prod is unchanged. Debug token enabled in dev.
 
+Decision history: on 29 Jul 2026 Adam doubted App Check was needed
+and skipping enforcement (dormant wiring, budget alert, revisit on
+abuse) was recommended; on 11 Aug 2026 Adam explicitly chose the
+FULL rollout instead. Stage 1 below was explained to him click by
+click on 11 Aug (classic key at google.com/recaptcha/admin/create,
+score-based v3, the five domains, and a warning about the Google
+Cloud Enterprise detour) but as of 18 Aug he has NOT yet reported
+creating the key. Resume by asking whether the key exists, then
+continue with the numbered steps. The secret key must never be
+pasted into chat (Adam pastes it straight into the Firebase
+console); the site key is public and fine to share.
+
 REMAINING when resuming (this is the resume point):
 1. Adam finishes reCAPTCHA v3 key creation at
    google.com/recaptcha/admin (label MeppleTime, v3 score-based,
