@@ -47,6 +47,7 @@ features were proposed, 11 accepted, 4 rejected (see bottom).
 | 14 | Domain + landing    | 6     | done        |
 | 15 | Donations           | 6     | not started |
 | 17 | Bring a friend      | 6     | done        |
+| 18 | Branded splash      | 6     | done        |
 | 16 | Enriched my-polls   | 7     | not started |
 
 ## Phase 1: Poll lifecycle (foundations)
@@ -800,6 +801,24 @@ finalize banner; test poll expired via the cron path afterwards.
 Goal: reflect that people sometimes bring a spouse or friend; only
 the player count matters, not who the guest is.
 
+### 18. Branded splash screen (added 18 Aug 2026 on Adam's request)
+
+Status: done (18 Aug 2026). A static splash lives directly in
+index.html (cream #f5ead8 full-viewport overlay, the illustrated
+mark at min(38vw, 170px) with a gentle scale pulse, disabled under
+prefers-reduced-motion): it paints with the app shell before React
+boots, which is exactly the blank gap on mobile/PWA cold starts.
+main.jsx fades it out after first paint with a ~700ms floor from
+navigation start so fast desktop loads read as intentional rather
+than a flash; the node is removed after the transition. The mark is
+referenced as /favicon.svg (already SW-precached), so installed
+PWAs show it instantly; on a slow first-ever visit the cream paints
+first and the mark pops in when loaded (accepted tradeoff to keep
+the HTML shell lean). Android's native PWA splash already matched
+(manifest background_color cream + icon). Verified in the browser
+at 390px and desktop: splash shows, crossfades into the app, and
+the DOM node is gone afterwards; lint and build green.
+
 ## Phase 7: Post-launch
 
 ### 16. Enriched my-polls list (added 29 Jul 2026)
@@ -956,6 +975,10 @@ Acceptance criteria:
   early: app.meppletime.today and the apex both serve the app
   (Adam added both to Firebase authorized domains); the apex
   repoints to the landing in feature 14.
+- 18 Aug 2026: feature 18 (branded splash screen) implemented and
+  verified: static in-shell splash with the illustrated mark, fading
+  into the app after first paint, instant on installed PWAs via the
+  existing SW precache. Requested by Adam as pre-launch polish.
 - 10 Aug 2026: investigated Adam's "cross-month polls only show one
   month" report. NOT a display bug: calendar, matrix and results all
   handle multi-month polls correctly (verified with a staged Aug-Sep

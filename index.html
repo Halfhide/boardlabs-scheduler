@@ -8,9 +8,43 @@
     <meta name="theme-color" content="#c67139" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <title>MeppleTime</title>
+    <style>
+      /* Branded splash, painted straight from the app shell before
+         React boots (feature 18). main.jsx fades it out on mount. */
+      #splash {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f5ead8;
+        transition: opacity 0.45s ease;
+      }
+      #splash.splash-hide {
+        opacity: 0;
+        pointer-events: none;
+      }
+      #splash img {
+        width: min(38vw, 170px);
+        height: auto;
+        filter: drop-shadow(0 10px 24px rgb(46 43 37 / 0.2));
+        animation: splash-bob 1.6s ease-in-out infinite;
+      }
+      @keyframes splash-bob {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #splash img { animation: none; }
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>
+    <div id="splash" aria-hidden="true">
+      <img src="/favicon.svg" alt="" />
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
