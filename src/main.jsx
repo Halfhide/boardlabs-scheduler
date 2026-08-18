@@ -15,11 +15,11 @@ createRoot(document.getElementById('root')).render(
 )
 
 // Fade out the static splash from index.html once the app has had a
-// first paint. A floor of ~700ms since navigation start keeps a fast
+// first paint. A floor of ~1.4s since navigation start keeps a fast
 // load from flashing the splash like a glitch.
 const splash = document.getElementById('splash')
 if (splash) {
-  const delay = Math.max(0, 700 - performance.now())
+  const delay = Math.max(0, 1400 - performance.now())
   requestAnimationFrame(() => {
     setTimeout(() => {
       splash.classList.add('splash-hide')

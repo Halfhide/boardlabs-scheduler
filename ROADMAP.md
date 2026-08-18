@@ -803,14 +803,17 @@ the player count matters, not who the guest is.
 
 ### 18. Branded splash screen (added 18 Aug 2026 on Adam's request)
 
-Status: done (18 Aug 2026). A static splash lives directly in
-index.html (cream #f5ead8 full-viewport overlay, the illustrated
-mark at min(38vw, 170px) with a gentle scale pulse, disabled under
-prefers-reduced-motion): it paints with the app shell before React
-boots, which is exactly the blank gap on mobile/PWA cold starts.
-main.jsx fades it out after first paint with a ~700ms floor from
-navigation start so fast desktop loads read as intentional rather
-than a flash; the node is removed after the transition. The mark is
+Status: done (18 Aug 2026; extended same day on Adam's request:
+display floor doubled to ~1.4s and the MeppleTime wordmark added
+below the mark, Caprasimo with sage/terra split, system-font
+fallback on cold first visits until the bundle's font loads). A
+static splash lives directly in index.html (cream #f5ead8
+full-viewport overlay, the illustrated mark at min(38vw, 170px)
+with a gentle scale pulse, disabled under prefers-reduced-motion):
+it paints with the app shell before React boots, which is exactly
+the blank gap on mobile/PWA cold starts. main.jsx fades it out
+after first paint once the floor has passed; the node is removed
+after the transition. The mark is
 referenced as /favicon.svg (already SW-precached), so installed
 PWAs show it instantly; on a slow first-ever visit the cream paints
 first and the mark pops in when loaded (accepted tradeoff to keep

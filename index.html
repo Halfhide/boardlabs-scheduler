@@ -16,11 +16,20 @@
         inset: 0;
         z-index: 9999;
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
+        gap: 22px;
         background: #f5ead8;
         transition: opacity 0.45s ease;
       }
+      #splash .splash-word {
+        font-family: 'Caprasimo', system-ui, sans-serif;
+        font-size: clamp(28px, 8vw, 40px);
+        line-height: 1;
+      }
+      #splash .splash-word .m { color: #56633f; }
+      #splash .splash-word .t { color: #b2622d; }
       #splash.splash-hide {
         opacity: 0;
         pointer-events: none;
@@ -44,6 +53,7 @@
     <div id="root"></div>
     <div id="splash" aria-hidden="true">
       <img src="/favicon.svg" alt="" />
+      <div class="splash-word"><span class="m">Mepple</span><span class="t">Time</span></div>
     </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
