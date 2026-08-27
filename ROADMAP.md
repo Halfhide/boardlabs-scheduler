@@ -757,7 +757,10 @@ favicon (public/favicon.svg) and the landing page
 plus regenerated PWA icons (192/512 transparent, maskable 512 and
 apple-touch 180 on cream). Wordmarks in the app and landing remain
 Caprasimo live text: Bogart is a commercial font and is not
-licensed for embedding; adopting it is an open decision for Adam.
+licensed for embedding. DECIDED (27 Aug 2026): Caprasimo stays
+permanently (it is on Google Fonts under the SIL Open Font
+License, free for commercial use and embedding); Bogart will not
+be licensed. This is closed, not an open decision.
 The old flat-geometry mark is fully retired. Verified in headless
 Chrome (app header at desktop and 390px, landing hero/nav/footer,
 favicon served); lint and build green.
@@ -1092,6 +1095,9 @@ Acceptance criteria:
   assets from design-assets/good-logotype.svg. Wordmarks stay
   Caprasimo text; the logotype's Bogart Extrabold face is
   commercial and unlicensed, flagged to Adam as an open decision.
+- 27 Aug 2026: font decision closed: wordmarks stay Caprasimo
+  permanently (SIL OFL via Google Fonts, free for commercial use);
+  Bogart will not be licensed.
 - 27 Aug 2026: feature 15 (donations) implemented and verified in
   both languages, then reworked the same day on Adam's request into
   branded buttons with official platform identities, and the EN
