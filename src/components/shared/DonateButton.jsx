@@ -1,39 +1,40 @@
-import { useTranslation } from '../../i18n/useTranslation';
 import bcLogo from '../../assets/buycoffee-logo.svg';
 import bmcButton from '../../assets/bmc-button.png';
 
-// Official platform branding for the donation link, self-hosted so it
-// works offline and needs no third-party request. English UI: Buy Me
-// a Coffee's official yellow button (their brand page's embed asset).
-// Polish UI: buycoffee.to's official white wordmark (copy of their
-// /img/brand/bc-logo.svg) on black, matching how the brand presents
-// itself.
+// Both donation platforms are always offered, in every language:
+// Buy Me a Coffee for international supporters (earth emoji) and
+// buycoffee.to for Polish ones (flag emoji; supports BLIK). Official
+// branding, self-hosted assets: Buy Me a Coffee's yellow embed
+// button, and buycoffee.to's white wordmark on their signature
+// green-to-magenta brand gradient.
 function DonateButton() {
-  const { t, lang } = useTranslation();
-
   return (
-    <a
-      href={t('donateUrl')}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="inline-flex rounded-full hover:opacity-85 transition-opacity"
-    >
-      {lang === 'pl' ? (
-        <span className="inline-flex items-center bg-black rounded-full h-9 px-5">
+    <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
+      <a
+        href="https://buymeacoffee.com/halfhide"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-2 hover:opacity-85 transition-opacity"
+      >
+        <span aria-hidden="true" className="text-lg">🌍</span>
+        <img src={bmcButton} alt="Buy me a coffee" className="h-9 w-auto rounded-xl" />
+      </a>
+      <a
+        href="https://buycoffee.to/halfhide"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-2 hover:opacity-85 transition-opacity"
+      >
+        <span aria-hidden="true" className="text-lg">🇵🇱</span>
+        <span className="inline-flex items-center h-9 px-5 rounded-full bg-[linear-gradient(90deg,#009052,#b43899)]">
           <img
             src={bcLogo}
             alt="Postaw mi kawę na buycoffee.to"
             className="h-[17px] w-auto"
           />
         </span>
-      ) : (
-        <img
-          src={bmcButton}
-          alt="Buy me a coffee"
-          className="h-9 w-auto"
-        />
-      )}
-    </a>
+      </a>
+    </div>
   );
 }
 

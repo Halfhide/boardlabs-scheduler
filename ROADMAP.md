@@ -821,6 +821,17 @@ surfaces, all images loading locally; lint and build green.
 History note: Ko-fi was implemented first but its CDN refuses
 hotlinked embeds (and this network cannot fetch it for
 self-hosting), which Adam resolved by switching platforms.
+Refinement (27 Aug 2026, on Adam's feedback): BOTH buttons now
+show in BOTH languages (a Polish speaker may still prefer BMC and
+vice versa), each prefixed with an emoji marker (earth for Buy Me
+a Coffee = international, Polish flag for buycoffee.to = BLIK);
+the buycoffee pill background changed from flat black (looked bad
+on the cream theme) to the platform's signature green-to-magenta
+brand gradient (#009052 -> #b43899; no other official logo color
+variants exist, only the white wordmark); and the landing #support
+section got the same 88px/56px top margin as the other sections
+(it previously sat cramped under the FAQ). donateUrl left the i18n
+dictionary; URLs live in DonateButton.jsx and the landing markup.
 
 Monetization stays donation-only and fully optional: no payments in
 the app itself, just links out to donation platforms, so no payment

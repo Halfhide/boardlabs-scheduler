@@ -292,9 +292,6 @@ export const translations = {
 
     // Footer + privacy page
     footerPrivacy: 'Privacy',
-    // Per-language donation platform: Buy Me a Coffee for EN,
-    // buycoffee.to for PL
-    donateUrl: 'https://buymeacoffee.com/halfhide',
     privacyTitle: 'Privacy',
     privacyIntro: 'MeppleTime is a small tool for scheduling board game nights. It stores as little as possible; this page explains what, where, and for how long.',
     privacyWhatTitle: 'What is stored',
@@ -596,7 +593,6 @@ export const translations = {
 
     // Footer + privacy page
     footerPrivacy: 'Prywatność',
-    donateUrl: 'https://buycoffee.to/halfhide',
     privacyTitle: 'Prywatność',
     privacyIntro: 'MeppleTime to małe narzędzie do umawiania wieczorów planszówkowych. Przechowuje tak mało danych, jak to możliwe; ta strona wyjaśnia co, gdzie i na jak długo.',
     privacyWhatTitle: 'Co przechowujemy',
