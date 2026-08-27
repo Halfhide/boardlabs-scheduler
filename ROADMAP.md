@@ -50,7 +50,7 @@ features were proposed, 11 accepted, 4 rejected (see bottom).
 | 18 | Branded splash      | 6     | done        |
 | 19 | SEO launch foundation | 6b  | done        |
 | 20 | Bilingual landing URLs | 6b | done        |
-| 21 | Performance pass    | 6b    | not started |
+| 21 | Performance pass    | 6b    | done        |
 | 16 | Enriched my-polls   | 7     | not started |
 
 ## Phase 1: Poll lifecycle (foundations)
@@ -1004,8 +1004,13 @@ position sensibly; sitemap lists both.
 
 ### 21. Performance pass
 
-Status: implemented, awaiting push (27 Aug 2026). Local Lighthouse
-mobile results: EN landing performance 100 / accessibility 100
+Status: done (27 Aug 2026, commit 763f194). PRODUCTION Lighthouse
+mobile: both / and /pl/ score 98 performance / 100 accessibility /
+100 SEO with FCP 1.2s and LCP 1.5s (real network beats the local
+emulation on LCP thanks to Vercel's CDN). Phase 6b complete;
+MeppleTime is launch-ready. Local Lighthouse
+mobile results during development: EN landing performance 100 /
+accessibility 100
 (was 84 / 96), FCP 1.1s (was 2.9s), LCP 1.9s (was 3.7s), CLS 0;
 PL landing 98 / 100 / 100. Acceptance criteria exceeded. Done:
 - Fonts self-hosted (12 woff2 subsets copied from @fontsource
@@ -1255,6 +1260,11 @@ Acceptance criteria:
   assets from design-assets/good-logotype.svg. Wordmarks stay
   Caprasimo text; the logotype's Bogart Extrabold face is
   commercial and unlicensed, flagged to Adam as an open decision.
+- 27 Aug 2026: phase 6b COMPLETE, all in one day: feature 19 (SEO
+  foundation), feature 20 (bilingual /pl/ landing with hreflang)
+  and feature 21 (performance pass) shipped and live-verified.
+  Production Lighthouse mobile for both landing URLs: 98 / 100 /
+  100 with LCP 1.5s. Nothing remains before public launch.
 - 27 Aug 2026: SEO audit run before public launch (report in
   SEO-AUDIT.md): Polish content unindexable, robots/sitemap
   missing or broken, no social preview tags, user polls indexable.
