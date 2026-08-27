@@ -916,7 +916,23 @@ this phase.
 
 ### 19. SEO launch foundation
 
-Status: not started
+Status: implemented, awaiting push + live header verification
+(27 Aug 2026). Everything verified locally: landing robots.txt +
+sitemap.xml (static files in landing/); app public/robots.txt
+(served before the SPA rewrite, crawl allowed so the noindex
+headers are visible); vercel.json X-Robots-Tag noindex headers on
+every app path EXCEPT /privacy; new branded 1200x630 share card
+(scripts/generate-og-image.mjs -> landing/assets/og-card.png,
+copied to app public/og-card.png); full OG + Twitter tags on the
+landing (localized-alternate og:locale) and a generic card on the
+app shell so shared poll links preview; JSON-LD WebApplication +
+FAQPage on the landing (parse-validated); keyword-targeted titles
+and descriptions in EN and PL, em-dashes removed from live
+strings; landing self-canonical, and a CanonicalTag component in
+the app (root -> landing, /privacy -> self, poll routes none,
+verified in the browser). Lint + build green. AFTER the push:
+verify X-Robots-Tag on app routes (must be absent on /privacy),
+robots/sitemap live on both hosts, and a messenger link preview.
 
 The crawler-facing blockers, in one feature (audit findings C2, C3,
 C4, H1, H2, M4):

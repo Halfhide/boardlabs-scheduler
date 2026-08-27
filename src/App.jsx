@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import CreatePoll from './components/CreatePoll/CreatePoll';
 import PollView from './components/PollView/PollView';
 import LanguageProvider from './i18n/LanguageProvider';
@@ -35,6 +36,37 @@ function LanguageToggle() {
   );
 }
 
+// SEO plumbing (feature 19): the marketing site at
+// www.meppletime.today is the ranking surface, so the app root
+// canonicals there; /privacy is the one app page meant to be
+// indexed (vercel.json exempts it from the X-Robots-Tag noindex)
+// and self-canonicals. Other routes (polls) carry no canonical.
+const CANONICALS = {
+  '/': 'https://www.meppletime.today/',
+  '/privacy': 'https://app.meppletime.today/privacy'
+};
+
+function CanonicalTag() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    const href = CANONICALS[pathname];
+    let link = document.head.querySelector('link[rel="canonical"]');
+    if (href) {
+      if (!link) {
+        link = document.createElement('link');
+        link.setAttribute('rel', 'canonical');
+        document.head.appendChild(link);
+      }
+      link.setAttribute('href', href);
+    } else if (link) {
+      link.remove();
+    }
+  }, [pathname]);
+
+  return null;
+}
+
 function Footer() {
   const { t } = useTranslation();
 
@@ -57,6 +89,7 @@ function App() {
     <LanguageProvider>
       <AuthProvider>
       <Router>
+        <CanonicalTag />
         <div className="min-h-screen bg-ground">
           <OfflineBanner />
           <header className="bg-surface shadow-sm">

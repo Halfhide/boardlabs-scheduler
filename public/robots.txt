@@ -1,0 +1,6 @@
+# The app is intentionally kept out of search results via
+# X-Robots-Tag headers (see vercel.json); crawling stays allowed so
+# crawlers can see those headers. The indexable marketing site lives
+# at https://www.meppletime.today/
+User-agent: *
+Allow: /
