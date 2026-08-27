@@ -832,6 +832,9 @@ variants exist, only the white wordmark); and the landing #support
 section got the same 88px/56px top margin as the other sections
 (it previously sat cramped under the FAQ). donateUrl left the i18n
 dictionary; URLs live in DonateButton.jsx and the landing markup.
+Final placement (same day, Adam's call): the support section moved
+ABOVE the FAQ, so the landing order is hero -> three steps ->
+features -> feature grid -> support -> FAQ -> brand band -> footer.
 
 Monetization stays donation-only and fully optional: no payments in
 the app itself, just links out to donation platforms, so no payment
