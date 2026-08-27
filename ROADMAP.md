@@ -966,7 +966,25 @@ FAQPage; the app root is noindexed and canonicalized while
 
 ### 20. Bilingual landing URLs
 
-Status: not started
+Status: implemented, awaiting push (27 Aug 2026). Architecture:
+landing/index.html stays the single source of truth (EN markup +
+the STRINGS dictionary); scripts/generate-pl-landing.mjs loads it
+in headless Chrome, applies setLang('pl'), localizes the head
+(canonical /pl/, og:url and locales, PL OG/Twitter copy, PL
+JSON-LD WebApplication + FAQPage) and writes the fully static
+landing/pl/index.html, which is COMMITTED (the landing project
+has no build step). IMPORTANT for future sessions: after ANY
+landing copy change, re-run node scripts/generate-pl-landing.mjs
+or the Polish page goes stale. Asset paths switched to absolute
+(/assets/...) so both URLs share them. hreflang links (en, pl,
+x-default) on both pages; both URLs in sitemap.xml. The language
+toggle now NAVIGATES between / and /pl/ and saves the choice; a
+head script routes by saved choice, and only a first-visit Polish
+browser on / is auto-sent to /pl/. The PL page never redirects on
+browser language alone, so Googlebot (en-US) can index it.
+Verified locally in the browser: static Polish via curl (no JS),
+toggle both directions, saved-choice routing both directions, PL
+JSON-LD parse-validated. Verify live after push.
 
 Fixes C1, the biggest strategic gap: Polish content is invisible
 to crawlers. Build a real /pl/ version of the landing with the
