@@ -49,7 +49,7 @@ features were proposed, 11 accepted, 4 rejected (see bottom).
 | 17 | Bring a friend      | 6     | done        |
 | 18 | Branded splash      | 6     | done        |
 | 19 | SEO launch foundation | 6b  | done        |
-| 20 | Bilingual landing URLs | 6b | not started |
+| 20 | Bilingual landing URLs | 6b | done        |
 | 21 | Performance pass    | 6b    | not started |
 | 16 | Enriched my-polls   | 7     | not started |
 
@@ -966,7 +966,9 @@ FAQPage; the app root is noindexed and canonicalized while
 
 ### 20. Bilingual landing URLs
 
-Status: implemented, awaiting push (27 Aug 2026). Architecture:
+Status: done (27 Aug 2026, commit 61cda34; live-verified: static
+Polish HTML at /pl/, 3 hreflang links on both pages, PL title,
+2 sitemap URLs). Architecture:
 landing/index.html stays the single source of truth (EN markup +
 the STRINGS dictionary); scripts/generate-pl-landing.mjs loads it
 in headless Chrome, applies setLang('pl'), localizes the head
@@ -1002,7 +1004,35 @@ position sensibly; sitemap lists both.
 
 ### 21. Performance pass
 
-Status: not started
+Status: implemented, awaiting push (27 Aug 2026). Local Lighthouse
+mobile results: EN landing performance 100 / accessibility 100
+(was 84 / 96), FCP 1.1s (was 2.9s), LCP 1.9s (was 3.7s), CLS 0;
+PL landing 98 / 100 / 100. Acceptance criteria exceeded. Done:
+- Fonts self-hosted (12 woff2 subsets copied from @fontsource
+  into landing/assets/fonts/, @font-face with unicode-range and
+  font-display swap inlined into the page CSS, Google Fonts
+  stylesheet removed, 3 critical latin faces preloaded).
+  Curiosity: Caprasimo now SHIPS a latin-ext subset upstream
+  (it lacked Polish diacritics in July); included, though the
+  wordmark is ASCII anyway.
+- Screenshots converted to WebP via headless Chrome canvas
+  (scripts/convert-shots-webp.mjs, 234KB -> 88KB); all imgs got
+  width/height, below-fold ones loading=lazy, the hero mark
+  fetchpriority=high; mepple-mark.svg SVGO'd (-8%, it is mostly
+  irreducible path data); landing apple-touch-icon added.
+- Contrast (WCAG AA): primary buttons and active lang toggle
+  moved from terra to terra-700 with terra-800 hover, kickers to
+  terra-700, the brand band deepened to sage-700, footer text to
+  neutral-700, footer wordmark raised to 24px (large-text
+  threshold keeps the brand terracotta-600 legal). Verified
+  visually: reads as a richer version of the same identity.
+- landing/pl/index.html regenerated (remember: ALWAYS re-run
+  scripts/generate-pl-landing.mjs after landing edits).
+- Stretch item H4 (app code-splitting) deliberately NOT done:
+  risky refactor days before launch for a surface that is
+  noindexed; revisit post-launch if voters complain.
+Old PNG screenshots kept on disk (unreferenced) for the capture
+history; the pages load only the WebPs.
 
 Audit findings H3, M1, M2, L1, L2 plus optional H4:
 - Self-host the landing fonts (subset, font-display swap, preload
