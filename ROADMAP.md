@@ -675,14 +675,19 @@ account email), where (Google Firebase, EU visitors included), how
 long (auto-expiry window), and how to get data removed (contact
 Adam; owners can delete their polls). Footer link on both pages.
 
-Post-launch follow-up (agreed 26 Jul 2026, not part of the phase):
-Firebase's magic-link emails land in spam (confirmed with Adam's own
-mailbox; the sender is the default noreply@<project>.firebaseapp.com).
-Accepted for now; the UI warns users to check spam after sending a
-link. Some time after the public release, improve deliverability:
-customize the sender in Firebase Auth email templates to a domain
-Adam controls (requires DNS SPF/DKIM records) or route auth mail
-through a proper SMTP relay.
+Email deliverability follow-up: DONE (27 Aug 2026). Firebase Auth
+now sends from noreply@meppletime.today: domain customized in
+Authentication -> Templates, four DNS records added in Vercel
+(apex SPF TXT v=spf1 include:_spf.firebasemail.com ~all, apex
+firebase=... verification TXT, firebase1/2._domainkey DKIM CNAMEs
+to firebasemail.com; adding them intentionally disables wildcard
+matching for the _domainkey branch, which is harmless), Firebase
+verification passed same day. Verified live by Adam: magic link
+arrived IN THE INBOX (not spam) from the proper sender. The
+Firebase public-facing name was also corrected from
+"boardgame-scheduler" to "MeppleTime" (Project settings ->
+General), which fixes the app name in the email subject and body.
+The check-your-spam hint in the UI stays as a harmless safety net.
 
 Acceptance criteria for the phase: signed-out experience unchanged;
 sign-in works via Google and via magic link on desktop and phone;
@@ -1095,6 +1100,12 @@ Acceptance criteria:
   assets from design-assets/good-logotype.svg. Wordmarks stay
   Caprasimo text; the logotype's Bogart Extrabold face is
   commercial and unlicensed, flagged to Adam as an open decision.
+- 27 Aug 2026: email deliverability fixed: Firebase Auth mail now
+  sends from noreply@meppletime.today (SPF + DKIM via four DNS
+  records in Vercel, domain verified) and the Firebase
+  public-facing name corrected to MeppleTime. Verified live: magic
+  link in the inbox, proper sender. The last pre-launch loose end
+  is closed.
 - 27 Aug 2026: font decision closed: wordmarks stay Caprasimo
   permanently (SIL OFL via Google Fonts, free for commercial use);
   Bogart will not be licensed.
