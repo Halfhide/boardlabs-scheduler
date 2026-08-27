@@ -48,7 +48,7 @@ features were proposed, 11 accepted, 4 rejected (see bottom).
 | 15 | Donations           | 6     | done        |
 | 17 | Bring a friend      | 6     | done        |
 | 18 | Branded splash      | 6     | done        |
-| 19 | SEO launch foundation | 6b  | not started |
+| 19 | SEO launch foundation | 6b  | done        |
 | 20 | Bilingual landing URLs | 6b | not started |
 | 21 | Performance pass    | 6b    | not started |
 | 16 | Enriched my-polls   | 7     | not started |
@@ -916,8 +916,13 @@ this phase.
 
 ### 19. SEO launch foundation
 
-Status: implemented, awaiting push + live header verification
-(27 Aug 2026). Everything verified locally: landing robots.txt +
+Status: done (27 Aug 2026, commit a6f8412). Live production
+verification passed all acceptance criteria: X-Robots-Tag noindex
+present on the app root and poll routes, ABSENT on /privacy;
+app robots.txt serves as text/plain; landing robots.txt +
+sitemap.xml live (application/xml); og-card.png 200 on both
+hosts; canonical, OG tags and both JSON-LD blocks in the live
+landing HTML. Implementation details: landing robots.txt +
 sitemap.xml (static files in landing/); app public/robots.txt
 (served before the SPA rewrite, crawl allowed so the noindex
 headers are visible); vercel.json X-Robots-Tag noindex headers on
