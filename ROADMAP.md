@@ -48,6 +48,9 @@ features were proposed, 11 accepted, 4 rejected (see bottom).
 | 15 | Donations           | 6     | done        |
 | 17 | Bring a friend      | 6     | done        |
 | 18 | Branded splash      | 6     | done        |
+| 19 | SEO launch foundation | 6b  | not started |
+| 20 | Bilingual landing URLs | 6b | not started |
+| 21 | Performance pass    | 6b    | not started |
 | 16 | Enriched my-polls   | 7     | not started |
 
 ## Phase 1: Poll lifecycle (foundations)
@@ -903,7 +906,90 @@ the HTML shell lean). Android's native PWA splash already matched
 at 390px and desktop: splash shows, crossfades into the app, and
 the DOM node is gone afterwards; lint and build green.
 
+## Phase 6b: Pre-launch SEO (added 27 Aug 2026)
+
+Source of truth for the reasoning: `SEO-AUDIT.md` (full audit of
+27 Aug 2026, finding codes C1-C4, H1-H4, M1-M5, L1-L4 referenced
+below). Adam approved the three features and their order as
+proposed: 19 -> 20 -> 21 -> public launch. Public launch waits for
+this phase.
+
+### 19. SEO launch foundation
+
+Status: not started
+
+The crawler-facing blockers, in one feature (audit findings C2, C3,
+C4, H1, H2, M4):
+- robots.txt + sitemap.xml on the landing; a real static
+  robots.txt in the app's public/ so the SPA rewrite stops serving
+  HTML for it (C2).
+- Open Graph + Twitter Card tags with a branded share image on the
+  landing, and a generic branded card on the app shell so shared
+  poll links preview properly (C3). Note: this deliberately
+  un-rejects only the OG-tags slice of the "richer share options"
+  rejection of 15 Jul 2026; QR codes and share buttons stay
+  rejected. Per-poll dynamic previews are NOT in scope (phase 7
+  candidate).
+- noindex the app (robots meta + X-Robots-Tag), keep /privacy
+  indexable, canonical app root -> landing (C4).
+- JSON-LD on the landing: FAQPage from the existing FAQ,
+  WebApplication, Organization with logo (H1).
+- Keyword-targeted title + meta description, no em-dashes, under
+  ~60/155 chars (H2); self-canonicals (M4).
+
+Acceptance criteria: robots.txt and sitemap.xml return valid
+content on both hosts; a landing link pasted into a messenger
+shows a branded card; Google's Rich Results test recognizes the
+FAQPage; the app root is noindexed and canonicalized while
+/privacy stays indexable.
+
+### 20. Bilingual landing URLs
+
+Status: not started
+
+Fixes C1, the biggest strategic gap: Polish content is invisible
+to crawlers. Build a real /pl/ version of the landing with the
+Polish translations baked into the HTML (title, meta, body,
+localized JSON-LD), correct lang attributes, hreflang link pairs
+(en, pl, x-default) on both versions, and both URLs in the
+sitemap. The existing JS language toggle stays as a convenience
+(switching navigates between the two URLs). The translation
+dictionary already in landing/index.html is the content source.
+
+Acceptance criteria: fetching /pl/ with JS disabled shows full
+Polish content; hreflang validates; both versions self-canonical;
+the language toggle navigates between URLs and preserves scroll
+position sensibly; sitemap lists both.
+
+### 21. Performance pass
+
+Status: not started
+
+Audit findings H3, M1, M2, L1, L2 plus optional H4:
+- Self-host the landing fonts (subset, font-display swap, preload
+  the two critical faces) instead of render-blocking Google Fonts
+  CSS; ~2s estimated LCP savings (H3).
+- Optimize mepple-mark.svg with SVGO and preload it (it is the LCP
+  element, 36KB used three times) (L1); add an apple-touch-icon to
+  the landing (L2).
+- Screenshots to WebP with width/height attributes, loading=lazy
+  below the fold (M1).
+- Fix the WCAG AA contrast failures (terra buttons, kickers,
+  language toggle on cream) (M2).
+- Stretch, only if time allows: app code-splitting and lazy
+  Firebase init to cut the 7.2s mobile first paint (H4).
+
+Acceptance criteria: landing Lighthouse mobile performance >= 95
+with FCP < 1.5s and LCP < 2.5s; accessibility 100; both themes of
+buttons pass AA contrast; no regression in either language.
+
 ## Phase 7: Post-launch
+
+Post-launch SEO candidates (from SEO-AUDIT.md, 27 Aug 2026, not
+yet scheduled): a small content layer of EN/PL guides linking to
+the app (finding L4, builds topical authority for the new .today
+domain), and per-poll dynamic OG previews so each shared poll
+renders its own card.
 
 ### 16. Enriched my-polls list (added 29 Jul 2026)
 
@@ -1100,6 +1186,11 @@ Acceptance criteria:
   assets from design-assets/good-logotype.svg. Wordmarks stay
   Caprasimo text; the logotype's Bogart Extrabold face is
   commercial and unlicensed, flagged to Adam as an open decision.
+- 27 Aug 2026: SEO audit run before public launch (report in
+  SEO-AUDIT.md): Polish content unindexable, robots/sitemap
+  missing or broken, no social preview tags, user polls indexable.
+  Adam approved turning it into phase 6b (features 19, 20, 21,
+  in that order) as the last gate before launch.
 - 27 Aug 2026: email deliverability fixed: Firebase Auth mail now
   sends from noreply@meppletime.today (SPF + DKIM via four DNS
   records in Vercel, domain verified) and the Firebase
