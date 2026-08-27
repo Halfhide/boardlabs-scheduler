@@ -1057,6 +1057,33 @@ Acceptance criteria: landing Lighthouse mobile performance >= 95
 with FCP < 1.5s and LCP < 2.5s; accessibility 100; both themes of
 buttons pass AA contrast; no regression in either language.
 
+## Copy quality pass (27 Aug 2026, evening)
+
+A copywriter-agent audit (files in marketing-mcp/projects/meppletime/)
+drove a product-wide copy pass, implemented per its brief with these
+notable outcomes beyond string edits:
+- Results.jsx voter dedupe bug fixed (was voterId-first, now
+  uid-first like the matrix and calendar; one person on two devices
+  no longer counts twice) and VoteMatrix now shows each
+  participant's most recent name by vote timestamp.
+- Landing /pl/ deep links always win over the stored language
+  preference (the saved-en bounce was removed); only the toggle
+  writes the preference.
+- Cross-origin language handoff: all landing links to the app carry
+  ?lang=en|pl, which the app reads once, persists, and strips.
+- Localized document titles: app home, /privacy, and per-poll tab
+  titles ({poll title} | MeppleTime), language-toggle safe.
+- EN app copy sentence-cased and aligned with the (better) PL copy;
+  "Un-finalize" family became "Undo the pick"; capacity became
+  player count; landing feature H3s promoted to H2; landing title
+  tags now carry the secondary phrase; EN support section names the
+  maker.
+- OPS NOTE: localhost dev now requires a registered App Check debug
+  token (enforcement!). This session registered this Mac's Chrome
+  token as "Adam MacBook localhost dev" in Firebase console ->
+  App Check -> Apps -> Manage debug tokens. A fresh browser profile
+  prints a new token in the console; register it the same way.
+
 ## Phase 7: Post-launch
 
 Post-launch SEO candidates (from SEO-AUDIT.md, 27 Aug 2026, not

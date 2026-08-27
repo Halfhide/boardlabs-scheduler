@@ -2,7 +2,7 @@
 <html lang="pl"><head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>MeppleTime: planer wieczoru planszówek</title>
+  <title>Planer wieczoru planszówek i ankieta terminu | MeppleTime</title>
   <meta name="description" content="Darmowa ankieta terminu na planszówki: udostępniasz jeden link, znajomi głosują na terminy, a grę wybieracie razem. Bez zakładania kont.">
   <link rel="canonical" href="https://www.meppletime.today/pl/">
   <link rel="alternate" hreflang="en" href="https://www.meppletime.today/">
@@ -18,8 +18,10 @@
       try {
         var saved = localStorage.getItem('landingLang');
         var onPl = location.pathname === '/pl/' || location.pathname === '/pl';
+        // An explicit /pl/ URL always wins: shared Polish links must
+        // open Polish, whatever this browser chose before. Only the
+        // root entry point routes by preference or browser language.
         if (saved === 'pl' && !onPl) location.replace('/pl/');
-        else if (saved === 'en' && onPl) location.replace('/');
         else if (!saved && !onPl &&
                  (navigator.language || '').toLowerCase().indexOf('pl') === 0) {
           location.replace('/pl/');
@@ -30,7 +32,7 @@
   <meta property="og:site_name" content="MeppleTime">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://www.meppletime.today/pl/">
-  <meta property="og:title" content="MeppleTime: planer wieczoru planszówek">
+  <meta property="og:title" content="Planer wieczoru planszówek i ankieta terminu | MeppleTime">
   <meta property="og:description" content="Darmowa ankieta terminu na planszówki: udostępniasz jeden link, znajomi głosują na terminy, a grę wybieracie razem. Bez zakładania kont.">
   <meta property="og:image" content="https://www.meppletime.today/assets/og-card.png">
   <meta property="og:image:width" content="1200">
@@ -38,7 +40,7 @@
   <meta property="og:locale" content="pl_PL">
   <meta property="og:locale:alternate" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="MeppleTime: planer wieczoru planszówek">
+  <meta name="twitter:title" content="Planer wieczoru planszówek i ankieta terminu | MeppleTime">
   <meta name="twitter:description" content="Darmowa ankieta terminu na planszówki: udostępniasz jeden link, znajomi głosują na terminy, a grę wybieracie razem. Bez zakładania kont.">
   <meta name="twitter:image" content="https://www.meppletime.today/assets/og-card.png">
   <script type="application/ld+json">{
@@ -345,7 +347,7 @@
     .features { padding-top: 40px; }
     .feature { display: grid; grid-template-columns: 1fr 1.25fr; gap: 48px; align-items: center; margin: 72px 0; }
     .feature:nth-child(even) .feature-copy { order: 2; }
-    .feature h3 { font-size: clamp(24px, 3vw, 32px); margin-bottom: 10px; }
+    .feature h2 { font-size: clamp(24px, 3vw, 32px); margin-bottom: 10px; }
     .feature p { color: var(--neutral-700); margin: 0; }
     .shot-stage { position: relative; }
     .shot-stage .blob { z-index: 0; }
@@ -455,7 +457,7 @@
         <button id="lang-en" aria-pressed="false">EN</button>
         <button id="lang-pl" aria-pressed="true">PL</button>
       </div>
-      <a class="btn btn-primary btn-small" href="https://app.meppletime.today/" data-i18n="navCta">Otwórz aplikację</a>
+      <a class="btn btn-primary btn-small" href="https://app.meppletime.today/?lang=pl" data-i18n="navCta">Otwórz aplikację</a>
     </nav>
 
     <header class="hero">
@@ -463,7 +465,7 @@
         <h1 data-i18n="heroTitle">Wieczór planszówek, wreszcie ustalony.</h1>
         <p data-i18n="heroSub">MeppleTime to darmowa ankieta do planowania planszówek: udostępniasz jeden link, znajomi głosują na terminy, a grę wybieracie razem.</p>
         <div class="hero-cta">
-          <a class="btn btn-primary" href="https://app.meppletime.today/" data-i18n="heroCta">Zaplanuj wieczór gier</a>
+          <a class="btn btn-primary" href="https://app.meppletime.today/?lang=pl" data-i18n="heroCta">Zaplanuj wieczór gier</a>
           <a class="btn btn-ghost" href="#how" data-i18n="heroGhost">Zobacz, jak to działa</a>
         </div>
       </div>
@@ -503,7 +505,7 @@
       <div class="feature">
         <div class="feature-copy">
           <p class="kicker sage" data-i18n="f1Kicker">Dostępność grupy</p>
-          <h3 data-i18n="f1Title">Najlepszy termin widać od razu</h3>
+          <h2 data-i18n="f1Title">Najlepszy termin widać od razu</h2>
           <p data-i18n="f1Body">Widok dostępności grupy cieniuje każdą datę według liczby osób, które mogą przyjść. Bez arkusza i wątku na dwadzieścia wiadomości.</p>
         </div>
         <div class="shot-stage">
@@ -514,7 +516,7 @@
       <div class="feature">
         <div class="feature-copy">
           <p class="kicker" data-i18n="f2Kicker">Obok siebie</p>
-          <h3 data-i18n="f2Title">Kto może, kto nie, kto się waha</h3>
+          <h2 data-i18n="f2Title">Kto może, kto nie, kto się waha</h2>
           <p data-i18n="f2Body">Tabela w stylu Doodle pokazuje odpowiedzi wszystkich obok siebie i aktualizuje się na żywo.</p>
         </div>
         <div class="shot-stage">
@@ -525,7 +527,7 @@
       <div class="feature">
         <div class="feature-copy">
           <p class="kicker sage" data-i18n="f3Kicker">Głosowanie na gry</p>
-          <h3 data-i18n="f3Title">Zdecydujcie też, w co gracie</h3>
+          <h2 data-i18n="f3Title">Zdecydujcie też, w co gracie</h2>
           <p data-i18n="f3Body">Każdy może proponować gry z podpowiedziami z BoardGameGeek i głosować na ulubione. Prowadząca gra pojawia się obok zwycięskiego terminu.</p>
         </div>
         <div class="shot-stage">
@@ -616,7 +618,7 @@
     <section class="band">
       <h2 class="band-title" data-i18n="bandTitle">Dwie połowy, jeden wieczór</h2>
       <p data-i18n="bandBody"><strong>Szałwia</strong> to kalendarz: osobne tygodnie każdego z nas. <strong>Terakota</strong> to moment decyzji: wieczór, na który naprawdę przychodzisz. MeppleTime stoi na szwie, gdzie się spotykają.</p>
-      <a class="btn btn-cream" href="https://app.meppletime.today/" data-i18n="bandCta">Otwórz MeppleTime</a>
+      <a class="btn btn-cream" href="https://app.meppletime.today/?lang=pl" data-i18n="bandCta">Otwórz MeppleTime</a>
     </section>
 
     <footer>
@@ -626,8 +628,8 @@
       <span class="foot-spacer"></span>
       <a class="don-item don-small" href="https://buymeacoffee.com/halfhide" target="_blank" rel="noopener noreferrer"><span class="don-emoji" aria-hidden="true">🌍</span><span class="bmc-btn"><img src="/assets/bmc-button.png" alt="Buy me a coffee" width="545" height="153" loading="lazy"></span></a>
       <a class="don-item don-small" href="https://buycoffee.to/halfhide" target="_blank" rel="noopener noreferrer"><span class="don-emoji" aria-hidden="true">🇵🇱</span><span class="bc-btn"><img src="/assets/buycoffee-logo.svg" alt="Postaw mi kawę na buycoffee.to" width="319" height="42" loading="lazy"></span></a>
-      <a href="https://app.meppletime.today/privacy" data-i18n="footPrivacy">Prywatność</a>
-      <a href="https://app.meppletime.today/" data-i18n="footApp">Otwórz aplikację</a>
+      <a href="https://app.meppletime.today/privacy?lang=pl" data-i18n="footPrivacy">Prywatność</a>
+      <a href="https://app.meppletime.today/?lang=pl" data-i18n="footApp">Otwórz aplikację</a>
     </footer>
   </div>
 
@@ -690,11 +692,11 @@
         bandCta: 'Open MeppleTime',
         supportKicker: 'Support',
         supportTitle: 'Keep the dice rolling',
-        supportBody: 'MeppleTime is free, with no ads and no paid tier. If it saved your group a planning headache, you can support it with a coffee.',
+        supportBody: 'MeppleTime is free, with no ads and no paid tier. It is one person\'s passion project: if it saved your group a planning headache, you can buy me a coffee.',
         footNote: 'Made for game nights.',
         footPrivacy: 'Privacy',
         footApp: 'Open the app',
-        docTitle: 'MeppleTime: Board Game Night Planner',
+        docTitle: 'Board Game Night Planner & Date Poll | MeppleTime',
         docDesc: 'Free board game night planner: share one link, friends vote on dates, no accounts needed. Pick the game together with built-in BoardGameGeek search.'
       },
       pl: {
@@ -758,7 +760,7 @@
         footNote: 'Stworzone dla wieczorów planszówek.',
         footPrivacy: 'Prywatność',
         footApp: 'Otwórz aplikację',
-        docTitle: 'MeppleTime: planer wieczoru planszówek',
+        docTitle: 'Planer wieczoru planszówek i ankieta terminu | MeppleTime',
         docDesc: 'Darmowa ankieta terminu na planszówki: udostępniasz jeden link, znajomi głosują na terminy, a grę wybieracie razem. Bez zakładania kont.'
       }
     };

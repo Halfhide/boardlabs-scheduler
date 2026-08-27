@@ -46,8 +46,9 @@ const CANONICALS = {
   '/privacy': 'https://app.meppletime.today/privacy'
 };
 
-function CanonicalTag() {
+function RouteHead() {
   const { pathname } = useLocation();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const href = CANONICALS[pathname];
@@ -62,7 +63,13 @@ function CanonicalTag() {
     } else if (link) {
       link.remove();
     }
-  }, [pathname]);
+
+    // Localized document titles; poll pages start from the brand
+    // title and PollView swaps in the poll's own title once loaded
+    if (pathname === '/') document.title = t('appTitle');
+    else if (pathname === '/privacy') document.title = t('privacyDocTitle');
+    else document.title = 'MeppleTime';
+  }, [pathname, t]);
 
   return null;
 }
@@ -89,7 +96,7 @@ function App() {
     <LanguageProvider>
       <AuthProvider>
       <Router>
-        <CanonicalTag />
+        <RouteHead />
         <div className="min-h-screen bg-ground">
           <OfflineBanner />
           <header className="bg-surface shadow-sm">

@@ -47,6 +47,14 @@ function PollView() {
   const { pollId } = useParams();
   const navigate = useNavigate();
   const { poll, loading, error } = usePoll(pollId);
+
+  // Tab title carries the poll's name so open polls are
+  // distinguishable; RouteHead resets it when leaving the route.
+  // Depends on t so this re-wins after RouteHead's own language
+  // effect resets the title on a language toggle.
+  useEffect(() => {
+    if (poll?.title) document.title = `${poll.title} | MeppleTime`;
+  }, [poll?.title, t]);
   const { user } = useAuth();
   const [voterName, setVoterName] = useLocalStorage('voterName', '');
   // Stable per-browser voter ID so votes survive renames and two

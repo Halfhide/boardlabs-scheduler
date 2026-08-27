@@ -16,14 +16,22 @@ function VoteMatrix({ dates, voterId, voterName, voterUid, finalizedDateId, onDa
   // votes from two devices share a row, then stable voter ID, name
   // for legacy votes) and index their vote per date
   const participantsByKey = new Map();
+  // A renamed voter's old votes keep their old name; show the name
+  // from their most recent vote so one person reads as one name
+  const voteMillis = (v) =>
+    v.timestamp?.toMillis ? v.timestamp.toMillis() : (v.timestamp ? +new Date(v.timestamp) : 0);
   dates.forEach((d) => {
     d.votes.forEach((v) => {
       const key = v.uid || v.voterId || v.voterName;
       if (!participantsByKey.has(key)) {
-        participantsByKey.set(key, { key, name: v.voterName, votes: {} });
+        participantsByKey.set(key, { key, name: v.voterName, nameAt: -1, votes: {} });
       }
       const p = participantsByKey.get(key);
-      p.name = v.voterName;
+      const at = voteMillis(v);
+      if (at >= p.nameAt) {
+        p.name = v.voterName;
+        p.nameAt = at;
+      }
       p.votes[d.id] = { response: v.response, guests: v.guests || 0 };
     });
   });

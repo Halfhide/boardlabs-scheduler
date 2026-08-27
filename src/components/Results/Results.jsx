@@ -22,12 +22,13 @@ function Results({ dates, finalizedDateId, minPlayers, maxPlayers, onDateClick }
     return null;
   }
 
-  // Get total unique voters (by stable ID, falling back to name for
-  // votes recorded before voter IDs existed)
+  // Get total unique voters (account ID first so one person's votes
+  // from two devices count once, then stable voter ID, name for
+  // legacy votes; same keying as the matrix and calendar)
   const allVoters = new Set();
   dates.forEach(date => {
     date.votes.forEach(vote => {
-      allVoters.add(vote.voterId || vote.voterName);
+      allVoters.add(vote.uid || vote.voterId || vote.voterName);
     });
   });
 
@@ -124,10 +125,10 @@ function Results({ dates, finalizedDateId, minPlayers, maxPlayers, onDateClick }
                 </div>
               )}
 
-              {/* Total votes indicator */}
+              {/* Participation for this date */}
               {hasVotes && (
                 <div className="mt-1 text-[10px] text-neutral-600">
-                  {t('votes', { count: totalVotes })}
+                  {t('votedOfTotal', { voted: totalVotes, total: totalVoters })}
                 </div>
               )}
             </button>

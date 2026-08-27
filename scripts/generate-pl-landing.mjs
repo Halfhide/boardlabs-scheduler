@@ -19,7 +19,6 @@ const page = await browser.newPage();
 await page.goto('file://' + resolve('landing/index.html'), { waitUntil: 'domcontentloaded' });
 
 const html = await page.evaluate(() => {
-  /* eslint-disable no-undef */
   setLang('pl');
   const pl = STRINGS.pl;
 
@@ -35,6 +34,12 @@ const html = await page.evaluate(() => {
   setAttr('meta[property="og:description"]', 'content', pl.docDesc);
   setAttr('meta[name="twitter:title"]', 'content', pl.docTitle);
   setAttr('meta[name="twitter:description"]', 'content', pl.docDesc);
+
+  // Language handoff: app-bound links carry the page's language so
+  // the app (a separate origin with its own storage) opens in it
+  document.querySelectorAll('a[href*="app.meppletime.today"]').forEach((a) => {
+    a.setAttribute('href', a.getAttribute('href').replace('lang=en', 'lang=pl'));
+  });
 
   const ldBlocks = document.head.querySelectorAll('script[type="application/ld+json"]');
   ldBlocks[0].textContent = JSON.stringify({

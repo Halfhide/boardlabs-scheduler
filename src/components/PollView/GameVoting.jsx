@@ -138,7 +138,10 @@ function GameVoting({ games, voterId, voterName, voterUid, isCreator, closed, on
                   <p className="text-xs text-neutral-600 truncate">
                     {t('suggestedBy', { name: game.suggestedBy })}
                     {game.votes.length > 0 &&
-                      ` · ${game.votes.map((v) => v.voterName).join(', ')}`}
+                      ` · ${t('gameVotesList', {
+                        count: game.votes.length,
+                        names: game.votes.map((v) => v.voterName).join(', ')
+                      })}`}
                   </p>
                 </div>
 
