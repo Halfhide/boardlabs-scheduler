@@ -288,7 +288,35 @@ export const translations = {
     errGameLinkLong: 'The link is too long',
     errTooManyGames: 'A poll can have at most {max} game suggestions',
     errDuplicateGame: 'That game has already been suggested',
-    errGameNotFound: 'Game not found'
+    errGameNotFound: 'Game not found',
+
+    // Footer + privacy page
+    footerPrivacy: 'Privacy',
+    // Per-language donation platform: Buy Me a Coffee for EN,
+    // buycoffee.to for PL
+    donateUrl: 'https://buymeacoffee.com/halfhide',
+    privacyTitle: 'Privacy',
+    privacyIntro: 'MeppleTime is a small tool for scheduling board game nights. It stores as little as possible; this page explains what, where, and for how long.',
+    privacyWhatTitle: 'What is stored',
+    privacyWhatIntro: 'Only what you and your group type into a poll:',
+    privacyWhatItem1: 'poll titles and the proposed dates,',
+    privacyWhatItem2: 'the first names or nicknames voters enter,',
+    privacyWhatItem3: 'votes, comments and game suggestions,',
+    privacyWhatItem4: 'if you choose to sign in: your email address and, with Google sign-in, your name and profile picture.',
+    privacyWhatOutro: 'There are no analytics, no ads and no tracking scripts.',
+    privacyWhereTitle: 'Where it is stored',
+    privacyWhereBody: 'All data lives in Google Firebase (Firestore and Firebase Authentication) and is processed on Google Cloud infrastructure. This applies to all visitors, including those in the EU. To protect the database from abuse, the app uses Firebase App Check with Google reCAPTCHA v3.',
+    privacyRecaptchaPrefix: 'This site is protected by reCAPTCHA and the Google',
+    privacyRecaptchaPrivacy: 'Privacy Policy',
+    privacyRecaptchaAnd: 'and',
+    privacyRecaptchaTerms: 'Terms of Service',
+    privacyRecaptchaSuffix: 'apply.',
+    privacyHowLongTitle: 'How long it is kept',
+    privacyHowLongBody: 'Polls clean up after themselves: about {months} months after a poll\'s last proposed date, the poll is automatically and permanently deleted together with all its votes and comments.',
+    privacyRemovalTitle: 'Removing your data',
+    privacyRemovalOwner: 'Signed-in poll owners can delete their polls at any time from the poll page ("Delete this poll" in the creator tools). Deletion is permanent and removes the poll with all its votes and comments.',
+    privacyContactPrefix: 'For anything else, or to have specific data removed, write to',
+    backToHome: 'Back to the homepage'
   },
 
   pl: {
@@ -564,7 +592,33 @@ export const translations = {
     errGameLinkLong: 'Link jest za długi',
     errTooManyGames: 'Ankieta może mieć najwyżej {max} propozycji gier',
     errDuplicateGame: 'Ta gra już została zaproponowana',
-    errGameNotFound: 'Nie znaleziono gry'
+    errGameNotFound: 'Nie znaleziono gry',
+
+    // Footer + privacy page
+    footerPrivacy: 'Prywatność',
+    donateUrl: 'https://buycoffee.to/halfhide',
+    privacyTitle: 'Prywatność',
+    privacyIntro: 'MeppleTime to małe narzędzie do umawiania wieczorów planszówkowych. Przechowuje tak mało danych, jak to możliwe; ta strona wyjaśnia co, gdzie i na jak długo.',
+    privacyWhatTitle: 'Co przechowujemy',
+    privacyWhatIntro: 'Tylko to, co ty i twoja grupa wpiszecie do ankiety:',
+    privacyWhatItem1: 'tytuły ankiet i proponowane daty,',
+    privacyWhatItem2: 'imiona lub pseudonimy podane przez głosujących,',
+    privacyWhatItem3: 'głosy, komentarze i propozycje gier,',
+    privacyWhatItem4: 'jeśli zdecydujesz się zalogować: twój adres e-mail, a przy logowaniu przez Google także imię i zdjęcie profilowe.',
+    privacyWhatOutro: 'Nie ma tu żadnych statystyk, reklam ani skryptów śledzących.',
+    privacyWhereTitle: 'Gdzie są przechowywane',
+    privacyWhereBody: 'Wszystkie dane znajdują się w Google Firebase (Firestore i Firebase Authentication) i są przetwarzane w infrastrukturze Google Cloud. Dotyczy to wszystkich odwiedzających, w tym osób z UE. Aby chronić bazę danych przed nadużyciami, aplikacja korzysta z Firebase App Check z Google reCAPTCHA v3.',
+    privacyRecaptchaPrefix: 'Ta strona jest chroniona przez reCAPTCHA; zastosowanie mają',
+    privacyRecaptchaPrivacy: 'Polityka prywatności',
+    privacyRecaptchaAnd: 'oraz',
+    privacyRecaptchaTerms: 'Warunki usług',
+    privacyRecaptchaSuffix: 'Google.',
+    privacyHowLongTitle: 'Jak długo je trzymamy',
+    privacyHowLongBody: 'Ankiety sprzątają po sobie same: około {months} miesięcy po ostatniej proponowanej dacie ankieta jest automatycznie i trwale usuwana wraz ze wszystkimi głosami i komentarzami.',
+    privacyRemovalTitle: 'Usuwanie danych',
+    privacyRemovalOwner: 'Zalogowani właściciele ankiet mogą w każdej chwili usunąć swoje ankiety na stronie ankiety ("Usuń tę ankietę" w narzędziach twórcy). Usunięcie jest trwałe i obejmuje ankietę wraz ze wszystkimi głosami i komentarzami.',
+    privacyContactPrefix: 'W każdej innej sprawie, albo aby usunąć konkretne dane, napisz na',
+    backToHome: 'Wróć na stronę główną'
   }
 };
 

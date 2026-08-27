@@ -173,6 +173,17 @@
     #how, #features-grid, #faq { margin-top: 88px; }
 
     /* Footer */
+    /* Branded donation buttons: one per platform, shown per language */
+    .don-en, .don-pl { display: none; }
+    html[lang="en"] .don-en { display: inline-flex; }
+    html[lang="pl"] .don-pl { display: inline-flex; }
+    .bmc-btn img { height: 44px; width: auto; display: block; border: 0; border-radius: 12px; }
+    .bc-btn { align-items: center; background: #000; border-radius: 999px; height: 44px; padding: 0 24px; }
+    .bc-btn img { height: 20px; width: auto; display: block; }
+    .don-small.bmc-btn img { height: 34px; border-radius: 9px; }
+    .don-small.bc-btn { height: 34px; padding: 0 18px; }
+    .don-small.bc-btn img { height: 15px; }
+    .don-en:hover, .don-pl:hover { opacity: 0.85; }
     footer { border-top: 1px solid rgb(32 30 29 / 0.16); padding: 28px 0 48px; display: flex; flex-wrap: wrap; align-items: center; gap: 14px; color: var(--neutral-600); font-size: 14px; }
     footer .brand-word { font-size: 18px; }
     footer .foot-spacer { margin-left: auto; }
@@ -361,6 +372,14 @@
       </div>
     </section>
 
+    <section id="support" style="text-align:center">
+      <p class="kicker" data-i18n="supportKicker">Support</p>
+      <h2 class="band-title" data-i18n="supportTitle">Keep the dice rolling</h2>
+      <p style="max-width:560px;margin:0 auto 20px" data-i18n="supportBody">MeppleTime is free, with no ads and no paid tier. If it saved your group a planning headache, you can support it with a coffee.</p>
+      <a class="don-en bmc-btn" href="https://buymeacoffee.com/halfhide" target="_blank" rel="noopener noreferrer"><img src="assets/bmc-button.png" alt="Buy me a coffee" /></a>
+      <a class="don-pl bc-btn" href="https://buycoffee.to/halfhide" target="_blank" rel="noopener noreferrer"><img src="assets/buycoffee-logo.svg" alt="Postaw mi kawę na buycoffee.to" /></a>
+    </section>
+
     <section class="band">
       <h2 class="band-title" data-i18n="bandTitle">Two halves, one night</h2>
       <p data-i18n="bandBody"><strong>Sage</strong> is the calendar: everyone's separate weeks. <strong>Terracotta</strong> is the moment of commitment: the night you actually show up. MeppleTime stands on the seam where they meet.</p>
@@ -372,7 +391,9 @@
       <span class="brand-word"><span class="m">Mepple</span><span class="t">Time</span></span>
       <span data-i18n="footNote">Made for game nights.</span>
       <span class="foot-spacer"></span>
-      <!-- TODO feature 11g: privacy link; TODO feature 15: donation links -->
+      <a class="don-en bmc-btn don-small" href="https://buymeacoffee.com/halfhide" target="_blank" rel="noopener noreferrer"><img src="assets/bmc-button.png" alt="Buy me a coffee" /></a>
+      <a class="don-pl bc-btn don-small" href="https://buycoffee.to/halfhide" target="_blank" rel="noopener noreferrer"><img src="assets/buycoffee-logo.svg" alt="Postaw mi kawę na buycoffee.to" /></a>
+      <a href="https://app.meppletime.today/privacy" data-i18n="footPrivacy">Privacy</a>
       <a href="https://app.meppletime.today/" data-i18n="footApp">Open the app</a>
     </footer>
   </div>
@@ -434,7 +455,11 @@
         bandTitle: 'Two halves, one night',
         bandBody: '<strong>Sage</strong> is the calendar: everyone\'s separate weeks. <strong>Terracotta</strong> is the moment of commitment: the night you actually show up. MeppleTime stands on the seam where they meet.',
         bandCta: 'Open MeppleTime',
+        supportKicker: 'Support',
+        supportTitle: 'Keep the dice rolling',
+        supportBody: 'MeppleTime is free, with no ads and no paid tier. If it saved your group a planning headache, you can support it with a coffee.',
         footNote: 'Made for game nights.',
+        footPrivacy: 'Privacy',
         footApp: 'Open the app',
         docTitle: 'MeppleTime — plan your board game night',
         docDesc: 'MeppleTime is a free poll for board game nights: share one link, friends vote on dates, and you pick the game together.'
@@ -494,7 +519,11 @@
         bandTitle: 'Dwie połowy, jeden wieczór',
         bandBody: '<strong>Szałwia</strong> to kalendarz: osobne tygodnie każdego z nas. <strong>Terakota</strong> to moment decyzji: wieczór, na który naprawdę przychodzisz. MeppleTime stoi na szwie, gdzie się spotykają.',
         bandCta: 'Otwórz MeppleTime',
+        supportKicker: 'Wsparcie',
+        supportTitle: 'Niech kostki się toczą',
+        supportBody: 'MeppleTime jest darmowy, bez reklam i płatnych funkcji. Jeśli oszczędził twojej ekipie bólu głowy przy planowaniu, możesz postawić mi kawę.',
         footNote: 'Stworzone dla wieczorów planszówek.',
+        footPrivacy: 'Prywatność',
         footApp: 'Otwórz aplikację',
         docTitle: 'MeppleTime — zaplanuj wieczór planszówek',
         docDesc: 'MeppleTime to darmowa ankieta do planowania planszówek: udostępniasz jeden link, znajomi głosują na terminy, a grę wybieracie razem.'

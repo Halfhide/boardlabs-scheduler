@@ -7,6 +7,8 @@ import { useTranslation } from './i18n/useTranslation';
 import OfflineBanner from './components/shared/OfflineBanner';
 import AccountMenu from './components/shared/AccountMenu';
 import Logo from './components/shared/Logo';
+import PrivacyPage from './components/shared/PrivacyPage';
+import DonateButton from './components/shared/DonateButton';
 
 function LanguageToggle() {
   const { lang, setLang } = useTranslation();
@@ -30,6 +32,23 @@ function LanguageToggle() {
       {button('en', 'EN')}
       {button('pl', 'PL')}
     </div>
+  );
+}
+
+function Footer() {
+  const { t } = useTranslation();
+
+  return (
+    <footer className="max-w-4xl mx-auto px-4 py-8 flex flex-col items-center gap-4">
+      <DonateButton />
+      <p className="text-sm text-neutral-600 flex items-center gap-2">
+        <span>MeppleTime</span>
+        <span aria-hidden="true">&middot;</span>
+        <Link to="/privacy" className="underline hover:text-ink">
+          {t('footerPrivacy')}
+        </Link>
+      </p>
+    </footer>
   );
 }
 
@@ -58,8 +77,11 @@ function App() {
             <Routes>
               <Route path="/" element={<CreatePoll />} />
               <Route path="/poll/:pollId" element={<PollView />} />
+              <Route path="/privacy" element={<PrivacyPage />} />
             </Routes>
           </main>
+
+          <Footer />
         </div>
       </Router>
       </AuthProvider>

@@ -41,11 +41,11 @@ features were proposed, 11 accepted, 4 rejected (see bottom).
 | 11c | My polls sync      | 5     | done        |
 | 11d | Poll deletion      | 5     | done        |
 | 11e | Poll auto-expiry   | 5     | done        |
-| 11f | Rules + App Check  | 5     | in progress |
-| 11g | Privacy note       | 5     | not started |
+| 11f | Rules + App Check  | 5     | done        |
+| 11g | Privacy note       | 5     | done        |
 | 13 | Design system align | 6     | done        |
 | 14 | Domain + landing    | 6     | done        |
-| 15 | Donations           | 6     | not started |
+| 15 | Donations           | 6     | done        |
 | 17 | Bring a friend      | 6     | done        |
 | 18 | Branded splash      | 6     | done        |
 | 16 | Enriched my-polls   | 7     | not started |
@@ -591,8 +591,27 @@ plus CRON_SECRET in Vercel env vars.
 
 ### 11f. Hardening: rules + App Check
 
-Status: in progress (29 Jul 2026). PAUSED mid-feature. Done so far,
-committed and pushed, working tree clean:
+Status: done (27 Aug 2026). App Check ENFORCEMENT is ON for Cloud
+Firestore. Full rollout completed with Adam: classic reCAPTCHA v3
+key created (attached to the board-game-scheduler-81820 GCP
+project; the project picker is now a normal part of key creation),
+secret registered in Firebase App Check, VITE_RECAPTCHA_SITE_KEY
+set in Vercel Production (marked Config/public, correctly so) and
+local .env, redeployed. Verified BEFORE enforcing: real App Check
+JWT minted (right aud, 1h TTL, auto-refresh), create/vote/delete
+all green in the live app. Verified AFTER enforcing: tokenless
+REST read now gets 403 PERMISSION_DENIED (previously 200/404),
+while the live app still works end to end (test poll 8V5b3HWqXw
+created, voted, owner-deleted under enforcement; the earlier
+pre-enforcement test poll 4rAoKJ7wGz likewise cleaned up,
+NOT_FOUND confirmed). Authentication API is in Monitoring mode
+only, deliberately not enforced. Note: since REST reads are now
+blocked by App Check, future sessions cannot use anonymous REST
+probes to inspect polls; verify through the app or Admin SDK.
+No code changes in this final rollout, so no commit was needed
+(the .env change is local and gitignored).
+
+History. Done earlier (29 Jul 2026), committed and pushed:
 - Part 1 (commit 1c7a514): Firestore rules rewritten and APPLIED by
   Adam in the console. Owned polls (ownerUid present) are protected
   server-side (management, dates-list resize, game removal need the
@@ -621,28 +640,34 @@ continue with the numbered steps. The secret key must never be
 pasted into chat (Adam pastes it straight into the Firebase
 console); the site key is public and fine to share.
 
-REMAINING when resuming (this is the resume point):
-1. Adam finishes reCAPTCHA v3 key creation at
-   google.com/recaptcha/admin (label MeppleTime, v3 score-based,
-   domains: meppletime.today, www.meppletime.today,
-   app.meppletime.today, boardlabs-scheduler.vercel.app, localhost).
-   Yields a public SITE KEY and a private SECRET.
-2. Register that provider in Firebase console -> App Check -> the web
-   app -> reCAPTCHA v3, paste the SECRET there.
-3. Set VITE_RECAPTCHA_SITE_KEY (the public site key) in Vercel env
-   (Production) for the APP project AND in local .env; redeploy.
-4. Verify tokens flow: Firebase App Check console shows verified
-   requests climbing, and (before enforcing) that "unverified"
-   requests are only from non-app sources. Drive the app to confirm
-   voting/creating still works with a token attached.
-5. ONLY THEN: enable App Check ENFORCEMENT on Firestore in the
-   console. Enforcing before step 4 confirms tokens locks everyone
-   out. Also add app.meppletime.today etc. as needed.
-6. Immediately re-verify the live app end to end after enforcing.
+Reference: reCAPTCHA v3 site key (public)
+6LcVIZstAAAAALS9QqARyZ0SxVUhCIojMukw2-s9; the secret lives only in
+the Firebase App Check console. Ops gotchas kept for posterity: the
+PWA service worker serves the old bundle for one load after each
+deploy (the update lands on the next reload); Vercel env values
+must have no leading/trailing whitespace or every build fails.
 
 ### 11g. Privacy note
 
-Status: not started
+Status: done (27 Aug 2026, NOT yet committed; Adam commits/pushes
+when ready and the push auto-deploys both Vercel projects).
+Implemented: /privacy route (PrivacyPage.jsx on the shared card
+style), fully translated EN/PL via the i18n dictionary, covering
+what is stored (incl. optional account email and Google profile),
+where (Google Firebase / Google Cloud, EU visitors included, plus
+the reCAPTCHA v3 / App Check mention with the Google-required
+"protected by reCAPTCHA" attribution links), how long (12-month
+auto-expiry, constant mirrors api/expire-polls.js default), and
+removal (owner deletion in the app; everything else by email). The
+app gained its first global footer (MeppleTime + privacy link,
+rendered on all routes; feature 15's donation link rides along
+here later). Landing footer TODO slot filled with a bilingual
+Prywatnosc/Privacy link to app.meppletime.today/privacy. Contact
+email used: adam.jastrzebski@codelabs.pl (swap in PrivacyPage.jsx
+if Adam prefers another address). Verified in the browser in both
+languages (dev server, /privacy deep link, footer on the homepage,
+landing link and its EN/PL toggle); vercel.json's SPA rewrite
+already covers /privacy; lint and build green.
 
 A short /privacy page in Polish and English: what is stored (poll
 titles, dates, first names or nicks, votes, comments, optional
@@ -773,7 +798,29 @@ boardlabs-scheduler.vercel.app URL keeps working for old links.
 
 ### 15. Optional donations (added 28 Jul 2026)
 
-Status: not started
+Status: done (27 Aug 2026, NOT yet committed; ships with 11g in one
+push). PLATFORM CHANGE the same day: Adam dropped Ko-fi and chose
+Buy Me a Coffee for the English side, so the pair is
+https://buymeacoffee.com/halfhide (EN) and
+https://buycoffee.to/halfhide (PL). On Adam's request the links are
+visually distinct branded buttons, not text links, using each
+platform's official identity, self-hosted in the repo (works
+offline, no third-party requests): EN = Buy Me a Coffee's official
+yellow button (cdn.buymeacoffee.com/buttons/v2/default-yellow.png,
+saved as src/assets/bmc-button.png and landing/assets/); PL =
+buycoffee.to's official white wordmark (their /img/brand/bc-logo.svg,
+saved as buycoffee-logo.svg in the same places) on a black pill,
+matching their own presentation. App: DonateButton.jsx renders the
+right button from the i18n lang, URL still carried by the
+dictionary's per-language donateUrl; footer is now button above a
+"MeppleTime · Privacy" line. Landing: support section between FAQ
+and the brand band plus a footer button, both buttons present in
+markup and toggled per language via html[lang] CSS (.don-en /
+.don-pl). Verified in the browser in both languages on both
+surfaces, all images loading locally; lint and build green.
+History note: Ko-fi was implemented first but its CDN refuses
+hotlinked embeds (and this network cannot fetch it for
+self-hosting), which Adam resolved by switching platforms.
 
 Monetization stays donation-only and fully optional: no payments in
 the app itself, just links out to donation platforms, so no payment
@@ -1031,6 +1078,26 @@ Acceptance criteria:
   assets from design-assets/good-logotype.svg. Wordmarks stay
   Caprasimo text; the logotype's Bogart Extrabold face is
   commercial and unlicensed, flagged to Adam as an open decision.
+- 27 Aug 2026: feature 15 (donations) implemented and verified in
+  both languages, then reworked the same day on Adam's request into
+  branded buttons with official platform identities, and the EN
+  platform switched from Ko-fi to Buy Me a Coffee
+  (buymeacoffee.com/halfhide; PL stays buycoffee.to/halfhide).
+  ALL pre-launch features are now done; MeppleTime is ready for
+  public launch once Adam commits and pushes (one deploy covers
+  11g + 15).
+- 27 Aug 2026: feature 11g (privacy note) implemented and verified
+  in both languages: /privacy page, the app's first global footer
+  with the privacy link, landing footer link filled in. Phase 5 is
+  complete pending Adam's commit/push. Only feature 15 (donations)
+  remains before public launch.
+- 27 Aug 2026: feature 11f completed and App Check ENFORCEMENT
+  enabled on Cloud Firestore. reCAPTCHA v3 key created, provider
+  registered, site key deployed via Vercel env; tokens verified
+  flowing before enforcement, and after enforcement the live app
+  was re-verified end to end (create/vote/delete green) while
+  tokenless REST requests are now rejected with PERMISSION_DENIED.
+  Remaining before launch: 11g (privacy note), 15 (donations).
 - 29 Jul 2026: Adam's "dashboard as the main view" idea discussed
   and rejected in its full form; the useful core (poll status and
   next game night surfaced on the existing "Your polls" list) added
