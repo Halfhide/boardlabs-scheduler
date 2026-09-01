@@ -336,7 +336,7 @@ export const translations = {
     emailPlaceholder: 'ty@przyklad.pl',
     sendMagicLink: 'Wyślij link do logowania',
     sendingLink: 'Wysyłanie...',
-    magicLinkHelp: 'Bez hasła: wyślemy Ci e-mail z linkiem, który Cię zaloguje.',
+    magicLinkHelp: 'Bez hasła: wyślemy ci e-mail z linkiem, który cię zaloguje.',
     linkSent: 'Sprawdź skrzynkę: wysłaliśmy link do logowania na {email}.',
     linkSentSpamHint: 'Nie widzisz wiadomości? Zajrzyj do folderu spam, link często tam trafia.',
     confirmEmailTitle: 'Potwierdź swój e-mail',

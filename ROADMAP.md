@@ -1331,3 +1331,11 @@ Acceptance criteria:
   next game night surfaced on the existing "Your polls" list) added
   as feature 16 in a new post-launch phase 7. Launch order and the
   remaining pre-launch work (11f, 11g, 15) unchanged.
+- 1 Sep 2026: copy brief decision D1 (Adam, 31 Aug: lowercase
+  ty/twój in PL) applied. Sweep found exactly one remaining
+  honorific capitalization in the whole product: magicLinkHelp on
+  the sign-in screen, now "wyślemy ci e-mail z linkiem, który cię
+  zaloguje". Everything else was already lowercase or is
+  sentence-initial (normal grammar, kept). Verified in the browser
+  on the preview build; lint and build green. Awaiting Adam's
+  commit/push.
