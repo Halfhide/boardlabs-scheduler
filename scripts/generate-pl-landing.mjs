@@ -12,7 +12,10 @@ import { resolve } from 'node:path';
 mkdirSync('landing/pl', { recursive: true });
 
 const browser = await puppeteer.launch({
-  executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+  executablePath:
+    process.env.CHROME_PATH ||
+    process.env.CHROME_BIN ||
+    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
   headless: 'new'
 });
 const page = await browser.newPage();
