@@ -19,7 +19,9 @@ features were proposed, 11 accepted, 4 rejected (see bottom).
   Firebase console. Rules are NOT deployed automatically.
 - Keep the constraints in CLAUDE.md (transactions for writes, voter ID
   identity, Tailwind v4 syntax, no em-dashes anywhere).
-- Commit only when Adam asks. He usually asks after reviewing.
+- Ship changes as feature-branch PRs through the CI/CD loop (see
+  CLAUDE.md working conventions); Adam reviews the PR and its
+  Vercel preview, then merges.
 
 ## Status overview
 
@@ -1331,6 +1333,23 @@ Acceptance criteria:
   next game night surfaced on the existing "Your polls" list) added
   as feature 16 in a new post-launch phase 7. Launch order and the
   remaining pre-launch work (11f, 11g, 15) unchanged.
+- 1 Sep 2026: CI/CD loop established (ops work, no roadmap
+  feature), done with Adam step by step across PRs #1-#4:
+  GitHub Actions CI on every PR and push to main (npm ci, lint,
+  vitest, build, and a landing/pl staleness check that regenerates
+  the Polish landing and fails on any diff; generate-pl-landing.mjs
+  now honors CHROME_PATH/CHROME_BIN); a 42-test vitest suite for
+  src/utils (pollHelpers pure functions, dateHelpers, myPolls);
+  the repo made PUBLIC (full history scanned clean of secrets
+  first) so branch protection is enforced on the free plan: main
+  requires a PR, a green `ci` check and an up-to-date branch,
+  admins included, direct pushes rejected (verified), merged
+  branches auto-delete; Vercel previews reach Firestore under App
+  Check via a fixed Preview-scoped debug token (see CLAUDE.md)
+  behind Vercel Authentication. Squash merge is the house style.
+  Open follow-up: npm audit reports 13 vulnerabilities, all in
+  firebase-admin's transitive deps (used only by the expiry cron);
+  fix in a separate PR.
 - 1 Sep 2026: copy brief decision D1 (Adam, 31 Aug: lowercase
   ty/twój in PL) applied. Sweep found exactly one remaining
   honorific capitalization in the whole product: magicLinkHelp on

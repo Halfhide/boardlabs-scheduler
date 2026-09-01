@@ -21,9 +21,11 @@ listed there as rejected.
 
 ## Commands
 
-- `npm run dev` for the dev server, `npm run lint`, `npm run build`.
-- There is no test suite. Verify changes by driving the app in the
-  browser (dev server + real interaction), not just lint/build.
+- `npm run dev` for the dev server, `npm run lint`, `npm run build`,
+  `npm test` (vitest unit suite for the pure logic in src/utils).
+- The unit tests cover pure logic only. Verify features by driving
+  the app in the browser (dev server + real interaction), not just
+  lint/test/build.
 
 ## Hard constraints and gotchas
 
@@ -59,8 +61,23 @@ listed there as rejected.
 
 ## Working conventions
 
-- Commit or push only when Adam explicitly asks. He works directly on
-  `main` (no PR flow) and Vercel auto-deploys from it.
+- CI/CD loop (established 1 Sep 2026): all changes ship through
+  feature branches and pull requests. `main` is protected: PR
+  required, the `ci` check must be green, the branch up to date,
+  admins included, so direct pushes are rejected. GitHub Actions
+  runs lint, tests, build and a landing/pl staleness check on every
+  PR. Squash merge is the house style; merged branches auto-delete;
+  merging to `main` deploys production on Vercel. Once a change is
+  ready and verified, branching, committing and opening the PR is
+  normal session work; Adam reviews and merges (or explicitly asks
+  for a merge from the session).
+- Vercel preview deployments reach Firestore under App Check
+  through a fixed debug token: `VITE_APP_CHECK_DEBUG_TOKEN`, a
+  Preview-scoped Vercel env var registered in Firebase App Check's
+  debug token list, with previews behind Vercel Authentication.
+  NEVER add that variable to the Production scope.
+- The repo is public (GPL-3) since 1 Sep 2026. Never commit
+  anything secret; `.env` stays gitignored.
 - Keep the existing code style: plain JSX, function components, small
   focused components, Tailwind utility classes inline.
 - lint must stay clean; the eslint config forbids synchronous setState
