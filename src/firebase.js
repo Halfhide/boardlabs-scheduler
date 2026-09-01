@@ -23,10 +23,18 @@ const app = initializeApp(firebaseConfig);
 // never lock users out before tokens are confirmed flowing).
 const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 if (recaptchaSiteKey) {
-  // In local dev, allow a debug token so App Check works on localhost
-  // (register the printed token in the console's App Check debug list)
-  if (import.meta.env.DEV) {
-    self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+  // Debug tokens let builds on hostnames reCAPTCHA does not know
+  // reach Firestore under App Check enforcement. Local dev prints a
+  // per-browser token to register in the console's debug list. Vercel
+  // preview deployments instead carry a fixed token via
+  // VITE_APP_CHECK_DEBUG_TOKEN, which must be scoped to the Preview
+  // environment ONLY (in Production it would weaken App Check to the
+  // secrecy of that token) and registered once in the Firebase
+  // console. Unregistered tokens are rejected, so this path grants
+  // nothing by itself.
+  const debugToken = import.meta.env.VITE_APP_CHECK_DEBUG_TOKEN;
+  if (import.meta.env.DEV || debugToken) {
+    self.FIREBASE_APPCHECK_DEBUG_TOKEN = debugToken || true;
   }
   initializeAppCheck(app, {
     provider: new ReCaptchaV3Provider(recaptchaSiteKey),
