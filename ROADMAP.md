@@ -1129,6 +1129,28 @@ Acceptance criteria:
   snapshot render exactly as today; homepage load performs no poll
   document reads; works in EN and PL.
 
+### 22. Availability table UX notes (added 24 Sep 2026 on Adam's request)
+
+Status: not started (notes only; think through before building)
+
+Observed on a real 21-day poll (screenshot from Adam, 24 Sep 2026).
+Component: `src/components/PollView/VoteMatrix.jsx`.
+
+- Long ranges look cut off. On desktop only 14 day columns fit; the
+  remaining days sit in a horizontal scroll container
+  (`overflow-x-auto`), and macOS hides scrollbars, so users do not
+  know more days exist. Think of improvements, e.g. a visible
+  scroll cue (fade edge, arrows, "+7 more days"), a sticky
+  participant column, narrower columns, week-by-week paging, or
+  wrapping into week rows. Check phone width too.
+- Users try to vote by clicking the table cells. Today only the date
+  header opens the details/voting view; cells are not interactive.
+  Allow voting from the table: at least the current user's own row
+  (e.g. click to cycle yes / maybe / no, or open the voting view for
+  that date), while other participants' cells stay read-only or open
+  the date details. Writes must go through the existing
+  `runTransaction` helpers and vote identity rules.
+
 ## Rejected features (do not build unless Adam changes his mind)
 
 - Time slots (time-of-day options): rejected 15 Jul 2026.
@@ -1358,3 +1380,16 @@ Acceptance criteria:
   sentence-initial (normal grammar, kept). Verified in the browser
   on the preview build; lint and build green. Awaiting Adam's
   commit/push.
+
+## Local security checkpoint, September 24, 2026
+
+The separate emulator-only v2 prototype passed eight Google sign-in browser
+checks: cancellation and consent, session persistence, interrupted migration and
+retry, activity/history preservation and owner commands. No production app code,
+data or rules changed. This is not a production release or real Google OAuth
+verification. Seven additional v2 browser checks now cover cross-device email,
+source-device recovery, shared transfer state and simultaneous-tab confirmations.
+Six further browser scenarios now cover rejected final-switch/secondary-signout
+calls and local marker read/write/remove exceptions, with reload/retry recovery.
+No app-code fixes were needed. Next: in-flight account changes, revoked/expired
+credentials and lost browser storage. Current security status and remaining release gates: `../../projects/meppletime/HANDOFF.md`.
