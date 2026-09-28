@@ -16,15 +16,19 @@ export function MeppleMark({ size = 36, className = '' }) {
       alt=""
       aria-hidden="true"
       className={className}
-      style={{ height: size, width: 'auto' }}
+      style={size ? { height: size, width: 'auto' } : undefined}
     />
   );
 }
 
-function Logo({ markSize = 38, textClass = 'text-2xl' }) {
+// Smaller on phones so the lockup fits beside the language toggle
+// and the longer Polish sign-in button; below 375 px there is no room
+// for the wordmark at all, so the header shows the mark alone (the
+// home link keeps its aria-label)
+function Logo({ markClass = 'h-8 sm:h-[38px] w-auto', textClass = 'hidden min-[375px]:inline text-lg sm:text-2xl' }) {
   return (
-    <span className="inline-flex items-center gap-2.5">
-      <MeppleMark size={markSize} />
+    <span className="inline-flex items-center gap-2 sm:gap-2.5">
+      <MeppleMark size={null} className={markClass} />
       <span
         className={`${textClass} leading-none`}
         style={{ fontFamily: '"Caprasimo", system-ui, sans-serif' }}
