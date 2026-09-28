@@ -1163,6 +1163,12 @@ Component: `src/components/PollView/VoteMatrix.jsx`.
   the useful core was scoped down into feature 16 instead.
 
 ## Changelog
+- 28 Sep 2026: fix (no roadmap feature): on phones the header logo
+  collided with the language toggle and the Polish sign-in button
+  (wordmark cut to "MeppleTim" at 390 px; 360 and 320 px also
+  scrolled sideways). Found by the 28 Sep visual review. Phones now
+  get a smaller lockup (32 px mark, 18 px wordmark), and below
+  375 px the header shows the mark alone. Desktop unchanged.
 - 28 Sep 2026: fix (no roadmap feature): polls closed by a passed
   deadline showed "Close voting" in the creator tools, so they could
   not be reopened without removing the deadline by hand. The toggle
