@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { pl, enUS } from 'date-fns/locale';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { LanguageContext } from './context';
@@ -41,6 +41,12 @@ const urlLang = langFromUrl();
 function LanguageProvider({ children }) {
   const [storedLang, setLang] = useLocalStorage('language', urlLang || detectLanguage());
   const lang = LANGUAGES.includes(storedLang) ? storedLang : 'en';
+
+  // Keep <html lang> in step so screen readers, spellcheck and
+  // search engines treat Polish pages as Polish (index.html ships "en")
+  useEffect(() => {
+    document.documentElement.lang = lang;
+  }, [lang]);
 
   const t = useCallback((key, params) => translate(lang, key, params), [lang]);
 
