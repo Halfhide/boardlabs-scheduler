@@ -409,7 +409,9 @@ function PollView() {
         voterName={voterName}
         voterUid={voterUid}
         finalizedDateId={poll.finalizedDateId ?? null}
+        closed={isClosed}
         onDateClick={handleDateClick}
+        onVote={(dateId, response) => handleVote(dateId, response)}
       />
 
       {/* Game suggestions and voting */}

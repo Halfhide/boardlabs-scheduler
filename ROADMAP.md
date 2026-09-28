@@ -54,6 +54,7 @@ features were proposed, 11 accepted, 4 rejected (see bottom).
 | 20 | Bilingual landing URLs | 6b | done        |
 | 21 | Performance pass    | 6b    | done        |
 | 16 | Enriched my-polls   | 7     | not started |
+| 22 | Availability table UX | 7   | done        |
 
 ## Phase 1: Poll lifecycle (foundations)
 
@@ -1131,7 +1132,22 @@ Acceptance criteria:
 
 ### 22. Availability table UX notes (added 24 Sep 2026 on Adam's request)
 
-Status: not started (notes only; think through before building)
+Status: done (28 Sep 2026). Adam chose, from three options each:
+compact columns plus a scroll cue, and tap-to-cycle voting in your
+own row. Day columns are 32 px (weekday, day number, month stacked),
+the name column is capped at 96 px (full name on hover), so 21 days
+fit on desktop without scrolling. When the table still overflows
+(phones, longer polls) a right fade, a left fade after scrolling,
+arrow buttons and a "+N more days" count show the hidden days.
+Tapping a cell in your own row cycles yes, maybe, no (no "remove
+vote", matching the date window), shown instantly and saved through
+the existing addVote transaction; one write per date in flight and
+only the latest answer is sent after it, so rapid taps cannot commit
+out of order. Guests are kept from yes to maybe and cleared on no.
+A named voter without votes gets an empty own row. Other people's
+cells and the date headers open the date window; closed polls are
+read-only. Verified with a 45-check headless Chrome run against the
+local emulator (evidence in projects/meppletime/feature-22-2026-09-28/).
 
 Observed on a real 21-day poll (screenshot from Adam, 24 Sep 2026).
 Component: `src/components/PollView/VoteMatrix.jsx`.
@@ -1163,6 +1179,9 @@ Component: `src/components/PollView/VoteMatrix.jsx`.
   the useful core was scoped down into feature 16 instead.
 
 ## Changelog
+- 28 Sep 2026: feature 22 (availability table UX) done: compact
+  columns so 21 days fit on desktop, scroll cue on overflow, and
+  tap-to-cycle voting in your own row. No rules change.
 - 28 Sep 2026: fix (no roadmap feature): <html lang> now follows
   the chosen language (it stayed "en" in Polish, misleading screen
   readers and search engines), and the header's EN/PL toggle,
