@@ -78,6 +78,10 @@ function AdminBar({
       setMaxDraft('');
     }, t('capacityRemovedNotice'));
 
+  // A passed deadline closes voting just like the manual flag, so the
+  // toggle must offer reopening in both cases
+  const votingClosed = !!poll.closed || deadlinePassed;
+
   const hasCapacity = poll.minPlayers != null || poll.maxPlayers != null;
 
   return (
@@ -89,16 +93,16 @@ function AdminBar({
         {!finalizedDate && (
           <button
             onClick={() =>
-              run(onToggleClosed, poll.closed ? t('votingReopenedNotice') : t('votingClosedNotice'))
+              run(onToggleClosed, votingClosed ? t('votingReopenedNotice') : t('votingClosedNotice'))
             }
             disabled={busy}
             className={`text-sm font-medium px-3 py-1.5 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
-              poll.closed
+              votingClosed
                 ? 'bg-sage-600 text-ground hover:bg-sage-700'
                 : 'bg-gold-500 text-ink hover:bg-gold-600'
             }`}
           >
-            {poll.closed ? t('reopenVoting') : t('closeVoting')}
+            {votingClosed ? t('reopenVoting') : t('closeVoting')}
           </button>
         )}
       </div>
