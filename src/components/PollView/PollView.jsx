@@ -271,7 +271,12 @@ function PollView() {
           onRename={(title) => updatePollTitle(pollId, creatorAuth, title)}
           onAddDate={(dateString) => addPollDate(pollId, creatorAuth, dateString)}
           onToggleClosed={() =>
-            setPollClosed(pollId, creatorAuth, !poll.closed, poll.closed && deadlinePassed)
+            setPollClosed(
+              pollId,
+              creatorAuth,
+              !(poll.closed || deadlinePassed),
+              deadlinePassed
+            )
           }
           onSetDeadline={(date) => setPollDeadline(pollId, creatorAuth, date)}
           onClearDeadline={() => setPollDeadline(pollId, creatorAuth, null)}

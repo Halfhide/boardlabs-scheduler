@@ -1163,6 +1163,11 @@ Component: `src/components/PollView/VoteMatrix.jsx`.
   the useful core was scoped down into feature 16 instead.
 
 ## Changelog
+- 28 Sep 2026: fix (no roadmap feature): polls closed by a passed
+  deadline showed "Close voting" in the creator tools, so they could
+  not be reopened without removing the deadline by hand. The toggle
+  now treats a passed deadline as closed, offers "Reopen voting",
+  and reopening clears the passed deadline. No rules change.
 
 - 15 Jul 2026: roadmap created from the feature review session.
 - 15 Jul 2026: feature 1 (creator controls) implemented and verified
