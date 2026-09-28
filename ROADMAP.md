@@ -1404,3 +1404,21 @@ Six further browser scenarios now cover rejected final-switch/secondary-signout
 calls and local marker read/write/remove exceptions, with reload/retry recovery.
 No app-code fixes were needed. Next: in-flight account changes, revoked/expired
 credentials and lost browser storage. Current security status and remaining release gates: `../../projects/meppletime/HANDOFF.md`.
+
+## Local security checkpoint, September 28, 2026
+
+All implementation remains in the separate emulator-only prototype. Auth now
+checks that an in-flight transfer still belongs to the same guest and destination.
+A deleted browser transfer marker is restored from the authenticated server job
+before controls are enabled. The transfer panel follows the existing app layout
+and fonts; its error, mobile controls and long account text were revised.
+
+The visual review covers 40 reference/local screenshots, PL/EN at 1440 and 390 px.
+Known gaps include the inherited PL phone header logo collision, native date
+format, user-facing reauthentication, bounded discovery recovery and production
+architecture. This is not a deployment candidate or whole-product quality signoff.
+Final emulator regression: 55/55 across seven suites on September 28.
+Unit tests: 42/42; lint/build pass with the existing bundle-size warning.
+Detailed final regression evidence and restart steps: ../../projects/meppletime/HANDOFF.md.
+Visual evidence and criticism list: ../../projects/meppletime/QUALITY-REVIEW-2026-09-28.md.
+No production app code, rules or database writes in this checkpoint.
