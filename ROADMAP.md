@@ -1163,6 +1163,11 @@ Component: `src/components/PollView/VoteMatrix.jsx`.
   the useful core was scoped down into feature 16 instead.
 
 ## Changelog
+- 28 Sep 2026: fix (no roadmap feature): <html lang> now follows
+  the chosen language (it stayed "en" in Polish, misleading screen
+  readers and search engines), and the header's EN/PL toggle,
+  sign-in button and account avatar get invisible 44 px tap areas
+  (they were 24 to 32 px) without changing how they look.
 - 28 Sep 2026: fix (no roadmap feature): on phones the header logo
   collided with the language toggle and the Polish sign-in button
   (wordmark cut to "MeppleTim" at 390 px; 360 and 320 px also

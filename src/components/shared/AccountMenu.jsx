@@ -242,7 +242,7 @@ function AccountMenu() {
       <>
         <button
           onClick={() => setModalOpen(true)}
-          className="px-3 py-1.5 text-sm font-semibold bg-terra text-ground rounded-full hover:bg-terra-600 transition-colors"
+          className="relative px-3 py-1.5 text-sm font-semibold bg-terra text-ground rounded-full hover:bg-terra-600 transition-colors after:absolute after:inset-x-0 after:-inset-y-1.5"
         >
           {t('signIn')}
         </button>
@@ -260,7 +260,7 @@ function AccountMenu() {
         onClick={() => setMenuOpen((open) => !open)}
         aria-label={t('accountMenuAria')}
         aria-expanded={menuOpen}
-        className="flex items-center gap-2 rounded-full hover:opacity-80 transition-opacity"
+        className="relative flex items-center gap-2 rounded-full hover:opacity-80 transition-opacity after:absolute after:-inset-1.5"
       >
         {user.photoURL ? (
           <img

@@ -18,7 +18,7 @@ function LanguageToggle() {
     <button
       onClick={() => setLang(value)}
       aria-pressed={lang === value}
-      className={`px-2.5 py-1 text-xs font-semibold transition-colors ${
+      className={`relative px-2.5 py-1 text-xs font-semibold transition-colors first:rounded-l-full last:rounded-r-full after:absolute after:inset-x-0 after:-inset-y-2.5 ${
         lang === value
           ? 'bg-terra text-ground'
           : 'bg-surface text-neutral-700 hover:bg-ink/5'
@@ -29,7 +29,10 @@ function LanguageToggle() {
   );
 
   return (
-    <div className="inline-flex rounded-full border border-neutral-400 overflow-hidden">
+    // The invisible ::after strips stretch each 24 px button to a 44 px
+    // tap area without enlarging the pill (so no overflow-hidden here,
+    // it would clip them)
+    <div className="inline-flex rounded-full border border-neutral-400">
       {button('en', 'EN')}
       {button('pl', 'PL')}
     </div>
