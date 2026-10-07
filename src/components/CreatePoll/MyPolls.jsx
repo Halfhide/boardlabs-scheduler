@@ -1,3 +1,4 @@
+import { isTrustedPoll } from '../../utils/trustedClient';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
@@ -23,7 +24,8 @@ function MyPolls() {
 
   useEffect(() => {
     if (!uid) return;
-    return watchUserPolls(uid, (byId) => setCloud({ uid, byId }));
+    return watchUserPolls(uid, (byId) => setCloud({ uid, byId, error: false }),
+      () => setCloud(previous => ({ uid, byId: previous.uid === uid ? previous.byId : null, error: true })));
   }, [uid]);
 
   // Once per account per mount: push local-only entries up so the
@@ -39,7 +41,7 @@ function MyPolls() {
   // the created-by-me badge is sticky across both sources
   const polls = useMemo(() => {
     const byId = new Map();
-    localPolls.forEach((p) => byId.set(p.id, { ...p }));
+    localPolls.filter(p => !uid || !isTrustedPoll(p.id)).forEach((p) => byId.set(p.id, { ...p }));
     if (cloudById) {
       Object.values(cloudById).forEach((c) => {
         const local = byId.get(c.id);
@@ -52,7 +54,7 @@ function MyPolls() {
       });
     }
     return [...byId.values()].sort((a, b) => b.lastSeen - a.lastSeen);
-  }, [localPolls, cloudById]);
+  }, [localPolls, cloudById, uid]);
 
   // Removal is two-step so a stray click cannot silently lose the
   // only pointer to a poll; the armed state disarms itself
@@ -63,7 +65,8 @@ function MyPolls() {
     return () => clearTimeout(timer);
   }, [confirmingId]);
 
-  if (polls.length === 0) {
+  const historyError = uid && cloud.uid === uid && cloud.error;
+  if (polls.length === 0 && !historyError) {
     return null;
   }
 
@@ -84,11 +87,12 @@ function MyPolls() {
       <p className="text-xs text-neutral-500 mb-2">
         {uid ? t('yourPollsHintSynced') : t('yourPollsHint')}
       </p>
+      {historyError && <p role="alert" className="text-sm text-danger-700 mb-3">{t('errLoadHistory')}</p>}
       <ul className="divide-y divide-neutral-200">
         {polls.map((p) => (
           <li key={p.id} className="flex items-center gap-3 py-2.5">
             <Link to={`/poll/${p.id}`} className="flex-1 min-w-0 group">
-              <span className="block text-sm font-medium text-ink group-hover:text-terra-700 truncate">
+              <span className="block text-sm font-medium text-ink group-hover:text-terra-700 break-words">
                 {p.title}
               </span>
               <span className="block text-xs text-neutral-600">

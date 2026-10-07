@@ -14,11 +14,26 @@
   "headers": [
     {
       "source": "/",
-      "headers": [{ "key": "X-Robots-Tag", "value": "noindex" }]
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex"
+        }
+      ]
     },
     {
       "source": "/((?!privacy$|api/).*)",
-      "headers": [{ "key": "X-Robots-Tag", "value": "noindex" }]
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex"
+        }
+      ]
     }
-  ]
+  ],
+  "functions": {
+    "api/trusted-migrate.js": {
+      "maxDuration": 60
+    }
+  }
 }

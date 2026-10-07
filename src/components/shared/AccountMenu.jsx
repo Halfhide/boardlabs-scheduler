@@ -24,6 +24,7 @@ function errorKey(error) {
   ) {
     return 'errAuthLinkInvalid';
   }
+  if (code.startsWith('recovery/')) return 'transferRecoveryWrong';
   if (code === 'auth/popup-blocked') return 'errAuthPopupBlocked';
   if (code === 'auth/network-request-failed') return 'errAuthNetwork';
   if (code === 'auth/too-many-requests') return 'errAuthTooMany';
@@ -70,7 +71,7 @@ function SignInModal({ onClose }) {
 
   const needEmail = emailLinkStatus === 'needEmail';
   const completing = emailLinkStatus === 'completing';
-  const shownError = error || (needEmail ? emailLinkError : null);
+  const shownError = error || emailLinkError;
 
   const close = () => {
     if (emailLinkStatus !== 'idle') cancelEmailLink();
@@ -215,7 +216,7 @@ function SignInModal({ onClose }) {
 
 function AccountMenu() {
   const { t } = useTranslation();
-  const { user, authLoading, emailLinkStatus, emailLinkError, signOutUser } =
+  const { user, transferStarted, authLoading, emailLinkStatus, emailLinkError, signOutUser } =
     useAuth();
   const [modalOpen, setModalOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -225,7 +226,7 @@ function AccountMenu() {
   // A pending magic link (or its failure) opens the modal by itself
   const linkNeedsAttention =
     emailLinkStatus !== 'idle' ||
-    (!!emailLinkError && emailLinkError !== dismissedError && !user);
+    (!!emailLinkError && emailLinkError !== dismissedError && !user && !transferStarted);
   const showModal = modalOpen || linkNeedsAttention;
 
   const closeModal = () => {
@@ -241,6 +242,7 @@ function AccountMenu() {
     return (
       <>
         <button
+          disabled={transferStarted}
           onClick={() => setModalOpen(true)}
           className="relative px-3 py-1.5 text-sm font-semibold bg-terra text-ground rounded-full hover:bg-terra-600 transition-colors after:absolute after:inset-x-0 after:-inset-y-1.5"
         >

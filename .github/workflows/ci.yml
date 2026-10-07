@@ -30,6 +30,14 @@ jobs:
       - name: Test
         run: npm test
 
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Security API and migration emulator checks
+        run: npm run test:security -- release-backend
+
       - name: Build
         run: npm run build
 

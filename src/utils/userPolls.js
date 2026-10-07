@@ -1,3 +1,5 @@
+import { watchTrusted } from './trustedRead';
+import { trustedMode, isTrustedPoll, trustedWrite } from './trustedClient';
 // Cloud copy of the my-polls list for signed-in users, stored in
 // users/{uid} (one document per account, readable and writable only
 // by its owner). Entries live in a `polls` map keyed by poll ID so
@@ -22,6 +24,7 @@ function userDocRef(uid) {
  */
 export async function rememberPollForUser(uid, { id, title, createdByMe = false }) {
   if (!uid || !id || !title) return;
+  if (isTrustedPoll(id)) return trustedWrite(id, 'visit', {}).catch(console.error);
   try {
     await setDoc(
       userDocRef(uid),
@@ -46,6 +49,7 @@ export async function rememberPollForUser(uid, { id, title, createdByMe = false 
  */
 export async function forgetPollForUser(uid, pollId) {
   if (!uid || !pollId) return;
+  if (isTrustedPoll(pollId)) return trustedWrite(pollId, 'forget', {}).catch(console.error);
   try {
     await setDoc(
       userDocRef(uid),
@@ -63,7 +67,18 @@ export async function forgetPollForUser(uid, pollId) {
  * user document does not exist yet.
  * @returns {Function} unsubscribe
  */
-export function watchUserPolls(uid, onChange) {
+export function watchUserPolls(uid, onChange, onError = () => {}) {
+  if (trustedMode) {
+    let legacy = {}, trusted = {};
+    const emit = () => onChange({ ...legacy, ...trusted });
+    const stopLegacy = onSnapshot(userDocRef(uid), snap => {
+      legacy = Object.fromEntries(Object.entries(snap.data()?.polls || {}).filter(([id]) => !isTrustedPoll(id)).map(([id, entry]) =>
+        [id, { ...entry, id, lastSeen: entry.lastSeen?.toMillis?.() ?? 0 }]));
+      emit();
+    }, error => { onError(error); });
+    const stopTrusted = watchTrusted({ action: 'history' }, result => { trusted = result.polls; emit(); }, onError, uid);
+    return () => { stopLegacy(); stopTrusted(); };
+  }
   return onSnapshot(
     userDocRef(uid),
     (snap) => {
@@ -94,6 +109,17 @@ export function watchUserPolls(uid, onChange) {
  */
 export async function syncLocalPollsUp(uid, localList, cloudById) {
   if (!uid) return;
+  // Local bookmarks are not ownership evidence. Import only through the server's
+  // visit operation, which derives ownership from the actual poll document.
+  if (trustedMode) {
+    for (const entry of localList.filter(p => isTrustedPoll(p.id)).slice(0, MAX_ENTRIES)) {
+      if (!cloudById[entry.id]) {
+        try { await trustedWrite(entry.id, 'visit', {}); } catch { /* Retry on a later visit. */ }
+      }
+    }
+    localList = localList.filter(p => !isTrustedPoll(p.id));
+    cloudById = Object.fromEntries(Object.entries(cloudById).filter(([id]) => !isTrustedPoll(id)));
+  }
 
   const updates = {};
   localList.forEach((p) => {

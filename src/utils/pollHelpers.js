@@ -1,3 +1,4 @@
+import { trustedMode, isTrustedPoll, trustedWrite } from './trustedClient';
 import { doc, setDoc, runTransaction, deleteField, deleteDoc } from 'firebase/firestore';
 import { nanoid } from 'nanoid';
 import { db } from '../firebase';
@@ -25,6 +26,7 @@ function appError(code, message, params) {
  * @returns {Promise<{pollId: string, creatorToken: string}>} Poll ID and creator token
  */
 export async function createPoll(title, dateStrings, options = {}) {
+  if (trustedMode) return trustedWrite(null, 'create', { title, dates: dateStrings, deadline: options.deadline?.toISOString() ?? null, minPlayers: options.minPlayers ?? null, maxPlayers: options.maxPlayers ?? null });
   const { deadline = null, minPlayers = null, maxPlayers = null, ownerUid = null } = options;
 
   try {
@@ -68,7 +70,7 @@ export async function createPoll(title, dateStrings, options = {}) {
  * @param {{creatorToken?: string|null, uid?: string|null}} auth
  */
 async function runCreatorUpdate(pollId, auth, mutate) {
-  const { creatorToken = null, uid = null } = auth || {};
+  const { uid = null } = auth || {};
   const pollRef = doc(db, 'polls', pollId);
 
   await runTransaction(db, async (transaction) => {
@@ -83,9 +85,8 @@ async function runCreatorUpdate(pollId, auth, mutate) {
     // Mirrors the Firestore rules: an owned poll is managed only by
     // the owner account; the token authorizes only unowned polls
     const isOwner = !!poll.ownerUid && !!uid && poll.ownerUid === uid;
-    const hasToken =
-      !poll.ownerUid && !!poll.creatorToken && creatorToken === poll.creatorToken;
-    if (!isOwner && !hasToken) {
+
+    if (!isOwner) {
       throw appError('errNotCreator', 'Only the poll creator can do this');
     }
 
@@ -97,6 +98,7 @@ async function runCreatorUpdate(pollId, auth, mutate) {
  * Rename a poll (creator only)
  */
 export async function updatePollTitle(pollId, auth, title) {
+  if (isTrustedPoll(pollId)) return trustedWrite(pollId, 'rename', { title });
   const trimmed = title.trim();
   if (!trimmed || trimmed.length > 100) {
     throw appError('errTitleLength', 'Title must be between 1 and 100 characters');
@@ -117,6 +119,7 @@ export async function updatePollTitle(pollId, auth, title) {
  *   keep it closed
  */
 export async function setPollClosed(pollId, auth, closed, clearDeadline = false) {
+  if (isTrustedPoll(pollId)) return trustedWrite(pollId, 'close', { closed, clearDeadline });
   try {
     await runCreatorUpdate(pollId, auth, () => ({
       closed,
@@ -133,6 +136,7 @@ export async function setPollClosed(pollId, auth, closed, clearDeadline = false)
  * @param {Date|null} deadline - New deadline, or null to remove it
  */
 export async function setPollDeadline(pollId, auth, deadline) {
+  if (isTrustedPoll(pollId)) return trustedWrite(pollId, 'deadline', { deadline: deadline?.toISOString() ?? null });
   if (deadline !== null && (!(deadline instanceof Date) || isNaN(deadline.getTime()))) {
     throw appError('errInvalidDeadline', 'Invalid deadline');
   }
@@ -152,6 +156,7 @@ export async function setPollDeadline(pollId, auth, deadline) {
  * @param {string} dateString - ISO date string (YYYY-MM-DD)
  */
 export async function addPollDate(pollId, auth, dateString) {
+  if (isTrustedPoll(pollId)) return trustedWrite(pollId, 'addDate', { date: dateString });
   if (!/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
     throw appError('errInvalidDate', 'Invalid date');
   }
@@ -183,6 +188,7 @@ export async function addPollDate(pollId, auth, dateString) {
  * bound to remove it.
  */
 export async function setPollCapacity(pollId, auth, minPlayers, maxPlayers) {
+  if (isTrustedPoll(pollId)) return trustedWrite(pollId, 'capacity', { minPlayers, maxPlayers });
   const validate = (value, label) => {
     if (value !== null && (!Number.isInteger(value) || value < 1 || value > 99)) {
       throw appError('errPlayersRange', `${label} must be a whole number between 1 and 99`);
@@ -237,6 +243,7 @@ export function getCapacityStatus(votes, minPlayers, maxPlayers) {
  *   un-finalize and reopen voting
  */
 export async function setFinalizedDate(pollId, auth, dateId) {
+  if (isTrustedPoll(pollId)) return trustedWrite(pollId, 'finalize', { dateId });
   try {
     await runCreatorUpdate(pollId, auth, (poll) => {
       if (dateId !== null && !poll.dates.some(d => d.id === dateId)) {
@@ -255,6 +262,7 @@ export async function setFinalizedDate(pollId, auth, dateId) {
  * (creator only)
  */
 export async function removePollDate(pollId, auth, dateId) {
+  if (isTrustedPoll(pollId)) return trustedWrite(pollId, 'removeDate', { dateId });
   try {
     await runCreatorUpdate(pollId, auth, (poll) => {
       if (poll.dates.length <= 1) {
@@ -314,6 +322,7 @@ export function findUserVote(votes, voterId, voterName, uid = null) {
  *   re-voting; a 'no' response always clears them.
  */
 export async function addVote(pollId, dateId, voter, response, guests = undefined) {
+  if (isTrustedPoll(pollId)) return trustedWrite(pollId, 'vote', { dateId, name: voter.name, response, ...(guests !== undefined ? { guests } : {}) });
   try {
     const pollRef = doc(db, 'polls', pollId);
 
@@ -406,6 +415,7 @@ export async function addVote(pollId, dateId, voter, response, guests = undefine
  * @param {string} text - Comment text
  */
 export async function addComment(pollId, dateId, voter, text) {
+  if (isTrustedPoll(pollId)) return trustedWrite(pollId, 'comment', { dateId, name: voter.name, text });
   try {
     const pollRef = doc(db, 'polls', pollId);
 
@@ -462,6 +472,7 @@ export const MAX_GAMES = 30;
  * @param {string} url - Optional link (e.g. BoardGameGeek)
  */
 export async function addGame(pollId, voter, title, url = '') {
+  if (isTrustedPoll(pollId)) return trustedWrite(pollId, 'game', { name: voter.name, title, url });
   const trimmed = title.trim();
   if (!trimmed || trimmed.length > 80) {
     throw appError('errGameTitleLength', 'Game title must be between 1 and 80 characters');
@@ -559,6 +570,7 @@ export async function toggleGameVote(pollId, gameId, voter) {
  * Remove a game suggestion (creator only)
  */
 export async function removeGame(pollId, auth, gameId) {
+  if (isTrustedPoll(pollId)) return trustedWrite(pollId, 'removeGame', { gameId });
   try {
     await runCreatorUpdate(pollId, auth, (poll) => {
       const games = poll.games ?? [];
@@ -580,6 +592,7 @@ export async function removeGame(pollId, auth, gameId) {
  * match the poll's ownerUid), so a browser token is never enough.
  */
 export async function deletePoll(pollId, uid) {
+  if (isTrustedPoll(pollId)) return trustedWrite(pollId, 'delete', {});
   if (!uid) {
     throw appError('errNotCreator', 'Only the signed-in poll owner can delete a poll');
   }
@@ -601,7 +614,8 @@ export async function deletePoll(pollId, uid) {
  * @param {string} pollId
  * @param {{voterId: string, uid: string, creatorToken?: string|null}} identity
  */
-export async function claimPollIdentity(pollId, { voterId, uid, creatorToken = null }) {
+export async function claimPollIdentity(pollId, { voterId, uid }) {
+  if (isTrustedPoll(pollId)) return;
   if (!uid) return;
 
   try {
@@ -642,15 +656,13 @@ export async function claimPollIdentity(pollId, { voterId, uid, creatorToken = n
         };
       });
 
-      const claimOwnership =
-        !poll.ownerUid && !!poll.creatorToken && creatorToken === poll.creatorToken;
 
-      if (!changed && !claimOwnership) return;
+
+      if (!changed) return;
 
       transaction.update(pollRef, {
         ...(changed ? { dates } : {}),
-        ...(changed && poll.games ? { games } : {}),
-        ...(claimOwnership ? { ownerUid: uid } : {})
+        ...(changed && poll.games ? { games } : {})
       });
     });
   } catch (error) {

@@ -1446,3 +1446,49 @@ Unit tests: 42/42; lint/build pass with the existing bundle-size warning.
 Detailed final regression evidence and restart steps: ../../projects/meppletime/HANDOFF.md.
 Visual evidence and criticism list: ../../projects/meppletime/QUALITY-REVIEW-2026-09-28.md.
 No production app code, rules or database writes in this checkpoint.
+
+
+## Local security checkpoint, October 7, 2026
+
+The separate emulator prototype now supports destination reauthentication through
+Google or a new email link while the original guest session survives. A temporary
+in-memory candidate must match the locked destination before replacing pendingAuth.
+Wrong accounts, cancellation and primary-session changes leave migration locked.
+Firebase sign-in link language metadata no longer switches the saved UI language.
+Existing header/logo/tap-target fixes were ported into the local prototype.
+
+49 browser scenarios and 42 unit tests pass; lint and trusted build pass with
+existing bundle-size/Browserslist warnings. PL/EN quality run covers 56 full
+screenshots plus 16 panel details at 1440/390; all full screenshots inspected.
+Local logs retain six cancelled Firestore listeners during navigation, with no
+local console/page errors or HTTP error responses in the quality run.
+This is not a production release, real OAuth verification or full accessibility audit.
+Bounded discovery above 500 items, legacy import and production rollout remain open.
+The prototype has its own local Git repository with no remote or deploy integration;
+its initial commit includes the earlier prototype and recovery changes.
+Current details, commit pointer and evidence: ../../projects/meppletime/HANDOFF.md.
+No production app code, rules, database writes or deployment changed here.
+
+
+## Repository integration checkpoint, October 7, 2026
+
+Supersedes the earlier prototype-only checkpoint above. Branch
+feature/trusted-identity-release includes the current feature 22 base (48cf9cb)
+and integrates trusted identity, guest-to-account transfer and destination recovery
+into this repository. Deployable Vercel API handlers, App Check/token validation,
+server-only v2 reads/writes, paged indexed migration with a worker lease, old-link
+compatibility, merged legacy history and v2 expiry are included. Firestore rules
+were not changed; do not deploy the standalone prototype rules.
+
+54 unit tests, 48 integrated browser checks, six backend checks, lint and build
+passed locally. The backend fixture includes 604 polls and 504 transferred records.
+PL/EN UI review covers 72 screens at 1440/390, plus 16 panel details. Evidence is in
+tests/results; release details and remaining gaps are in RELEASE.md.
+
+No push, merge or production writes. Cloud settings remain unverified because
+Vercel/Firebase are not authenticated in this session. The production build gate
+reads provider/domain configuration and refuses missing prerequisites; it was not
+run against live configuration. Real OAuth, email delivery, Safari and physical
+phones remain unverified. Legacy arrays retain their existing direct-write risk.
+Publish the combined branch through PR/CI/squash merge after these deployment
+prerequisites are resolved. PR #10 is superseded only after that merge.

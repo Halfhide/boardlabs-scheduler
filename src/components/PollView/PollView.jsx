@@ -1,3 +1,4 @@
+import { isTrustedPoll, trustedWrite } from '../../utils/trustedClient';
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { nanoid } from 'nanoid';
@@ -55,14 +56,14 @@ function PollView() {
   useEffect(() => {
     if (poll?.title) document.title = `${poll.title} | MeppleTime`;
   }, [poll?.title, t]);
-  const { user } = useAuth();
+  const { identity, transferStarted } = useAuth();
   const [voterName, setVoterName] = useLocalStorage('voterName', '');
   // Stable per-browser voter ID so votes survive renames and two
   // voters with the same name don't overwrite each other
   const [voterId] = useLocalStorage('voterId', nanoid(8));
   // Signed-in identity; votes and creator rights follow this across
   // devices while everything keeps working without it
-  const voterUid = user?.uid ?? null;
+  const voterUid = identity?.uid ?? null;
   const [tempName, setTempName] = useState('');
   const [selectedDateId, setSelectedDateId] = useState(null);
   const [copied, setCopied] = useState(false);
@@ -83,12 +84,12 @@ function PollView() {
       (!!voterUid && poll.ownerUid === voterUid);
     rememberPoll({ id: poll.id, title: poll.title, createdByMe });
 
-    if (!voterUid) return;
+    if (!voterUid || transferStarted) return;
     const syncKey = `${voterUid}|${poll.id}|${poll.title}|${createdByMe}`;
     if (lastCloudSyncRef.current === syncKey) return;
     lastCloudSyncRef.current = syncKey;
     rememberPollForUser(voterUid, { id: poll.id, title: poll.title, createdByMe });
-  }, [poll, voterUid]);
+  }, [poll, voterUid, transferStarted]);
 
   // Signed-in visitors claim their earlier anonymous activity: votes
   // made under this browser's voterId get the account ID, and a poll
@@ -172,9 +173,7 @@ function PollView() {
   // managed only by the signed-in owner account; the browser token
   // grants management only while the poll has no owner yet
   const creatorToken = localStorage.getItem(`creatorToken:${pollId}`);
-  const isCreator = poll.ownerUid
-    ? !!voterUid && poll.ownerUid === voterUid
-    : !!poll.creatorToken && creatorToken === poll.creatorToken;
+  const isCreator = !!voterUid && poll.ownerUid === voterUid;
   // Identity handed to creator actions; either credential authorizes
   const creatorAuth = { creatorToken, uid: voterUid };
   // Deletion is stricter than the other creator tools: rules only
@@ -259,6 +258,7 @@ function PollView() {
         </div>
       )}
 
+      {!poll.ownerUid && <p role="status" className="bg-surface rounded-lg p-4">{t('legacyOwnerNotice')}</p>}
       {/* Creator tools */}
       {isCreator && (
         <AdminBar
@@ -271,12 +271,7 @@ function PollView() {
           onRename={(title) => updatePollTitle(pollId, creatorAuth, title)}
           onAddDate={(dateString) => addPollDate(pollId, creatorAuth, dateString)}
           onToggleClosed={() =>
-            setPollClosed(
-              pollId,
-              creatorAuth,
-              !(poll.closed || deadlinePassed),
-              deadlinePassed
-            )
+            setPollClosed(pollId, creatorAuth, !(poll.closed || deadlinePassed), deadlinePassed)
           }
           onSetDeadline={(date) => setPollDeadline(pollId, creatorAuth, date)}
           onClearDeadline={() => setPollDeadline(pollId, creatorAuth, null)}
@@ -410,8 +405,8 @@ function PollView() {
         voterUid={voterUid}
         finalizedDateId={poll.finalizedDateId ?? null}
         closed={isClosed}
-        onDateClick={handleDateClick}
         onVote={(dateId, response) => handleVote(dateId, response)}
+        onDateClick={handleDateClick}
       />
 
       {/* Game suggestions and voting */}
@@ -426,7 +421,7 @@ function PollView() {
           addGame(pollId, { id: voterId, name: voterName, uid: voterUid }, title, url)
         }
         onToggleGameVote={(gameId) =>
-          toggleGameVote(pollId, gameId, { id: voterId, name: voterName, uid: voterUid })
+          isTrustedPoll(pollId) ? trustedWrite(pollId, 'gameVote', { gameId, name: voterName, selected: !poll.games.find(g => g.id === gameId)?.votes.some(v => v.uid === voterUid) }) : toggleGameVote(pollId, gameId, { id: voterId, name: voterName, uid: voterUid })
         }
         onRemoveGame={(gameId) => removeGame(pollId, creatorAuth, gameId)}
       />
