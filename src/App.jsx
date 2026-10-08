@@ -4,6 +4,7 @@ import CreatePoll from './components/CreatePoll/CreatePoll';
 import PollView from './components/PollView/PollView';
 import LanguageProvider from './i18n/LanguageProvider';
 import AuthProvider from './auth/AuthProvider';
+import TransferPanel from './auth/TransferPanel';
 import { useTranslation } from './i18n/useTranslation';
 import OfflineBanner from './components/shared/OfflineBanner';
 import AccountMenu from './components/shared/AccountMenu';
@@ -29,9 +30,6 @@ function LanguageToggle() {
   );
 
   return (
-    // The invisible ::after strips stretch each 24 px button to a 44 px
-    // tap area without enlarging the pill (so no overflow-hidden here,
-    // it would clip them)
     <div className="inline-flex rounded-full border border-neutral-400">
       {button('en', 'EN')}
       {button('pl', 'PL')}
@@ -117,6 +115,7 @@ function App() {
           </header>
 
           <main className="max-w-4xl mx-auto px-4 py-8">
+            <TransferPanel />
             <Routes>
               <Route path="/" element={<CreatePoll />} />
               <Route path="/poll/:pollId" element={<PollView />} />

@@ -54,10 +54,17 @@ const pwaPlugin = VitePWA({
 export default defineConfig(({ mode }) => {
   // Expose BGG_API_TOKEN from .env to the dev API handler. It has no
   // VITE_ prefix, so it never reaches the client bundle.
-  const env = loadEnv(mode, process.cwd(), 'BGG_')
+  const emulator = process.env.MEPPLE_EMULATORS === 'true'
+  const env = emulator ? {} : loadEnv(mode, process.cwd(), 'BGG_')
   if (env.BGG_API_TOKEN) process.env.BGG_API_TOKEN = env.BGG_API_TOKEN
 
   return {
     plugins: [react(), devApiPlugin, pwaPlugin],
+    ...(emulator ? {
+      envDir: false,
+      define: { 'import.meta.env.VITE_MEPPLE_EMULATORS': JSON.stringify('true') },
+      server: { host: '127.0.0.1', port: 15173, strictPort: true,
+        proxy: { '/api/trusted-': { target: 'http://127.0.0.1:15175' } } },
+    } : {}),
   }
 })

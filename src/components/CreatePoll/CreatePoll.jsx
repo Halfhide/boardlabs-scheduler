@@ -12,7 +12,7 @@ import { useAuth } from '../../auth/useAuth';
 
 function CreatePoll() {
   const { t, dateLocale } = useTranslation();
-  const { user } = useAuth();
+  const { user, ensureGuest, transferStarted } = useAuth();
   const [title, setTitle] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -96,17 +96,18 @@ function CreatePoll() {
 
       // Create poll in Firebase (a signed-in creator owns it from
       // the start; anonymous creators can claim ownership later)
+      const creator = await ensureGuest();
       const { pollId, creatorToken } = await createPoll(title, dates, {
         deadline: deadlineDate,
         minPlayers: min,
         maxPlayers: max,
-        ownerUid: user?.uid ?? null
+        ownerUid: creator.uid
       });
 
       // Remember that this browser created the poll, unlocking the
       // creator tools on the poll page
       try {
-        localStorage.setItem(`creatorToken:${pollId}`, creatorToken);
+        if (creatorToken) localStorage.setItem(`creatorToken:${pollId}`, creatorToken);
       } catch (storageErr) {
         console.error('Could not persist creator token:', storageErr);
       }
@@ -174,7 +175,7 @@ function CreatePoll() {
             placeholder={t('pollTitlePlaceholder')}
             maxLength={100}
             className="w-full px-4 py-2 border border-neutral-400 rounded-full focus:ring-2 focus:ring-terra focus:border-transparent"
-            disabled={loading}
+            disabled={loading || transferStarted}
           />
         </div>
 
@@ -190,7 +191,7 @@ function CreatePoll() {
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
               className="w-full px-4 py-2 border border-neutral-400 rounded-full focus:ring-2 focus:ring-terra focus:border-transparent"
-              disabled={loading}
+              disabled={loading || transferStarted}
             />
           </div>
 
@@ -205,7 +206,7 @@ function CreatePoll() {
               min={startDate || undefined}
               onChange={(e) => setEndDate(e.target.value)}
               className="w-full px-4 py-2 border border-neutral-400 rounded-full focus:ring-2 focus:ring-terra focus:border-transparent"
-              disabled={loading}
+              disabled={loading || transferStarted}
             />
           </div>
         </div>
@@ -248,7 +249,7 @@ function CreatePoll() {
             value={deadline}
             onChange={(e) => setDeadline(e.target.value)}
             className="w-full px-4 py-2 border border-neutral-400 rounded-full focus:ring-2 focus:ring-terra focus:border-transparent"
-            disabled={loading}
+            disabled={loading || transferStarted}
           />
           <p className="mt-1 text-xs text-neutral-600">
             {t('deadlineHelp')}
@@ -270,7 +271,7 @@ function CreatePoll() {
               onChange={(e) => setMinPlayers(e.target.value)}
               placeholder={t('minPlayersPlaceholder')}
               className="w-full px-4 py-2 border border-neutral-400 rounded-full focus:ring-2 focus:ring-terra focus:border-transparent"
-              disabled={loading}
+              disabled={loading || transferStarted}
             />
           </div>
           <div>
@@ -286,7 +287,7 @@ function CreatePoll() {
               onChange={(e) => setMaxPlayers(e.target.value)}
               placeholder={t('maxPlayersPlaceholder')}
               className="w-full px-4 py-2 border border-neutral-400 rounded-full focus:ring-2 focus:ring-terra focus:border-transparent"
-              disabled={loading}
+              disabled={loading || transferStarted}
             />
           </div>
         </div>
@@ -304,7 +305,7 @@ function CreatePoll() {
         {/* Submit Button */}
         <button
           type="submit"
-          disabled={loading}
+          disabled={loading || transferStarted}
           className="w-full bg-terra text-ground font-medium py-3 px-4 rounded-full hover:bg-terra-600 focus:outline-none focus:ring-2 focus:ring-terra focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {loading ? t('creatingPoll') : t('createPoll')}

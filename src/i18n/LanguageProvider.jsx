@@ -14,6 +14,9 @@ const DATE_LOCALES = { en: enUS, pl: pl };
 function langFromUrl() {
   try {
     const url = new URL(window.location.href);
+    // Firebase action links also carry lang (the emulator always sends en).
+    // That is email/action-handler metadata, not an app language selection.
+    if (url.searchParams.get('mode') === 'signIn' && url.searchParams.has('oobCode')) return null;
     const param = url.searchParams.get('lang');
     if (!LANGUAGES.includes(param)) return null;
     url.searchParams.delete('lang');

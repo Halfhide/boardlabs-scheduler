@@ -26,6 +26,8 @@ function PrivacyPage() {
         <li>{t('privacyWhatItem2')}</li>
         <li>{t('privacyWhatItem3')}</li>
         <li>{t('privacyWhatItem4')}</li>
+        <li>{t('privacyWhatItem5')}</li>
+        <li>{t('privacyWhatItem6')}</li>
       </ul>
       <p className={`${body} mt-2`}>{t('privacyWhatOutro')}</p>
 
@@ -55,6 +57,8 @@ function PrivacyPage() {
 
       <h3 className={heading}>{t('privacyHowLongTitle')}</h3>
       <p className={body}>{t('privacyHowLongBody', { months: EXPIRY_MONTHS })}</p>
+
+      <p className={`${body} mt-2`}>{t('privacyRetentionOther')}</p>
 
       <h3 className={heading}>{t('privacyRemovalTitle')}</h3>
       <p className={body}>{t('privacyRemovalOwner')}</p>

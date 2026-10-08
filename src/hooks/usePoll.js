@@ -1,3 +1,5 @@
+import { isTrustedPoll } from '../utils/trustedClient';
+import { watchTrusted } from '../utils/trustedRead';
 import { useState, useEffect } from 'react';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -28,6 +30,9 @@ export function usePoll(pollId) {
       return;
     }
 
+    if (isTrustedPoll(pollId)) return watchTrusted({ action: 'poll', pollId }, ({ poll }) => {
+      setPoll(poll); setError(poll ? null : 'errPollNotFound'); setLoading(false);
+    }, () => { setError('errLoadPoll'); setLoading(false); });
     const pollRef = doc(db, 'polls', pollId);
 
     // Set up real-time listener

@@ -1,9 +1,11 @@
 import { initializeApp } from 'firebase/app';
-import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check';
-import { getFirestore } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
+import { initializeAppCheck, ReCaptchaV3Provider, getToken } from 'firebase/app-check';
+import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
+import { getAuth, initializeAuth, inMemoryPersistence, connectAuthEmulator } from 'firebase/auth';
 
-const firebaseConfig = {
+export const emulatorMode = import.meta.env.VITE_MEPPLE_EMULATORS === 'true';
+if (emulatorMode && !['localhost', '127.0.0.1'].includes(location.hostname)) throw new Error('Emulator build requires localhost');
+const firebaseConfig = emulatorMode ? { projectId: 'demo-meppletime-local', apiKey: 'fake-local-api-key', authDomain: 'localhost' } : {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
@@ -22,7 +24,8 @@ const app = initializeApp(firebaseConfig);
 // enforcement is turned on in the console (deliberately last, so we
 // never lock users out before tokens are confirmed flowing).
 const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
-if (recaptchaSiteKey) {
+let appCheck;
+if (recaptchaSiteKey && !emulatorMode) {
   // Debug tokens let builds on hostnames reCAPTCHA does not know
   // reach Firestore under App Check enforcement. Local dev prints a
   // per-browser token to register in the console's debug list. Vercel
@@ -36,7 +39,7 @@ if (recaptchaSiteKey) {
   if (import.meta.env.DEV || debugToken) {
     self.FIREBASE_APPCHECK_DEBUG_TOKEN = debugToken || true;
   }
-  initializeAppCheck(app, {
+  appCheck = initializeAppCheck(app, {
     provider: new ReCaptchaV3Provider(recaptchaSiteKey),
     isTokenAutoRefreshEnabled: true
   });
@@ -47,3 +50,19 @@ export const db = getFirestore(app);
 
 // Initialize Auth (sign-in is optional app-wide; see src/auth/)
 export const auth = getAuth(app);
+
+export const pendingAuth = getAuth(initializeApp(firebaseConfig, 'pending-account'));
+export const recoveryAuth = initializeAuth(initializeApp(firebaseConfig, 'transfer-recovery'), { persistence: inMemoryPersistence });
+if (emulatorMode) {
+  connectFirestoreEmulator(db, '127.0.0.1', 18080);
+  for (const session of [auth, pendingAuth, recoveryAuth]) connectAuthEmulator(session, 'http://127.0.0.1:19099', { disableWarnings: true });
+}
+export async function apiHeaders(user) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (user) headers.Authorization = `Bearer ${await user.getIdToken()}`;
+  if (!emulatorMode) {
+    if (!appCheck) throw new Error('App verification unavailable');
+    headers['X-Firebase-AppCheck'] = (await getToken(appCheck)).token;
+  }
+  return headers;
+}

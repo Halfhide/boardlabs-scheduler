@@ -12,7 +12,7 @@
 // - EXPIRY_MONTHS (optional): override the 12-month window
 
 import { initializeApp, cert, getApps } from 'firebase-admin/app';
-import { getFirestore } from 'firebase-admin/firestore';
+import { getFirestore, FieldPath } from 'firebase-admin/firestore';
 
 const BATCH_LIMIT = 500; // Firestore's max writes per batch
 
@@ -64,26 +64,29 @@ export default async function handler(req, res) {
 
   try {
     const db = getDb();
-    const snapshot = await db.collection('polls').get();
-
+    let scanned = 0;
     const expiredIds = [];
-    snapshot.forEach((doc) => {
-      const latest = latestDate(doc.data());
-      // Polls with no readable dates are left alone: deleting on
-      // malformed data would be guessing
-      if (latest && latest < cutoff) expiredIds.push(doc.id);
-    });
-
-    for (let i = 0; i < expiredIds.length; i += BATCH_LIMIT) {
-      const batch = db.batch();
-      for (const id of expiredIds.slice(i, i + BATCH_LIMIT)) {
-        batch.delete(db.collection('polls').doc(id));
+    for (const collectionName of ['polls', 'pollsV2']) {
+      let cursor = null;
+      while (true) {
+        let query = db.collection(collectionName).orderBy(FieldPath.documentId()).limit(BATCH_LIMIT);
+        if (cursor) query = query.startAfter(cursor);
+        const snapshot = await query.get();
+        scanned += snapshot.size;
+        const batch = db.batch();
+        let deletes = 0;
+        for (const doc of snapshot.docs) {
+          const latest = latestDate(doc.data());
+          if (latest && latest < cutoff) { batch.delete(doc.ref); expiredIds.push(doc.id); deletes++; }
+        }
+        if (deletes) await batch.commit();
+        if (snapshot.size < BATCH_LIMIT) break;
+        cursor = snapshot.docs.at(-1).id;
       }
-      await batch.commit();
     }
 
     send(200, {
-      scanned: snapshot.size,
+      scanned,
       deleted: expiredIds.length,
       deletedIds: expiredIds,
       cutoff,
