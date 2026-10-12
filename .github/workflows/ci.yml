@@ -30,6 +30,11 @@ jobs:
       - name: Test
         run: npm test
 
+      # Vercel's function loader cannot require() ES modules; a dependency
+      # that does crashes every API request in production.
+      - name: Check API functions load like on Vercel
+        run: npm run check:functions
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
