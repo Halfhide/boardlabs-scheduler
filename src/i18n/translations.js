@@ -210,6 +210,20 @@ export const translations = {
     monthHeaderFormat: 'MMMM yyyy',
     weekDays: 'S,M,T,W,T,F,S',
 
+    // Date picker
+    pickDatePlaceholder: 'Choose a date',
+    pickDateTimePlaceholder: 'Choose date and time',
+    pickerDateFormat: 'EEE, MMM d, yyyy',
+    pickerDateTimeFormat: "EEE, MMM d, yyyy 'at' HH:mm",
+    prevMonth: 'Previous month',
+    nextMonth: 'Next month',
+    todayButton: 'Today',
+    clearButton: 'Clear',
+    doneButton: 'Done',
+    timeLabel: 'Time',
+    hourLabel: 'Hour',
+    minuteLabel: 'Minutes',
+
     // Availability matrix
     availabilityTable: 'Availability table',
     participants: ['{count} participant', '{count} participants'],
@@ -548,6 +562,20 @@ export const translations = {
     no: 'Nie',
     monthHeaderFormat: 'LLLL yyyy',
     weekDays: 'P,W,Ś,C,P,S,N',
+
+    // Date picker
+    pickDatePlaceholder: 'Wybierz datę',
+    pickDateTimePlaceholder: 'Wybierz datę i godzinę',
+    pickerDateFormat: 'EEE, d MMM yyyy',
+    pickerDateTimeFormat: "EEE, d MMM yyyy 'o' HH:mm",
+    prevMonth: 'Poprzedni miesiąc',
+    nextMonth: 'Następny miesiąc',
+    todayButton: 'Dziś',
+    clearButton: 'Wyczyść',
+    doneButton: 'Gotowe',
+    timeLabel: 'Godzina',
+    hourLabel: 'Godzina',
+    minuteLabel: 'Minuty',
 
     // Availability matrix
     availabilityTable: 'Tabela dostępności',

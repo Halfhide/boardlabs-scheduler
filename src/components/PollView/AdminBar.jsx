@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { format, parseISO } from 'date-fns';
 import { useTranslation, translateError } from '../../i18n/useTranslation';
+import DatePicker from '../shared/DatePicker';
 
 function AdminBar({
   poll,
@@ -152,12 +153,13 @@ function AdminBar({
           {t('addDateLabel')}
         </label>
         <div className="flex flex-col sm:flex-row gap-2">
-          <input
-            type="date"
+          <DatePicker
             id="admin-new-date"
             value={newDate}
-            onChange={(e) => setNewDate(e.target.value)}
-            className="flex-1 px-4 py-2 border border-neutral-400 rounded-full text-sm bg-ground focus:ring-2 focus:ring-terra focus:border-transparent"
+            onChange={setNewDate}
+            exclude={poll.dates.map((d) => d.date)}
+            wrapperClassName="flex-1 min-w-0"
+            className="px-4 py-2 border border-neutral-400 rounded-full text-sm bg-ground focus:ring-2 focus:ring-terra focus:border-transparent"
             disabled={busy}
           />
           <button
@@ -184,12 +186,13 @@ function AdminBar({
           {t('deadlineLabel')}
         </label>
         <div className="flex flex-col sm:flex-row gap-2">
-          <input
-            type="datetime-local"
+          <DatePicker
+            mode="datetime"
             id="admin-deadline"
             value={deadlineDraft}
-            onChange={(e) => setDeadlineDraft(e.target.value)}
-            className="flex-1 px-4 py-2 border border-neutral-400 rounded-full text-sm bg-ground focus:ring-2 focus:ring-terra focus:border-transparent"
+            onChange={setDeadlineDraft}
+            wrapperClassName="flex-1 min-w-0"
+            className="px-4 py-2 border border-neutral-400 rounded-full text-sm bg-ground focus:ring-2 focus:ring-terra focus:border-transparent"
             disabled={busy}
           />
           <button
