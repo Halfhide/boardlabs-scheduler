@@ -7,6 +7,7 @@ import { rememberPoll } from '../../utils/myPolls';
 import { rememberPollForUser } from '../../utils/userPolls';
 import { diceRoll } from '../../utils/diceRoll';
 import MyPolls from './MyPolls';
+import DatePicker from '../shared/DatePicker';
 import { useTranslation } from '../../i18n/useTranslation';
 import { useAuth } from '../../auth/useAuth';
 
@@ -185,12 +186,13 @@ function CreatePoll() {
             <label htmlFor="startDate" className="block text-sm font-medium text-neutral-800 mb-2">
               {t('startDate')}
             </label>
-            <input
-              type="date"
+            <DatePicker
               id="startDate"
               value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="w-full px-4 py-2 border border-neutral-400 rounded-full focus:ring-2 focus:ring-terra focus:border-transparent"
+              onChange={setStartDate}
+              rangeFrom={startDate}
+              rangeTo={endDate}
+              className="px-4 py-2 border border-neutral-400 rounded-full focus:ring-2 focus:ring-terra focus:border-transparent"
               disabled={loading || transferStarted}
             />
           </div>
@@ -199,13 +201,14 @@ function CreatePoll() {
             <label htmlFor="endDate" className="block text-sm font-medium text-neutral-800 mb-2">
               {t('endDate')}
             </label>
-            <input
-              type="date"
+            <DatePicker
               id="endDate"
               value={endDate}
               min={startDate || undefined}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="w-full px-4 py-2 border border-neutral-400 rounded-full focus:ring-2 focus:ring-terra focus:border-transparent"
+              onChange={setEndDate}
+              rangeFrom={startDate}
+              rangeTo={endDate}
+              className="px-4 py-2 border border-neutral-400 rounded-full focus:ring-2 focus:ring-terra focus:border-transparent"
               disabled={loading || transferStarted}
             />
           </div>
@@ -243,12 +246,14 @@ function CreatePoll() {
           <label htmlFor="deadline" className="block text-sm font-medium text-neutral-800 mb-2">
             {t('votingDeadlineLabel')} <span className="text-neutral-500 font-normal">{t('optional')}</span>
           </label>
-          <input
-            type="datetime-local"
+          <DatePicker
+            mode="datetime"
             id="deadline"
             value={deadline}
-            onChange={(e) => setDeadline(e.target.value)}
-            className="w-full px-4 py-2 border border-neutral-400 rounded-full focus:ring-2 focus:ring-terra focus:border-transparent"
+            onChange={setDeadline}
+            min={format(new Date(), 'yyyy-MM-dd')}
+            clearable
+            className="px-4 py-2 border border-neutral-400 rounded-full focus:ring-2 focus:ring-terra focus:border-transparent"
             disabled={loading || transferStarted}
           />
           <p className="mt-1 text-xs text-neutral-600">
