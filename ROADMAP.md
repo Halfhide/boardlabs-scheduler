@@ -1167,6 +1167,26 @@ Component: `src/components/PollView/VoteMatrix.jsx`.
   the date details. Writes must go through the existing
   `runTransaction` helpers and vote identity rules.
 
+### 23. MeppleTime date picker (added 12 Oct 2026 on Adam's request)
+
+Status: done (13 Oct 2026). The browser's native date/datetime popup
+could not be styled, clashed with the design language and ignored the
+app language (English month names and "Clear/Today" on Polish screens,
+dd/mm/yyyy in the field). Replaced in all five places (create: start,
+end, deadline; creator tools: add date, deadline) by
+`src/components/shared/DatePicker.jsx`, modelled on the poll calendar
+(`Calendar.jsx`): surface panel, rounded-sm day cells, terra for the
+selected day, terra-400 outline for today, locale week start and
+`weekDays`/`monthHeaderFormat` strings, 24 h time with hour/minute
+selects. Values keep the native string formats, so callers and
+validation are unchanged. Extras: the poll range is tinted in the
+start/end pickers, the end picker blocks days before the start, the
+deadline picker blocks past days, "add date" blocks days already in
+the poll; keyboard (arrows, PageUp/Down, Home/End, Enter, Escape).
+Browser suites pick dates through the real UI
+(`tests/security/pick-date.mjs`). Known limit: the hour/minute
+dropdown lists are still the OS-native menus.
+
 ## Rejected features (do not build unless Adam changes his mind)
 
 - Time slots (time-of-day options): rejected 15 Jul 2026.

@@ -4,6 +4,7 @@ import { spawn } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { Timestamp } from 'firebase-admin/firestore';
+import { pickDate } from './pick-date.mjs';
 import { adminDb, adminAuth, closeService } from './admin.mjs';
 const require = createRequire(new URL('../../package.json', import.meta.url));
 const puppeteer = require('puppeteer-core');
@@ -47,8 +48,8 @@ async function createPoll(page, title) {
   await page.goto(`${base}/?lang=en`);
   await page.waitForSelector('#title');
   await fill(page, '#title', title);
-  await fill(page, '#startDate', '2026-10-20');
-  await fill(page, '#endDate', '2026-10-21');
+  await pickDate(page, 'startDate', '2026-10-20');
+  await pickDate(page, 'endDate', '2026-10-21');
   await clickText(page, 'Create poll');
   await page.waitForFunction(() => location.pathname.startsWith('/poll/'));
   await page.waitForFunction(() => document.body.innerText.includes('Close voting'));
