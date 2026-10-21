@@ -1435,6 +1435,11 @@ dropdown lists are still the OS-native menus.
   sentence-initial (normal grammar, kept). Verified in the browser
   on the preview build; lint and build green. Awaiting Adam's
   commit/push.
+- 21 Oct 2026: reopening after a passed deadline restored. The
+  trusted identity release (#11) had reverted the AdminBar half of
+  #6, so a poll closed by its deadline showed "Close voting" instead
+  of "Reopen voting". Restored, plus a regression check in
+  tests/security/trusted-ui-browser.mjs (fails without the fix).
 
 ## Local security checkpoint, September 24, 2026
 
