@@ -4,6 +4,7 @@ import { createRequire } from 'node:module';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { pickDate } from './pick-date.mjs';
 import { adminDb, adminAuth, closeService } from './admin.mjs';
+import { Timestamp } from 'firebase-admin/firestore';
 const require = createRequire(new URL('../../package.json', import.meta.url));
 const puppeteer = require('puppeteer-core');
 const checks = [];
@@ -177,6 +178,15 @@ try {
   await voter.waitForSelector('button[title="Vote for this game"]');
   assert.equal((await read()).games[0].votes.length, 1);
   pass('Game voting and withdrawal preserve the other participant endorsement');
+  // Regression (lost once in #11): a passed deadline must offer "Reopen voting"
+  await adminDb.doc(`pollsV2/${pollId}`).update({ deadline: Timestamp.fromMillis(Date.now() - 60000) });
+  await page.reload();
+  await clickText(page, 'Reopen voting');
+  await page.waitForFunction(() => [...document.querySelectorAll('button')].some(b => b.textContent.trim() === 'Close voting'));
+  const reopened = await read();
+  assert.equal(reopened.closed, false);
+  assert.equal(reopened.deadline, undefined);
+  pass('A poll closed by a passed deadline offers Reopen voting and reopens without the deadline');
   await voter.setViewport({ width: 390, height: 844 });
   await clickText(voter, 'PL');
   await clickText(voter, '20');
