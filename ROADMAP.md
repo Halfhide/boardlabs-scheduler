@@ -57,8 +57,9 @@ features were proposed, 11 accepted, 4 rejected (see bottom).
 | 22 | Availability table UX | 7   | done        |
 | 23 | MeppleTime date picker | 7  | done        |
 | 24 | SEO + GEO pass      | 7     | done        |
-| 25 | Website analytics   | 7     | in review   |
+| 25 | Website analytics   | 7     | done        |
 | 26 | Usage stats page    | 7     | not started |
+| 27 | Landing visual pass | 7     | in review   |
 
 ## Phase 1: Poll lifecycle (foundations)
 
@@ -1232,7 +1233,8 @@ edited; plans change.
 
 ### 25. Website analytics (added 17 Nov 2026 on Adam's request)
 
-Status: in review (17 Nov 2026). Vercel Web Analytics on the landing
+Status: done (17 Nov 2026, PR #16, a03907f; verified live: a real
+browser visit is accepted by /_vercel/insights/view). Vercel Web Analytics on the landing
 project only (landing, PL page, guides, 404); the app gets none. Goal:
 see visits, top pages and referrers (ChatGPT, Perplexity, Reddit, BGG)
 that Search Console cannot show. Chosen over GA4 because GA4 sets
@@ -1260,6 +1262,41 @@ existing daily cron also writes an anonymous aggregate snapshot
 (polls expire after a year, so snapshots keep the history), and an
 in-app Stats page only Adam's account can open. No new personal data;
 check whether the Firestore rules need a change and say so loudly.
+
+### 27. Landing visual pass, "AbramsX treatment" (added 17 Nov 2026 on Adam's request)
+
+Status: in review (17 Nov 2026). Adam: give the website the AbramsX
+treatment (the codelabs.rocks name for "2026 standards, keep the
+identity, add fairy dust", 30 Oct 2026) and make it storybook, fairy
+tale, full of board-game imagination: "It needs to POP!" Built on the
+design system (two halves: sage = state, terracotta = the one action,
+never decoration; logo untouched; Caprasimo for display), with candle
+gold from the app palette as light. Landing only, plus shared parts
+the guides inherit (paper background, frosted floating nav, button
+sheen, star kickers). Hero: Caprasimo headline with a gold swash, the
+mark floating in a candlelit portal with SVG rings, drifting game
+pieces, fairy dust, a blooming sprig, popping stickers, pointer
+parallax; trust chips. How it works: a board track that draws itself
+with game-token numbers (step 3 terracotta = commitment). Screenshots
+as collectible cards with foil sheen and 3D tilt. Bento grid with
+drawn icons, a countdown and a player stack. Candlelit support card
+with a tumbling die. FAQ beside a question meeple. Guides as quest
+cards. The closing band is a night sky (twinkling stars, moon,
+fireflies, a meeple constellation that draws itself). Motion respects
+prefers-reduced-motion; without JavaScript everything is visible
+(reveals only hide content under html.js). Caprasimo has no Polish
+diacritics except o-acute: only the H1 uses it, other headings stay in
+Baloo 2. generate-pl-landing.mjs strips the motion script's runtime
+state (html.js, is-in, scrolled) before saving the Polish page.
+Round 2 (Adam's review, 17 Nov 2026): calmer hero parallax; buttons
+are carved wood with leaf sprigs that grow from opposite corners on
+hover (no glass sheen); four dice of different sizes tumble onto the
+support card; leaves and branches drawn as SVG symbols grow on the
+steps, screenshot cards, wide tiles, support card corners, guide
+numerals, under the FAQ meeple, as dark foliage in the night sky and
+as a flowering branch above the footer; switching language regrows
+the page from the toggle (cross-document view transition plus a hero
+sprout, regrow flag in sessionStorage).
 
 ## Rejected features (do not build unless Adam changes his mind)
 
@@ -1599,3 +1636,5 @@ prerequisites are resolved. PR #10 is superseded only after that merge.
   Console verified and sitemap accepted. Feature 25 (website
   analytics, Vercel Web Analytics on the landing only) in review;
   feature 26 (usage stats page) noted for later.
+- 17 Nov 2026: feature 25 done; feature 27 (landing visual pass,
+  "AbramsX treatment") in review.

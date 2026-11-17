@@ -55,13 +55,13 @@ const GUIDE_CSS = `
     .lang a[aria-current="page"] { background: var(--terra-700); color: var(--ground); }
     main { padding: 24px 0 8px; }
     .layout { display: grid; grid-template-columns: minmax(0, 720px) 230px; justify-content: space-between; gap: 56px; align-items: start; }
-    .toc { position: sticky; top: 24px; margin-top: 210px; font-size: 14.5px; }
+    .toc { position: sticky; top: 104px; margin-top: 210px; font-size: 14.5px; }
     .toc-label { font: 700 13px var(--font-body); letter-spacing: 0.14em; text-transform: uppercase; color: var(--neutral-700); margin: 0 0 10px; }
     .toc ol { list-style: none; margin: 0; padding: 0 0 0 14px; border-left: 2px solid rgb(32 30 29 / 0.12); }
     .toc li { margin: 0 0 9px; line-height: 1.35; }
     .toc a { color: var(--neutral-700); text-decoration: none; }
     .toc a:hover { color: var(--terra-700); text-decoration: underline; }
-    .article h2[id] { scroll-margin-top: 20px; }
+    .article h2[id] { scroll-margin-top: 104px; }
     .article { max-width: 720px; }
     .hub-intro { max-width: 56ch; }
     .crumbs { font-size: 14px; color: var(--neutral-700); margin: 0 0 22px; }
@@ -100,8 +100,6 @@ const GUIDE_CSS = `
     .band { background: var(--sage-700); color: var(--sage-100); border-radius: var(--radius); padding: 40px; margin: 48px 0 40px; }
     .band h2 { font-size: clamp(26px, 3.6vw, 34px); color: #fff; margin: 0 0 10px; }
     .band p { font-size: 18px; max-width: 56ch; margin: 0 0 22px; color: var(--sage-100); }
-    .btn-cream { background: var(--ground); color: var(--sage-900); }
-    .btn-cream:hover { background: #fdf7ec; }
     .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; margin: 0 0 24px; }
     .card { display: block; background: var(--surface); border-radius: var(--radius); padding: 22px 24px; text-decoration: none; color: var(--ink); transition: transform 0.2s; }
     .card:hover { transform: translateY(-3px); }
@@ -166,6 +164,18 @@ function head({ lang, title, description, path, altPaths, ogType, ld, extraMeta 
 <html lang="${lang}">
 <head>
   <meta charset="utf-8" />
+  <script>
+    // Arriving from the language toggle: regrow from where it was clicked
+    try {
+      var regrow = sessionStorage.getItem('mtRegrow');
+      if (regrow) {
+        sessionStorage.removeItem('mtRegrow');
+        var at = JSON.parse(regrow);
+        document.documentElement.style.setProperty('--vt-x', at.x + '%');
+        document.documentElement.style.setProperty('--vt-y', at.y + '%');
+      }
+    } catch (e) { /* fine */ }
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>${esc(title)}</title>
   <meta name="description" content="${esc(description)}" />
@@ -230,9 +240,24 @@ function footer(lang) {
 // Remembers the language picked in the toggle, like the landing does,
 // so the next visit to / routes straight to the chosen language.
 const LANG_SCRIPT = `  <script>
+    // The nav floats as a frosted island once the page scrolls (shared
+    // landing CSS, feature 27)
+    (function () {
+      var nav = document.querySelector('nav');
+      var onScroll = function () { nav.classList.toggle('scrolled', window.scrollY > 12); };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+    })();
     document.querySelectorAll('.lang a').forEach(function (a) {
       a.addEventListener('click', function () {
-        try { localStorage.setItem('landingLang', a.getAttribute('data-lang')); } catch (e) { /* fine */ }
+        try {
+          localStorage.setItem('landingLang', a.getAttribute('data-lang'));
+          var r = a.getBoundingClientRect();
+          sessionStorage.setItem('mtRegrow', JSON.stringify({
+            x: Math.round(((r.left + r.width / 2) / window.innerWidth) * 100),
+            y: Math.round(((r.top + r.height / 2) / window.innerHeight) * 100)
+          }));
+        } catch (e) { /* fine */ }
       });
     });
   </script>`;
