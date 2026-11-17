@@ -1,5 +1,8 @@
 # Board Game Scheduler
 
+Live as **MeppleTime**: [www.meppletime.today](https://www.meppletime.today/)
+(the app itself runs at [app.meppletime.today](https://app.meppletime.today/)).
+
 A lightweight Doodle-style app for finding the best date for a board game
 night. Create a poll with a range of candidate dates, share the link, and
 everyone votes Yes / Maybe / No on each date. Results update in real time.

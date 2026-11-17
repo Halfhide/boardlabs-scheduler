@@ -45,62 +45,169 @@
   <meta name="twitter:description" content="Share one link, friends vote on dates, and you pick the game together. Free, no accounts." />
   <meta name="twitter:image" content="https://www.meppletime.today/assets/og-card.png" />
   <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebApplication",
-    "name": "MeppleTime",
-    "url": "https://www.meppletime.today/",
-    "applicationCategory": "LifestyleApplication",
-    "operatingSystem": "Web",
-    "inLanguage": ["en", "pl"],
-    "description": "Free board game night planner: share one link, friends vote on dates, no accounts needed. Pick the game together with built-in BoardGameGeek search.",
-    "image": "https://www.meppletime.today/assets/og-card.png",
-    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-    "publisher": {
-      "@type": "Organization",
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://www.meppletime.today/#website",
       "name": "MeppleTime",
       "url": "https://www.meppletime.today/",
-      "logo": "https://www.meppletime.today/assets/mepple-mark.svg"
+      "inLanguage": [
+        "en",
+        "pl"
+      ],
+      "publisher": {
+        "@id": "https://www.meppletime.today/#organization"
+      }
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://www.meppletime.today/#organization",
+      "name": "MeppleTime",
+      "url": "https://www.meppletime.today/",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://www.meppletime.today/apple-touch-icon.png",
+        "width": 180,
+        "height": 180
+      },
+      "sameAs": [
+        "https://github.com/Halfhide/boardlabs-scheduler"
+      ]
+    },
+    {
+      "@type": "WebApplication",
+      "@id": "https://www.meppletime.today/#app",
+      "name": "MeppleTime",
+      "url": "https://www.meppletime.today/",
+      "applicationCategory": "LifestyleApplication",
+      "operatingSystem": "Any (web browser)",
+      "browserRequirements": "Requires JavaScript",
+      "inLanguage": [
+        "en",
+        "pl"
+      ],
+      "description": "Free board game night planner: share one link, friends vote on dates, no accounts needed. Pick the game together with built-in BoardGameGeek search.",
+      "featureList": [
+        "Date poll with yes, maybe and no answers",
+        "No accounts needed for voters",
+        "Group availability heatmap",
+        "Doodle-style table of everyone's answers",
+        "Optional voting deadline that closes the poll automatically",
+        "Minimum and maximum player counts",
+        "Game suggestions and voting with BoardGameGeek search",
+        "Lock the final date and see who is coming",
+        "Comments",
+        "Installable on phones as a web app",
+        "English and Polish"
+      ],
+      "screenshot": [
+        "https://www.meppletime.today/assets/shot-heatmap.png",
+        "https://www.meppletime.today/assets/shot-matrix.png",
+        "https://www.meppletime.today/assets/shot-games.png"
+      ],
+      "image": "https://www.meppletime.today/assets/og-card.png",
+      "isAccessibleForFree": true,
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "publisher": {
+        "@id": "https://www.meppletime.today/#organization"
+      }
     }
-  }
+  ]
+}
   </script>
   <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": [
-      {
-        "@type": "Question",
-        "name": "Is it free?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Yes, completely. No ads and no locked features; MeppleTime is a passion project for people who love game nights." }
-      },
-      {
-        "@type": "Question",
-        "name": "Do my friends need accounts?",
-        "acceptedAnswer": { "@type": "Answer", "text": "No. Voters open the link, type a first name and vote. Creating a poll needs no account either; signing in is optional and only keeps your polls together across devices." }
-      },
-      {
-        "@type": "Question",
-        "name": "Why not just any date poll?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Generic polls stop at dates. MeppleTime knows games have player counts, lets the group vote on what to play with BoardGameGeek search built in, and shows who is actually coming." }
-      },
-      {
-        "@type": "Question",
-        "name": "How long do polls stick around?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Until about a year after the last proposed date, then they are cleaned up automatically." }
-      },
-      {
-        "@type": "Question",
-        "name": "Does it work on phones?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Everywhere: it runs on any device with a browser, and you can install it to get an app icon on your home screen." }
-      },
-      {
-        "@type": "Question",
-        "name": "Is it available in Polish?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Yes: the whole app and this page speak Polish and English. The toggle is in the top corner." }
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How do I schedule a board game night with friends?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Create a poll with a few possible dates, share the link in your group chat and let everyone answer yes, maybe or no. The group availability view shows the best night; lock it, and everyone sees who is coming. Setting up the poll takes a minute or two."
       }
-    ]
-  }
+    },
+    {
+      "@type": "Question",
+      "name": "Is it free?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, completely. No ads and no locked features; MeppleTime is a passion project for people who love game nights."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do my friends need accounts?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Voters open the link, type a first name and vote. Creating a poll needs no account either; signing in is optional and only keeps your polls together across devices."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can we vote on which game to play?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Anyone in the poll can suggest games, with live BoardGameGeek search, and vote for every game they would enjoy. The game with the most votes shows up next to the winning date. Game voting is optional."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is MeppleTime a Doodle alternative?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "For game groups, yes. The date poll works the way you know from Doodle: one link, no accounts for voters, and yes, maybe or no on each date. On top of that, MeppleTime handles what game nights need: game suggestions and votes, player counts, and a clear view of who is coming. It is free and has no ads."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does it work on phones?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Everywhere: it runs on any device with a browser, and you can install it to get an app icon on your home screen."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is it available in Polish?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes: the whole app and this page speak Polish and English. The toggle is in the top corner."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How long do polls stick around?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Until about a year after the last proposed date, then they are cleaned up automatically."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What data does MeppleTime store?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "As little as possible: poll titles and dates, the names voters type in, votes, comments and game suggestions, plus your sign-in details if you choose to sign in. There are no ads, analytics or tracking scripts. The privacy page has the details."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Who makes MeppleTime?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "MeppleTime is an independent side project made by one board game fan. The source code is open on GitHub under the GPL-3 license."
+      }
+    }
+  ]
+}
   </script>
   <meta name="theme-color" content="#c67139" />
   <link rel="icon" type="image/svg+xml" href="/assets/mepple-mark.svg" />
@@ -355,6 +462,11 @@
     .cell h3 { font-size: 18.5px; margin-bottom: 6px; }
     .cell p { margin: 0; font-size: 15px; color: var(--neutral-700); }
 
+    /* Guide cards (feature 24) */
+    a.guide-card { display: block; text-decoration: none; color: var(--ink); transition: transform 0.2s; }
+    a.guide-card:hover { transform: translateY(-4px); }
+    .guide-card .more { display: inline-block; margin-top: 12px; font-weight: 600; font-size: 15px; color: var(--terra-700); }
+
     /* FAQ */
     .faq-list { max-width: 720px; }
     .faq {
@@ -379,7 +491,7 @@
     .band strong { color: #fff; }
 
     /* Section rhythm */
-    #how, #features-grid, #faq { margin-top: 88px; }
+    #how, #features-grid, #faq, #guides { margin-top: 88px; }
 
     /* Footer */
     /* Branded donation buttons: both platforms, always shown.
@@ -414,32 +526,33 @@
       .feature:nth-child(even) .feature-copy { order: 0; }
       .grid6 { grid-template-columns: 1fr; }
       .band { padding: 32px 24px; margin-top: 56px; }
-      #how, #features-grid, #faq, #support { margin-top: 56px; }
+      #how, #features-grid, #faq, #guides, #support { margin-top: 56px; }
     }
     @media (min-width: 821px) and (max-width: 1020px) {
       .grid6 { grid-template-columns: repeat(2, 1fr); }
     }
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
-      .step, .shot, .btn { transition: none; }
+      .step, .shot, .btn, a.guide-card { transition: none; }
     }
   </style>
 </head>
 <body>
   <div class="wrap">
     <nav>
-      <a class="brand" href="/" aria-label="MeppleTime">
+      <a class="brand" href="/" aria-label="MeppleTime" data-i18n-href="homeHref">
         <img src="/assets/mepple-mark.svg" alt="" aria-hidden="true" width="349" height="369" style="height:40px;width:auto" />
         <span class="brand-word"><span class="m">Mepple</span><span class="t">Time</span></span>
       </a>
       <span class="nav-spacer"></span>
-      <div class="lang" role="group" aria-label="Language">
+      <div class="lang" role="group" aria-label="Language" data-i18n-label="langLabel">
         <button id="lang-en" aria-pressed="true">EN</button>
         <button id="lang-pl" aria-pressed="false">PL</button>
       </div>
       <a class="btn btn-primary btn-small" href="https://app.meppletime.today/?lang=en" data-i18n="navCta">Open the app</a>
     </nav>
 
+    <main>
     <header class="hero">
       <div>
         <h1 data-i18n="heroTitle">Game night, finally scheduled.</h1>
@@ -490,7 +603,7 @@
         </div>
         <div class="shot-stage">
           <span class="blob" style="width:180px;height:180px;background:#e1eecc;right:-4%;bottom:-6%"></span>
-          <div class="shot shot-heatmap"><img src="/assets/shot-heatmap.webp" alt="Calendar heatmap of group availability" width="1256" height="1454" loading="lazy" /></div>
+          <div class="shot shot-heatmap"><img src="/assets/shot-heatmap.webp" alt="Calendar heatmap of group availability" data-i18n-alt="altHeatmap" width="1256" height="1454" loading="lazy" /></div>
         </div>
       </div>
       <div class="feature">
@@ -501,7 +614,7 @@
         </div>
         <div class="shot-stage">
           <span class="blob" style="width:160px;height:160px;background:#ffe1d0;left:-5%;top:-8%"></span>
-          <div class="shot"><img src="/assets/shot-matrix.webp" alt="Availability table with everyone's votes" width="1728" height="676" loading="lazy" /></div>
+          <div class="shot"><img src="/assets/shot-matrix.webp" alt="Availability table with everyone's votes" data-i18n-alt="altMatrix" width="1728" height="676" loading="lazy" /></div>
         </div>
       </div>
       <div class="feature">
@@ -512,7 +625,7 @@
         </div>
         <div class="shot-stage">
           <span class="blob" style="width:170px;height:170px;background:#ccdbb2;right:-4%;top:-10%"></span>
-          <div class="shot"><img src="/assets/shot-games.webp" alt="Game suggestions with votes" width="1728" height="736" loading="lazy" /></div>
+          <div class="shot"><img src="/assets/shot-games.webp" alt="Game suggestions with votes" data-i18n-alt="altGames" width="1728" height="736" loading="lazy" /></div>
         </div>
       </div>
     </section>
@@ -569,29 +682,67 @@
       <h2 class="band-title" data-i18n="faqTitle">Questions, answered</h2>
       <div class="faq-list">
         <details class="faq">
-          <summary data-i18n="faq1q">Is it free?</summary>
-          <p data-i18n="faq1a">Yes, completely. No ads and no locked features; MeppleTime is a passion project for people who love game nights.</p>
+          <summary data-i18n="faq1q">How do I schedule a board game night with friends?</summary>
+          <p data-i18n="faq1a">Create a poll with a few possible dates, share the link in your group chat and let everyone answer yes, maybe or no. The group availability view shows the best night; lock it, and everyone sees who is coming. Setting up the poll takes a minute or two.</p>
         </details>
         <details class="faq">
-          <summary data-i18n="faq2q">Do my friends need accounts?</summary>
-          <p data-i18n="faq2a">No. Voters open the link, type a first name and vote. Creating a poll needs no account either; signing in is optional and only keeps your polls together across devices.</p>
+          <summary data-i18n="faq2q">Is it free?</summary>
+          <p data-i18n="faq2a">Yes, completely. No ads and no locked features; MeppleTime is a passion project for people who love game nights.</p>
         </details>
         <details class="faq">
-          <summary data-i18n="faq3q">Why not just any date poll?</summary>
-          <p data-i18n="faq3a">Generic polls stop at dates. MeppleTime knows games have player counts, lets the group vote on what to play with BoardGameGeek search built in, and shows who is actually coming.</p>
+          <summary data-i18n="faq3q">Do my friends need accounts?</summary>
+          <p data-i18n="faq3a">No. Voters open the link, type a first name and vote. Creating a poll needs no account either; signing in is optional and only keeps your polls together across devices.</p>
         </details>
         <details class="faq">
-          <summary data-i18n="faq4q">How long do polls stick around?</summary>
-          <p data-i18n="faq4a">Until about a year after the last proposed date, then they are cleaned up automatically.</p>
+          <summary data-i18n="faq4q">Can we vote on which game to play?</summary>
+          <p data-i18n="faq4a">Yes. Anyone in the poll can suggest games, with live BoardGameGeek search, and vote for every game they would enjoy. The game with the most votes shows up next to the winning date. Game voting is optional.</p>
         </details>
         <details class="faq">
-          <summary data-i18n="faq5q">Does it work on phones?</summary>
-          <p data-i18n="faq5a">Everywhere: it runs on any device with a browser, and you can install it to get an app icon on your home screen.</p>
+          <summary data-i18n="faq5q">Is MeppleTime a Doodle alternative?</summary>
+          <p data-i18n="faq5a">For game groups, yes. The date poll works the way you know from Doodle: one link, no accounts for voters, and yes, maybe or no on each date. On top of that, MeppleTime handles what game nights need: game suggestions and votes, player counts, and a clear view of who is coming. It is free and has no ads.</p>
         </details>
         <details class="faq">
-          <summary data-i18n="faq6q">Is it available in Polish?</summary>
-          <p data-i18n="faq6a">Yes: the whole app and this page speak Polish and English. The toggle is in the top corner.</p>
+          <summary data-i18n="faq6q">Does it work on phones?</summary>
+          <p data-i18n="faq6a">Everywhere: it runs on any device with a browser, and you can install it to get an app icon on your home screen.</p>
         </details>
+        <details class="faq">
+          <summary data-i18n="faq7q">Is it available in Polish?</summary>
+          <p data-i18n="faq7a">Yes: the whole app and this page speak Polish and English. The toggle is in the top corner.</p>
+        </details>
+        <details class="faq">
+          <summary data-i18n="faq8q">How long do polls stick around?</summary>
+          <p data-i18n="faq8a">Until about a year after the last proposed date, then they are cleaned up automatically.</p>
+        </details>
+        <details class="faq">
+          <summary data-i18n="faq9q">What data does MeppleTime store?</summary>
+          <p data-i18n="faq9a">As little as possible: poll titles and dates, the names voters type in, votes, comments and game suggestions, plus your sign-in details if you choose to sign in. There are no ads, analytics or tracking scripts. The <a href="https://app.meppletime.today/privacy?lang=en">privacy page</a> has the details.</p>
+        </details>
+        <details class="faq">
+          <summary data-i18n="faq10q">Who makes MeppleTime?</summary>
+          <p data-i18n="faq10a">MeppleTime is an independent side project made by one board game fan. The source code is open <a href="https://github.com/Halfhide/boardlabs-scheduler">on GitHub</a> under the GPL-3 license.</p>
+        </details>
+      </div>
+    </section>
+
+    <section id="guides">
+      <p class="kicker" data-i18n="guidesKicker">Guides</p>
+      <h2 class="band-title" data-i18n="guidesTitle">How to plan a great game night</h2>
+      <div class="grid6">
+        <a class="cell guide-card" href="/guides/how-to-schedule-a-board-game-night/" data-i18n-href="guide1Href">
+          <h3 data-i18n="guide1Title">How to schedule a board game night</h3>
+          <p data-i18n="guide1Body">Seven steps from "when are you free?" to a night everyone can make.</p>
+          <span class="more" data-i18n="guideMore">Read the guide</span>
+        </a>
+        <a class="cell guide-card" href="/guides/doodle-alternative-for-board-game-groups/" data-i18n-href="guide2Href">
+          <h3 data-i18n="guide2Title">A Doodle alternative for game nights</h3>
+          <p data-i18n="guide2Body">How MeppleTime compares with Doodle, Rallly and chat polls.</p>
+          <span class="more" data-i18n="guideMore">Read the guide</span>
+        </a>
+        <a class="cell guide-card" href="/guides/how-to-choose-a-board-game-as-a-group/" data-i18n-href="guide3Href">
+          <h3 data-i18n="guide3Title">How to choose what to play</h3>
+          <p data-i18n="guide3Body">Filter by player count, let everyone suggest, then vote without hurt feelings.</p>
+          <span class="more" data-i18n="guideMore">Read the guide</span>
+        </a>
       </div>
     </section>
 
@@ -600,6 +751,7 @@
       <p data-i18n="bandBody"><strong>Sage</strong> is the calendar: everyone's separate weeks. <strong>Terracotta</strong> is the moment of commitment: the night you actually show up. MeppleTime stands on the seam where they meet.</p>
       <a class="btn btn-cream" href="https://app.meppletime.today/?lang=en" data-i18n="bandCta">Open MeppleTime</a>
     </section>
+    </main>
 
     <footer>
       <img src="/assets/mepple-mark.svg" alt="" aria-hidden="true" width="349" height="369" loading="lazy" style="height:22px;width:auto" />
@@ -608,7 +760,9 @@
       <span class="foot-spacer"></span>
       <a class="don-item don-small" href="https://buymeacoffee.com/halfhide" target="_blank" rel="noopener noreferrer"><span class="don-emoji" aria-hidden="true">🌍</span><span class="bmc-btn"><img src="/assets/bmc-button.png" alt="Buy me a coffee" width="545" height="153" loading="lazy" /></span></a>
       <a class="don-item don-small" href="https://buycoffee.to/halfhide" target="_blank" rel="noopener noreferrer"><span class="don-emoji" aria-hidden="true">🇵🇱</span><span class="bc-btn"><img src="/assets/buycoffee-logo.svg" alt="Postaw mi kawę na buycoffee.to" width="319" height="42" loading="lazy" /></span></a>
+      <a href="/guides/" data-i18n="footGuides" data-i18n-href="footGuidesHref">Guides</a>
       <a href="https://app.meppletime.today/privacy?lang=en" data-i18n="footPrivacy">Privacy</a>
+      <a href="https://github.com/Halfhide/boardlabs-scheduler" data-i18n="footSource">Source code</a>
       <a href="https://app.meppletime.today/?lang=en" data-i18n="footApp">Open the app</a>
     </footer>
   </div>
@@ -655,18 +809,47 @@
         g6Body: 'Voters just type a name. Results update live for everyone.',
         faqKicker: 'Good to know',
         faqTitle: 'Questions, answered',
-        faq1q: 'Is it free?',
-        faq1a: 'Yes, completely. No ads and no locked features; MeppleTime is a passion project for people who love game nights.',
-        faq2q: 'Do my friends need accounts?',
-        faq2a: 'No. Voters open the link, type a first name and vote. Creating a poll needs no account either; signing in is optional and only keeps your polls together across devices.',
-        faq3q: 'Why not just any date poll?',
-        faq3a: 'Generic polls stop at dates. MeppleTime knows games have player counts, lets the group vote on what to play with BoardGameGeek search built in, and shows who is actually coming.',
-        faq4q: 'How long do polls stick around?',
-        faq4a: 'Until about a year after the last proposed date, then they are cleaned up automatically.',
-        faq5q: 'Does it work on phones?',
-        faq5a: 'Everywhere: it runs on any device with a browser, and you can install it to get an app icon on your home screen.',
-        faq6q: 'Is it available in Polish?',
-        faq6a: 'Yes: the whole app and this page speak Polish and English. The toggle is in the top corner.',
+        faq1q: 'How do I schedule a board game night with friends?',
+        faq1a: 'Create a poll with a few possible dates, share the link in your group chat and let everyone answer yes, maybe or no. The group availability view shows the best night; lock it, and everyone sees who is coming. Setting up the poll takes a minute or two.',
+        faq2q: 'Is it free?',
+        faq2a: 'Yes, completely. No ads and no locked features; MeppleTime is a passion project for people who love game nights.',
+        faq3q: 'Do my friends need accounts?',
+        faq3a: 'No. Voters open the link, type a first name and vote. Creating a poll needs no account either; signing in is optional and only keeps your polls together across devices.',
+        faq4q: 'Can we vote on which game to play?',
+        faq4a: 'Yes. Anyone in the poll can suggest games, with live BoardGameGeek search, and vote for every game they would enjoy. The game with the most votes shows up next to the winning date. Game voting is optional.',
+        faq5q: 'Is MeppleTime a Doodle alternative?',
+        faq5a: 'For game groups, yes. The date poll works the way you know from Doodle: one link, no accounts for voters, and yes, maybe or no on each date. On top of that, MeppleTime handles what game nights need: game suggestions and votes, player counts, and a clear view of who is coming. It is free and has no ads.',
+        faq6q: 'Does it work on phones?',
+        faq6a: 'Everywhere: it runs on any device with a browser, and you can install it to get an app icon on your home screen.',
+        faq7q: 'Is it available in Polish?',
+        faq7a: 'Yes: the whole app and this page speak Polish and English. The toggle is in the top corner.',
+        faq8q: 'How long do polls stick around?',
+        faq8a: 'Until about a year after the last proposed date, then they are cleaned up automatically.',
+        faq9q: 'What data does MeppleTime store?',
+        faq9a: 'As little as possible: poll titles and dates, the names voters type in, votes, comments and game suggestions, plus your sign-in details if you choose to sign in. There are no ads, analytics or tracking scripts. The <a href="https://app.meppletime.today/privacy?lang=en">privacy page</a> has the details.',
+        faq10q: 'Who makes MeppleTime?',
+        faq10a: 'MeppleTime is an independent side project made by one board game fan. The source code is open <a href="https://github.com/Halfhide/boardlabs-scheduler">on GitHub</a> under the GPL-3 license.',
+        guide1Href: '/guides/how-to-schedule-a-board-game-night/',
+        guide1Title: 'How to schedule a board game night',
+        guide1Body: 'Seven steps from "when are you free?" to a night everyone can make.',
+        guide2Href: '/guides/doodle-alternative-for-board-game-groups/',
+        guide2Title: 'A Doodle alternative for game nights',
+        guide2Body: 'How MeppleTime compares with Doodle, Rallly and chat polls.',
+        guide3Href: '/guides/how-to-choose-a-board-game-as-a-group/',
+        guide3Title: 'How to choose what to play',
+        guide3Body: 'Filter by player count, let everyone suggest, then vote without hurt feelings.',
+        homeHref: '/',
+        guidesKicker: 'Guides',
+        guidesTitle: 'How to plan a great game night',
+        guideMore: 'Read the guide',
+        footGuides: 'Guides',
+        footGuidesHref: '/guides/',
+        footSource: 'Source code',
+        altHeatmap: 'Calendar heatmap of group availability',
+        altMatrix: 'Availability table with everyone\'s votes',
+        altGames: 'Game suggestions with votes',
+        langLabel: 'Language',
+        schemaFeatures: ['Date poll with yes, maybe and no answers', 'No accounts needed for voters', 'Group availability heatmap', 'Doodle-style table of everyone\'s answers', 'Optional voting deadline that closes the poll automatically', 'Minimum and maximum player counts', 'Game suggestions and voting with BoardGameGeek search', 'Lock the final date and see who is coming', 'Comments', 'Installable on phones as a web app', 'English and Polish'],
         bandTitle: 'Two halves, one night',
         bandBody: '<strong>Sage</strong> is the calendar: everyone\'s separate weeks. <strong>Terracotta</strong> is the moment of commitment: the night you actually show up. MeppleTime stands on the seam where they meet.',
         bandCta: 'Open MeppleTime',
@@ -719,18 +902,47 @@
         g6Body: 'Głosujący po prostu wpisują imię. Wyniki aktualizują się na żywo dla wszystkich.',
         faqKicker: 'Warto wiedzieć',
         faqTitle: 'Pytania i odpowiedzi',
-        faq1q: 'Czy to jest darmowe?',
-        faq1a: 'Tak, całkowicie. Bez reklam i bez płatnych funkcji; MeppleTime to projekt z pasji do planszówek.',
-        faq2q: 'Czy znajomi muszą zakładać konta?',
-        faq2a: 'Nie. Otwierają link, wpisują imię i głosują. Tworzenie ankiety też nie wymaga konta; logowanie jest opcjonalne i służy tylko temu, by mieć swoje ankiety na wszystkich urządzeniach.',
-        faq3q: 'Czym to się różni od zwykłej ankiety?',
-        faq3a: 'Zwykłe ankiety kończą się na datach. MeppleTime wie, że gry mają liczbę graczy, pozwala grupie głosować, w co gracie, z wbudowaną wyszukiwarką BoardGameGeek, i pokazuje, kto naprawdę przyjdzie.',
-        faq4q: 'Jak długo ankieta jest dostępna?',
-        faq4a: 'Do około roku po ostatnim zaproponowanym terminie, potem jest automatycznie usuwana.',
-        faq5q: 'Czy działa na telefonie?',
-        faq5a: 'Wszędzie: działa na każdym urządzeniu z przeglądarką, a z przeglądarki można ją zainstalować, by mieć ikonę na ekranie głównym.',
-        faq6q: 'Czy jest po polsku?',
-        faq6a: 'Tak: cała aplikacja i ta strona działają po polsku i po angielsku. Przełącznik jest w górnym rogu.',
+        faq1q: 'Jak umówić się na planszówki ze znajomymi?',
+        faq1a: 'Utwórz ankietę z kilkoma możliwymi terminami, wyślij link na czat grupy i poproś wszystkich o odpowiedź: tak, może albo nie. Widok dostępności grupy pokaże najlepszy wieczór; zatwierdź go, a wszyscy zobaczą, kto przyjdzie. Założenie ankiety zajmuje minutę lub dwie.',
+        faq2q: 'Czy to jest darmowe?',
+        faq2a: 'Tak, całkowicie. Bez reklam i bez płatnych funkcji; MeppleTime to projekt z pasji do planszówek.',
+        faq3q: 'Czy znajomi muszą zakładać konta?',
+        faq3a: 'Nie. Otwierają link, wpisują imię i głosują. Tworzenie ankiety też nie wymaga konta; logowanie jest opcjonalne i służy tylko temu, by mieć swoje ankiety na wszystkich urządzeniach.',
+        faq4q: 'Czy możemy zagłosować, w co gramy?',
+        faq4a: 'Tak. Każdy uczestnik ankiety może proponować gry z podpowiedziami z BoardGameGeek i głosować na wszystkie, w które chętnie zagra. Gra z największą liczbą głosów pojawia się obok zwycięskiego terminu. Głosowanie na gry jest opcjonalne.',
+        faq5q: 'Czy MeppleTime to alternatywa dla Doodle?',
+        faq5a: 'Dla grup planszówkowych tak. Ankieta terminów działa tak, jak znasz to z Doodle: jeden link, głosujący bez kont, przy każdej dacie tak, może albo nie. Do tego MeppleTime ma to, czego potrzebuje wieczór gier: propozycje gier i głosowanie na nie, liczbę graczy i czytelną listę osób, które przyjdą. Jest darmowy i bez reklam.',
+        faq6q: 'Czy działa na telefonie?',
+        faq6a: 'Wszędzie: działa na każdym urządzeniu z przeglądarką, a z przeglądarki można ją zainstalować, by mieć ikonę na ekranie głównym.',
+        faq7q: 'Czy jest po polsku?',
+        faq7a: 'Tak: cała aplikacja i ta strona działają po polsku i po angielsku. Przełącznik jest w górnym rogu.',
+        faq8q: 'Jak długo ankieta jest dostępna?',
+        faq8a: 'Do około roku po ostatnim zaproponowanym terminie, potem jest automatycznie usuwana.',
+        faq9q: 'Jakie dane przechowuje MeppleTime?',
+        faq9a: 'Tak mało, jak to możliwe: tytuły ankiet i daty, imiona wpisane przez głosujących, głosy, komentarze i propozycje gier, a jeśli się zalogujesz, także dane logowania. Nie ma reklam, statystyk ani skryptów śledzących. Szczegóły są na <a href="https://app.meppletime.today/privacy?lang=pl">stronie prywatności</a>.',
+        faq10q: 'Kto tworzy MeppleTime?',
+        faq10a: 'MeppleTime to niezależny projekt po godzinach, tworzony przez jednego fana planszówek. Kod źródłowy jest otwarty i dostępny <a href="https://github.com/Halfhide/boardlabs-scheduler">na GitHubie</a> na licencji GPL-3.',
+        guide1Href: '/pl/poradniki/jak-umowic-sie-na-planszowki/',
+        guide1Title: 'Jak umówić się na planszówki',
+        guide1Body: 'Siedem kroków od „kiedy wam pasuje?” do wieczoru, na który przyjdą wszyscy.',
+        guide2Href: '/pl/poradniki/alternatywa-dla-doodle-do-planszowek/',
+        guide2Title: 'Alternatywa dla Doodle do planszówek',
+        guide2Body: 'Jak MeppleTime wypada na tle Doodle, Rallly i ankiet na czacie.',
+        guide3Href: '/pl/poradniki/jak-wybrac-gre-na-wieczor-planszowkowy/',
+        guide3Title: 'Jak wybrać grę na wieczór',
+        guide3Body: 'Odsiej po liczbie graczy, zbierz propozycje i zagłosujcie tak, żeby nikt nie czuł się pominięty.',
+        homeHref: '/pl/',
+        guidesKicker: 'Poradniki',
+        guidesTitle: 'Jak dobrze zaplanować wieczór gier',
+        guideMore: 'Przeczytaj poradnik',
+        footGuides: 'Poradniki',
+        footGuidesHref: '/pl/poradniki/',
+        footSource: 'Kod źródłowy',
+        altHeatmap: 'Kalendarz z mapą dostępności grupy',
+        altMatrix: 'Tabela dostępności z głosami wszystkich',
+        altGames: 'Propozycje gier z głosami',
+        langLabel: 'Język',
+        schemaFeatures: ['Ankieta terminów z odpowiedziami tak, może i nie', 'Głosujący nie zakładają kont', 'Mapa dostępności grupy', 'Tabela odpowiedzi wszystkich w stylu Doodle', 'Opcjonalny termin głosowania, który sam zamyka ankietę', 'Minimalna i maksymalna liczba graczy', 'Propozycje gier i głosowanie z wyszukiwarką BoardGameGeek', 'Zatwierdzanie terminu i lista osób, które przyjdą', 'Komentarze', 'Instalacja na telefonie jako aplikacja webowa', 'Wersja polska i angielska'],
         bandTitle: 'Dwie połowy, jeden wieczór',
         bandBody: '<strong>Szałwia</strong> to kalendarz: osobne tygodnie każdego z nas. <strong>Terakota</strong> to moment decyzji: wieczór, na który naprawdę przychodzisz. MeppleTime stoi na szwie, gdzie się spotykają.',
         bandCta: 'Otwórz MeppleTime',
@@ -752,6 +964,9 @@
     // which loads the page headlessly and calls setLang('pl').
     // Keep STRINGS and setLang in sync with the markup; after any
     // copy change, re-run: node scripts/generate-pl-landing.mjs
+    // Strings that carry markup (links, bold); everything else is text
+    const HTML_KEYS = ['bandBody', 'faq9a', 'faq10a'];
+
     function setLang(lang) {
       const dict = STRINGS[lang];
       document.documentElement.lang = lang;
@@ -760,9 +975,16 @@
       document.querySelectorAll('[data-i18n]').forEach((el) => {
         const key = el.getAttribute('data-i18n');
         if (!dict[key]) return;
-        if (key === 'bandBody') el.innerHTML = dict[key];
+        if (HTML_KEYS.includes(key)) el.innerHTML = dict[key];
         else el.textContent = dict[key];
       });
+      const setAttrs = (dataAttr, attr) => document.querySelectorAll('[' + dataAttr + ']').forEach((el) => {
+        const value = dict[el.getAttribute(dataAttr)];
+        if (value) el.setAttribute(attr, value);
+      });
+      setAttrs('data-i18n-href', 'href');
+      setAttrs('data-i18n-alt', 'alt');
+      setAttrs('data-i18n-label', 'aria-label');
       document.getElementById('lang-en').setAttribute('aria-pressed', String(lang === 'en'));
       document.getElementById('lang-pl').setAttribute('aria-pressed', String(lang === 'pl'));
     }

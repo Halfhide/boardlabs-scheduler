@@ -1,0 +1,35 @@
+# MeppleTime
+
+> MeppleTime is a free web app for scheduling board game nights. The organizer proposes possible dates and shares one link; friends vote yes, maybe or no on each date without creating an account, and the group can also suggest board games (with BoardGameGeek search) and vote on what to play. It is available in English and Polish.
+
+Key facts:
+
+- Free, with no ads, no paid tier and no tracking scripts. An independent, open-source side project (GPL-3).
+- Works in any browser on phones and computers and can be installed to the home screen. There is nothing to download from an app store.
+- Voters only type a name. Creating a poll needs no account either; signing in (Google or an emailed link) is optional and keeps your polls on every device.
+- Features: yes/maybe/no voting on dates, a group availability heatmap, a Doodle-style table of everyone's answers, optional voting deadline, minimum and maximum player counts, game suggestions and voting with BoardGameGeek search, locking the final date, comments.
+- Polls propose whole days, not time slots. They are deleted automatically about a year after their last proposed date.
+- Made for board game groups, but it works for any small group picking a date.
+
+## Main pages
+
+- [MeppleTime (English)](https://www.meppletime.today/): what it is, how it works, FAQ
+- [MeppleTime (Polski)](https://www.meppletime.today/pl/): the same page in Polish
+- [Open the app](https://app.meppletime.today/): create a poll
+
+## Guides (English)
+
+- [How to schedule a board game night with friends](https://www.meppletime.today/guides/how-to-schedule-a-board-game-night/): Get game night on the calendar: propose a few dates, share one poll link, set a deadline and check the player count before you lock the night.
+- [A Doodle alternative built for board game nights](https://www.meppletime.today/guides/doodle-alternative-for-board-game-groups/): How MeppleTime compares with Doodle, Rallly and chat polls for planning board game nights: date voting, game voting, player counts and free-plan limits.
+- [How to choose what to play at game night](https://www.meppletime.today/guides/how-to-choose-a-board-game-as-a-group/): Pick the game for game night without a long debate: filter by player count and time, collect suggestions, then vote for everything you would enjoy.
+
+## Poradniki (Polski)
+
+- [Jak umówić się na planszówki ze znajomymi](https://www.meppletime.today/pl/poradniki/jak-umowic-sie-na-planszowki/): Jak ustalić termin planszówek: kilka konkretnych dat, jeden link do ankiety, termin głosowania i liczba graczy sprawdzona, zanim zaklepiesz wieczór.
+- [Alternatywa dla Doodle stworzona z myślą o planszówkach](https://www.meppletime.today/pl/poradniki/alternatywa-dla-doodle-do-planszowek/): Porównanie MeppleTime z Doodle, Rallly i ankietami na czacie przy planowaniu planszówek: głosowanie na terminy i gry, liczba graczy, limity darmowych planów.
+- [Jak wybrać grę na wieczór planszówkowy](https://www.meppletime.today/pl/poradniki/jak-wybrac-gre-na-wieczor-planszowkowy/): Jak wybrać grę bez długiej dyskusji: odsiej tytuły po liczbie graczy i czasie, zbierz propozycje, a potem głosujcie na wszystko, w co chętnie zagracie.
+
+## Optional
+
+- [Privacy](https://app.meppletime.today/privacy): what is stored, where, and for how long
+- [Source code](https://github.com/Halfhide/boardlabs-scheduler): the full app, GPL-3
