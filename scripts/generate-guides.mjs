@@ -100,8 +100,6 @@ const GUIDE_CSS = `
     .band { background: var(--sage-700); color: var(--sage-100); border-radius: var(--radius); padding: 40px; margin: 48px 0 40px; }
     .band h2 { font-size: clamp(26px, 3.6vw, 34px); color: #fff; margin: 0 0 10px; }
     .band p { font-size: 18px; max-width: 56ch; margin: 0 0 22px; color: var(--sage-100); }
-    .btn-cream { background: var(--ground); color: var(--sage-900); }
-    .btn-cream:hover { background: #fdf7ec; }
     .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; margin: 0 0 24px; }
     .card { display: block; background: var(--surface); border-radius: var(--radius); padding: 22px 24px; text-decoration: none; color: var(--ink); transition: transform 0.2s; }
     .card:hover { transform: translateY(-3px); }
@@ -166,6 +164,18 @@ function head({ lang, title, description, path, altPaths, ogType, ld, extraMeta 
 <html lang="${lang}">
 <head>
   <meta charset="utf-8" />
+  <script>
+    // Arriving from the language toggle: regrow from where it was clicked
+    try {
+      var regrow = sessionStorage.getItem('mtRegrow');
+      if (regrow) {
+        sessionStorage.removeItem('mtRegrow');
+        var at = JSON.parse(regrow);
+        document.documentElement.style.setProperty('--vt-x', at.x + '%');
+        document.documentElement.style.setProperty('--vt-y', at.y + '%');
+      }
+    } catch (e) { /* fine */ }
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>${esc(title)}</title>
   <meta name="description" content="${esc(description)}" />
@@ -240,7 +250,14 @@ const LANG_SCRIPT = `  <script>
     })();
     document.querySelectorAll('.lang a').forEach(function (a) {
       a.addEventListener('click', function () {
-        try { localStorage.setItem('landingLang', a.getAttribute('data-lang')); } catch (e) { /* fine */ }
+        try {
+          localStorage.setItem('landingLang', a.getAttribute('data-lang'));
+          var r = a.getBoundingClientRect();
+          sessionStorage.setItem('mtRegrow', JSON.stringify({
+            x: Math.round(((r.left + r.width / 2) / window.innerWidth) * 100),
+            y: Math.round(((r.top + r.height / 2) / window.innerHeight) * 100)
+          }));
+        } catch (e) { /* fine */ }
       });
     });
   </script>`;

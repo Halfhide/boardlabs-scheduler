@@ -1288,6 +1288,15 @@ prefers-reduced-motion; without JavaScript everything is visible
 diacritics except o-acute: only the H1 uses it, other headings stay in
 Baloo 2. generate-pl-landing.mjs strips the motion script's runtime
 state (html.js, is-in, scrolled) before saving the Polish page.
+Round 2 (Adam's review, 17 Nov 2026): calmer hero parallax; buttons
+are carved wood with leaf sprigs that grow from opposite corners on
+hover (no glass sheen); four dice of different sizes tumble onto the
+support card; leaves and branches drawn as SVG symbols grow on the
+steps, screenshot cards, wide tiles, support card corners, guide
+numerals, under the FAQ meeple, as dark foliage in the night sky and
+as a flowering branch above the footer; switching language regrows
+the page from the toggle (cross-document view transition plus a hero
+sprout, regrow flag in sessionStorage).
 
 ## Rejected features (do not build unless Adam changes his mind)
 
