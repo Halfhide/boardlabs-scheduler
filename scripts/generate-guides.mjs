@@ -136,6 +136,11 @@ const FONT_PRELOADS = [
   'caprasimo-latin-400-normal.woff2'
 ].map((f) => `  <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/${f}" crossorigin />`).join('\n');
 
+// Vercel Web Analytics (feature 25), same snippet as landing/index.html
+const ANALYTICS = `  <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
+  <script defer src="/_vercel/insights/script.js"></script>
+`;
+
 const jsonLd = (data) =>
   `  <script type="application/ld+json">\n${JSON.stringify(data, null, 2)}\n  </script>`;
 
@@ -176,7 +181,7 @@ ${path ? `  <meta property="og:url" content="${abs(path)}" />\n` : ''}  <meta pr
   <meta name="twitter:title" content="${esc(title)}" />
   <meta name="twitter:description" content="${esc(description)}" />
   <meta name="twitter:image" content="${SITE}/assets/og-card.png" />
-${extraMeta}${ld ? ld + '\n' : ''}  <meta name="theme-color" content="#c67139" />
+${extraMeta}${ld ? ld + '\n' : ''}${ANALYTICS}  <meta name="theme-color" content="#c67139" />
   <link rel="icon" type="image/svg+xml" href="/assets/mepple-mark.svg" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 ${FONT_PRELOADS}
@@ -462,7 +467,7 @@ function llmsTxt() {
 
 Key facts:
 
-- Free, with no ads, no paid tier and no tracking scripts. An independent, open-source side project (GPL-3).
+- Free, with no ads and no paid tier. The app has no analytics or tracking scripts; this website counts page views anonymously with Vercel Web Analytics. An independent, open-source side project (GPL-3).
 - Works in any browser on phones and computers and can be installed to the home screen. There is nothing to download from an app store.
 - Voters only type a name. Creating a poll needs no account either; signing in (Google or an emailed link) is optional and keeps your polls on every device.
 - Features: yes/maybe/no voting on dates, a group availability heatmap, a Doodle-style table of everyone's answers, optional voting deadline, minimum and maximum player counts, game suggestions and voting with BoardGameGeek search, locking the final date, comments.
