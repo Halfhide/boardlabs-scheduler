@@ -23,6 +23,11 @@ listed there as rejected.
 
 - `npm run dev` for the dev server, `npm run lint`, `npm run build`,
   `npm test` (vitest unit suite for the pure logic in src/utils).
+- Landing (`landing/`, static, no build): after editing
+  `landing/index.html` run `node scripts/generate-pl-landing.mjs`
+  (Polish page) and `node scripts/generate-guides.mjs` (guide pages,
+  sitemap.xml, llms.txt, 404.html; content in `scripts/guides/`).
+  CI fails when either output is stale.
 - The unit tests cover pure logic only. Verify features by driving
   the app in the browser (dev server + real interaction), not just
   lint/test/build.

@@ -1,13 +1,73 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://www.meppletime.today/</loc>
-    <changefreq>monthly</changefreq>
-    <priority>1.0</priority>
+    <lastmod>2026-11-17</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.meppletime.today/" />
+    <xhtml:link rel="alternate" hreflang="pl" href="https://www.meppletime.today/pl/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.meppletime.today/" />
   </url>
   <url>
     <loc>https://www.meppletime.today/pl/</loc>
-    <changefreq>monthly</changefreq>
-    <priority>1.0</priority>
+    <lastmod>2026-11-17</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.meppletime.today/" />
+    <xhtml:link rel="alternate" hreflang="pl" href="https://www.meppletime.today/pl/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.meppletime.today/" />
+  </url>
+  <url>
+    <loc>https://www.meppletime.today/guides/</loc>
+    <lastmod>2026-11-17</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.meppletime.today/guides/" />
+    <xhtml:link rel="alternate" hreflang="pl" href="https://www.meppletime.today/pl/poradniki/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.meppletime.today/guides/" />
+  </url>
+  <url>
+    <loc>https://www.meppletime.today/pl/poradniki/</loc>
+    <lastmod>2026-11-17</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.meppletime.today/guides/" />
+    <xhtml:link rel="alternate" hreflang="pl" href="https://www.meppletime.today/pl/poradniki/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.meppletime.today/guides/" />
+  </url>
+  <url>
+    <loc>https://www.meppletime.today/guides/how-to-schedule-a-board-game-night/</loc>
+    <lastmod>2026-11-17</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.meppletime.today/guides/how-to-schedule-a-board-game-night/" />
+    <xhtml:link rel="alternate" hreflang="pl" href="https://www.meppletime.today/pl/poradniki/jak-umowic-sie-na-planszowki/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.meppletime.today/guides/how-to-schedule-a-board-game-night/" />
+  </url>
+  <url>
+    <loc>https://www.meppletime.today/pl/poradniki/jak-umowic-sie-na-planszowki/</loc>
+    <lastmod>2026-11-17</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.meppletime.today/guides/how-to-schedule-a-board-game-night/" />
+    <xhtml:link rel="alternate" hreflang="pl" href="https://www.meppletime.today/pl/poradniki/jak-umowic-sie-na-planszowki/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.meppletime.today/guides/how-to-schedule-a-board-game-night/" />
+  </url>
+  <url>
+    <loc>https://www.meppletime.today/guides/doodle-alternative-for-board-game-groups/</loc>
+    <lastmod>2026-11-17</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.meppletime.today/guides/doodle-alternative-for-board-game-groups/" />
+    <xhtml:link rel="alternate" hreflang="pl" href="https://www.meppletime.today/pl/poradniki/alternatywa-dla-doodle-do-planszowek/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.meppletime.today/guides/doodle-alternative-for-board-game-groups/" />
+  </url>
+  <url>
+    <loc>https://www.meppletime.today/pl/poradniki/alternatywa-dla-doodle-do-planszowek/</loc>
+    <lastmod>2026-11-17</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.meppletime.today/guides/doodle-alternative-for-board-game-groups/" />
+    <xhtml:link rel="alternate" hreflang="pl" href="https://www.meppletime.today/pl/poradniki/alternatywa-dla-doodle-do-planszowek/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.meppletime.today/guides/doodle-alternative-for-board-game-groups/" />
+  </url>
+  <url>
+    <loc>https://www.meppletime.today/guides/how-to-choose-a-board-game-as-a-group/</loc>
+    <lastmod>2026-11-17</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.meppletime.today/guides/how-to-choose-a-board-game-as-a-group/" />
+    <xhtml:link rel="alternate" hreflang="pl" href="https://www.meppletime.today/pl/poradniki/jak-wybrac-gre-na-wieczor-planszowkowy/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.meppletime.today/guides/how-to-choose-a-board-game-as-a-group/" />
+  </url>
+  <url>
+    <loc>https://www.meppletime.today/pl/poradniki/jak-wybrac-gre-na-wieczor-planszowkowy/</loc>
+    <lastmod>2026-11-17</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.meppletime.today/guides/how-to-choose-a-board-game-as-a-group/" />
+    <xhtml:link rel="alternate" hreflang="pl" href="https://www.meppletime.today/pl/poradniki/jak-wybrac-gre-na-wieczor-planszowkowy/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.meppletime.today/guides/how-to-choose-a-board-game-as-a-group/" />
   </url>
 </urlset>
