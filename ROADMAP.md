@@ -56,7 +56,9 @@ features were proposed, 11 accepted, 4 rejected (see bottom).
 | 16 | Enriched my-polls   | 7     | not started |
 | 22 | Availability table UX | 7   | done        |
 | 23 | MeppleTime date picker | 7  | done        |
-| 24 | SEO + GEO pass      | 7     | in review   |
+| 24 | SEO + GEO pass      | 7     | done        |
+| 25 | Website analytics   | 7     | in review   |
+| 26 | Usage stats page    | 7     | not started |
 
 ## Phase 1: Poll lifecycle (foundations)
 
@@ -1190,7 +1192,9 @@ dropdown lists are still the OS-native menus.
 
 ### 24. SEO + GEO pass (added 17 Nov 2026 on Adam's request)
 
-Status: in review (PR open, 17 Nov 2026). Adam: "this badly needs SEO
+Status: done (17 Nov 2026, commit 1f615d4, PR #15). Verified on
+production the same day; Search Console verified (Domain property,
+TXT in Vercel DNS) and the sitemap accepted. Adam: "this badly needs SEO
 and GEO optimisation". Findings that day: no search engine returned
 anything for "meppletime"; Search Console was never set up; asked for
 a "Doodle alternative for board game groups" (EN and PL), AI search
@@ -1225,6 +1229,37 @@ Webmaster Tools with the sitemap, then listings at announcement time
 (AlternativeTo, BGG forum, r/boardgames, Product Hunt). Re-check the
 comparison table against the vendors' pages whenever that guide is
 edited; plans change.
+
+### 25. Website analytics (added 17 Nov 2026 on Adam's request)
+
+Status: in review (17 Nov 2026). Vercel Web Analytics on the landing
+project only (landing, PL page, guides, 404); the app gets none. Goal:
+see visits, top pages and referrers (ChatGPT, Perplexity, Reddit, BGG)
+that Search Console cannot show. Chosen over GA4 because GA4 sets
+cookies (consent banner) and contradicts the "no tracking" promise.
+Facts from Vercel's docs (17 Nov 2026): free on Hobby up to 50,000
+events/month, one-month reporting window, custom events Pro only;
+visitors are identified by a hash of the request instead of
+third-party cookies, discarded after 24 hours, not tied to a person or
+IP address. Vercel does not claim GDPR compliance or that no consent
+banner is needed, so our texts do not claim it either. Privacy page
+(app), landing FAQ 9 and llms.txt now say the app has no analytics
+and the website counts page views anonymously. Analytics must be
+enabled in the meppletime-landing project BEFORE this ships, or the
+script path does not exist.
+
+### 26. Usage stats page (added 17 Nov 2026, later, on Adam's request)
+
+Status: not started (Adam: "we'll do that later"). Question it
+answers: are people actually using the app? Measure from the app's
+own Firestore data, no tracker: game nights locked (polls with a
+finalized date, the main number), polls created, polls with 3+
+voters, voters per poll, feature use (game voting, deadline, player
+counts), returning organizers and new accounts, per week. Plan: the
+existing daily cron also writes an anonymous aggregate snapshot
+(polls expire after a year, so snapshots keep the history), and an
+in-app Stats page only Adam's account can open. No new personal data;
+check whether the Firestore rules need a change and say so loudly.
 
 ## Rejected features (do not build unless Adam changes his mind)
 
@@ -1560,3 +1595,7 @@ prerequisites are resolved. PR #10 is superseded only after that merge.
   pages with a sourced Doodle/Rallly comparison, FAQ 6 -> 10, richer
   JSON-LD, llms.txt, 404 page, favicon.ico, sitemap with hreflang,
   trailing-slash and index.html redirects. Landing project only.
+- 17 Nov 2026: feature 24 live and verified on production; Search
+  Console verified and sitemap accepted. Feature 25 (website
+  analytics, Vercel Web Analytics on the landing only) in review;
+  feature 26 (usage stats page) noted for later.
