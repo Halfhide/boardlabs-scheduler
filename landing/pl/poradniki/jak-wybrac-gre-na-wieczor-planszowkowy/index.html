@@ -224,24 +224,36 @@
     :root {
       --ground: #f5ead8;
       --surface: #ebddc5;
+      --paper: #f9f4ed;
       --ink: #201e1d;
       --terra: #c67139;
+      --terra-100: #fff2eb;
       --terra-600: #b2622d;
       --terra-700: #8c491a;
       --terra-800: #6f3a15;
-      --terra-100: #fff2eb;
       --sage: #7a8a5e;
       --sage-100: #f0fae1;
       --sage-200: #e1eecc;
+      --sage-300: #ccdbb2;
+      --sage-400: #aebf92;
+      --sage-500: #8fa073;
       --sage-700: #56633f;
       --sage-800: #3d472b;
       --sage-900: #272e1b;
+      --gold: #d9a13f;
+      --gold-100: #faeed3;
+      --gold-200: #f3ddab;
+      --gold-300: #e8c274;
+      --gold-900: #5c3e0e;
+      --neutral-300: #dcd3c4;
       --neutral-600: #82796a;
       --neutral-700: #645c50;
       --radius: 28px;
       --radius-sm: 16px;
       --shadow-md: 0 3px 10px rgb(46 43 37 / 0.16);
       --shadow-lg: 0 12px 32px rgb(46 43 37 / 0.22);
+      --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+      --ease-pop: cubic-bezier(0.34, 1.56, 0.64, 1);
       --font-heading: "Baloo 2", system-ui, sans-serif;
       --font-logo: "Caprasimo", system-ui, sans-serif;
       --font-body: "Figtree", system-ui, sans-serif;
@@ -258,21 +270,35 @@
       -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
     }
+    /* Storybook paper (AbramsX pass, 17 Nov 2026): candlelight and sage
+       light over a faint paper grain, fixed behind every page */
+    body::before {
+      content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+      background:
+        radial-gradient(60vmax 42vmax at 95% -10%, rgb(243 221 171 / 0.6), transparent 70%),
+        radial-gradient(55vmax 50vmax at -15% 35%, rgb(225 238 204 / 0.7), transparent 70%),
+        radial-gradient(45vmax 40vmax at 105% 95%, rgb(250 238 211 / 0.7), transparent 70%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .28 0 0 0 0 .16 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
     h1, h2, h3 { font-family: var(--font-heading); font-weight: 700; line-height: 1.12; letter-spacing: -0.015em; margin: 0; }
     a { color: var(--terra-700); }
     :focus-visible { outline: 2px solid var(--terra); outline-offset: 2px; }
     ::selection { background: rgb(198 113 57 / 0.3); }
     .wrap { max-width: 1060px; margin: 0 auto; padding: 0 20px; }
-    section { scroll-margin-top: 24px; }
+    section { scroll-margin-top: 96px; }
     .kicker {
+      display: inline-flex; align-items: center; gap: 8px;
       font: 700 13px var(--font-body); letter-spacing: 0.14em; text-transform: uppercase;
       color: var(--terra-700); margin: 0 0 10px;
     }
+    .kicker::before { content: "\2726"; color: var(--gold); font-size: 13px; letter-spacing: 0; }
     .kicker.sage { color: var(--sage-700); }
 
-    /* Nav */
+    /* Nav: a floating frosted island on desktop once the page scrolls */
     nav { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; padding: 18px 0; }
     .brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
+    .brand img { transition: transform 0.4s var(--ease-pop); }
+    .brand:hover img { transform: rotate(-8deg) scale(1.06); }
     .brand-word { font-family: var(--font-logo); font-size: 26px; }
     .brand-word .m { color: var(--sage-700); }
     .brand-word .t { color: var(--terra-600); }
@@ -280,19 +306,48 @@
     .lang { display: inline-flex; border: 1px solid rgb(32 30 29 / 0.25); border-radius: 999px; overflow: hidden; }
     .lang button { border: 0; background: var(--surface); color: var(--neutral-700); font: 600 13px var(--font-body); padding: 6px 12px; cursor: pointer; }
     .lang button[aria-pressed="true"] { background: var(--terra-700); color: var(--ground); }
+    @media (max-width: 480px) {
+      nav .btn { display: none; }
+    }
+    @media (min-width: 821px) {
+      nav {
+        position: sticky; top: 12px; z-index: 50; margin: 12px -18px 0; padding: 10px 18px;
+        border-radius: 999px; border: 1px solid transparent;
+        transition: background-color 0.35s, box-shadow 0.35s, border-color 0.35s;
+      }
+      nav.scrolled {
+        background: rgb(249 244 237 / 0.72);
+        -webkit-backdrop-filter: blur(14px) saturate(1.4); backdrop-filter: blur(14px) saturate(1.4);
+        border-color: rgb(255 255 255 / 0.7);
+        box-shadow: 0 12px 34px rgb(46 43 37 / 0.14), 0 1px 0 rgb(255 255 255 / 0.8) inset;
+      }
+    }
+
+    /* Buttons: lift, a soft glow and a sheen that sweeps across on hover */
     .btn {
+      position: relative; isolation: isolate; overflow: hidden;
       display: inline-flex; align-items: center; justify-content: center; gap: 8px;
       font: 600 16px var(--font-body); text-decoration: none; cursor: pointer;
       border-radius: 999px; padding: 12px 26px; border: 1px solid transparent;
-      transition: background-color 0.15s, transform 0.15s;
+      transition: background-color 0.2s, transform 0.3s var(--ease-pop), box-shadow 0.3s;
     }
-    .btn-primary { background: var(--terra-700); color: var(--ground); }
-    .btn-primary:hover { background: var(--terra-800); transform: translateY(-1px); }
+    .btn::after {
+      content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+      background: linear-gradient(110deg, transparent 30%, rgb(255 255 255 / 0.32) 48%, rgb(250 238 211 / 0.28) 54%, transparent 70%);
+      transform: translateX(-130%); transition: transform 0.7s var(--ease-out);
+    }
+    .btn:hover::after { transform: translateX(130%); }
+    .btn-primary { background: var(--terra-700); color: var(--ground); box-shadow: 0 6px 18px rgb(140 73 26 / 0.28); }
+    .btn-primary:hover { background: var(--terra-800); transform: translateY(-2px); box-shadow: 0 12px 28px rgb(140 73 26 / 0.34); }
     .btn-ghost { color: var(--terra-700); }
-    .btn-ghost:hover { background: rgb(198 113 57 / 0.1); }
-    .btn-cream { background: var(--ground); color: var(--sage-900); }
-    .btn-cream:hover { background: #fdf7ec; }
+    .btn-ghost:hover { background: rgb(198 113 57 / 0.1); transform: translateY(-1px); }
+    .btn-cream { background: var(--ground); color: var(--sage-900); box-shadow: 0 8px 24px rgb(0 0 0 / 0.25); }
+    .btn-cream:hover { background: #fdf7ec; transform: translateY(-2px); box-shadow: 0 0 0 6px rgb(243 221 171 / 0.18), 0 12px 30px rgb(0 0 0 / 0.3); }
     .btn-small { padding: 8px 18px; font-size: 14px; }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .btn, .btn::after, .brand img, nav { transition: none; }
+    }
 
     /* Guide pages (feature 24) */
     .nav-link { font: 600 15px var(--font-body); color: var(--ink); text-decoration: none; padding: 8px 4px; }
@@ -301,13 +356,13 @@
     .lang a[aria-current="page"] { background: var(--terra-700); color: var(--ground); }
     main { padding: 24px 0 8px; }
     .layout { display: grid; grid-template-columns: minmax(0, 720px) 230px; justify-content: space-between; gap: 56px; align-items: start; }
-    .toc { position: sticky; top: 24px; margin-top: 210px; font-size: 14.5px; }
+    .toc { position: sticky; top: 104px; margin-top: 210px; font-size: 14.5px; }
     .toc-label { font: 700 13px var(--font-body); letter-spacing: 0.14em; text-transform: uppercase; color: var(--neutral-700); margin: 0 0 10px; }
     .toc ol { list-style: none; margin: 0; padding: 0 0 0 14px; border-left: 2px solid rgb(32 30 29 / 0.12); }
     .toc li { margin: 0 0 9px; line-height: 1.35; }
     .toc a { color: var(--neutral-700); text-decoration: none; }
     .toc a:hover { color: var(--terra-700); text-decoration: underline; }
-    .article h2[id] { scroll-margin-top: 20px; }
+    .article h2[id] { scroll-margin-top: 104px; }
     .article { max-width: 720px; }
     .hub-intro { max-width: 56ch; }
     .crumbs { font-size: 14px; color: var(--neutral-700); margin: 0 0 22px; }
@@ -471,6 +526,14 @@
     </footer>
   </div>
   <script>
+    // The nav floats as a frosted island once the page scrolls (shared
+    // landing CSS, feature 27)
+    (function () {
+      var nav = document.querySelector('nav');
+      var onScroll = function () { nav.classList.toggle('scrolled', window.scrollY > 12); };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+    })();
     document.querySelectorAll('.lang a').forEach(function (a) {
       a.addEventListener('click', function () {
         try { localStorage.setItem('landingLang', a.getAttribute('data-lang')); } catch (e) { /* fine */ }

@@ -46,6 +46,13 @@ const html = await page.evaluate(() => {
   setLang('pl');
   const pl = STRINGS.pl;
 
+  // The page ran its motion script while loading here: strip the state
+  // it left behind so the Polish file starts clean like the English one
+  // (feature 27)
+  document.documentElement.classList.remove('js');
+  if (!document.documentElement.getAttribute('class')) document.documentElement.removeAttribute('class');
+  document.querySelectorAll('.is-in, .scrolled').forEach((el) => el.classList.remove('is-in', 'scrolled'));
+
   const setAttr = (sel, attr, value) => {
     const el = document.head.querySelector(sel);
     if (el) el.setAttribute(attr, value);

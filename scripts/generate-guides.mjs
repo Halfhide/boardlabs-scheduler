@@ -55,13 +55,13 @@ const GUIDE_CSS = `
     .lang a[aria-current="page"] { background: var(--terra-700); color: var(--ground); }
     main { padding: 24px 0 8px; }
     .layout { display: grid; grid-template-columns: minmax(0, 720px) 230px; justify-content: space-between; gap: 56px; align-items: start; }
-    .toc { position: sticky; top: 24px; margin-top: 210px; font-size: 14.5px; }
+    .toc { position: sticky; top: 104px; margin-top: 210px; font-size: 14.5px; }
     .toc-label { font: 700 13px var(--font-body); letter-spacing: 0.14em; text-transform: uppercase; color: var(--neutral-700); margin: 0 0 10px; }
     .toc ol { list-style: none; margin: 0; padding: 0 0 0 14px; border-left: 2px solid rgb(32 30 29 / 0.12); }
     .toc li { margin: 0 0 9px; line-height: 1.35; }
     .toc a { color: var(--neutral-700); text-decoration: none; }
     .toc a:hover { color: var(--terra-700); text-decoration: underline; }
-    .article h2[id] { scroll-margin-top: 20px; }
+    .article h2[id] { scroll-margin-top: 104px; }
     .article { max-width: 720px; }
     .hub-intro { max-width: 56ch; }
     .crumbs { font-size: 14px; color: var(--neutral-700); margin: 0 0 22px; }
@@ -230,6 +230,14 @@ function footer(lang) {
 // Remembers the language picked in the toggle, like the landing does,
 // so the next visit to / routes straight to the chosen language.
 const LANG_SCRIPT = `  <script>
+    // The nav floats as a frosted island once the page scrolls (shared
+    // landing CSS, feature 27)
+    (function () {
+      var nav = document.querySelector('nav');
+      var onScroll = function () { nav.classList.toggle('scrolled', window.scrollY > 12); };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+    })();
     document.querySelectorAll('.lang a').forEach(function (a) {
       a.addEventListener('click', function () {
         try { localStorage.setItem('landingLang', a.getAttribute('data-lang')); } catch (e) { /* fine */ }
